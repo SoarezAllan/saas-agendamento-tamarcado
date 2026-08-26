@@ -115,3 +115,4 @@ export async function getMercadoPagoPayment(paymentId: string | number) {
 
   return response.json();
 }
+

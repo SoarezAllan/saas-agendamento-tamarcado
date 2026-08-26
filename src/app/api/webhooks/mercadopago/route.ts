@@ -96,3 +96,4 @@ export async function GET(req: NextRequest) {
   // Healthcheck for webhook endpoint
   return NextResponse.json({ status: 'Mercado Pago Webhook Endpoint Active' });
 }
+

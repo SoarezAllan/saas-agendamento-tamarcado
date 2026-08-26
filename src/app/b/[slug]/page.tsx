@@ -369,12 +369,15 @@ export default function PublicBookingPage({
 
       {/* Public Footer */}
       <footer className="py-6 text-center text-xs text-zinc-400">
-        <p className="flex items-center justify-center gap-1.5">
+        <div className="flex items-center justify-center gap-2">
           <span>Agendamento Online powered by</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="TáMarcado" className="w-4 h-4 object-contain inline-block" />
-          <strong className="text-zinc-700 dark:text-zinc-300">TáMarcado</strong>
-        </p>
+          <img
+            src="/logo.png"
+            alt="Tá Marcado"
+            className="h-5 w-auto object-contain inline-block dark:bg-white dark:rounded-md dark:px-1"
+          />
+        </div>
       </footer>
     </div>
   );
