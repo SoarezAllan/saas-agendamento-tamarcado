@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Clock, Tag, Search, Check, HelpCircle } from 'lucide-react';
+import { Clock, Tag, Search, Check, HelpCircle, MessageCircle, ExternalLink } from 'lucide-react';
 import { formatCurrency, formatDuration } from '@/lib/utils';
 
 interface ServiceItem {
@@ -19,6 +19,8 @@ interface ServiceStepProps {
   selectedService: ServiceItem | null;
   onSelectService: (service: ServiceItem) => void;
   primaryColor?: string;
+  businessPhone?: string | null;
+  businessName?: string;
 }
 
 export function ServiceStep({
@@ -26,6 +28,8 @@ export function ServiceStep({
   selectedService,
   onSelectService,
   primaryColor = '#2563eb',
+  businessPhone,
+  businessName,
 }: ServiceStepProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -42,6 +46,13 @@ export function ServiceStep({
 
     return matchesSearch && matchesCategory;
   });
+
+  const cleanPhone = (businessPhone || '').replace(/\D/g, '');
+  const phoneWithCountry = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
+  const defaultMsg = encodeURIComponent(
+    `Olá! Gostaria de tirar dúvidas sobre qual serviço é mais indicado para o meu caso no(a) ${businessName || 'estabelecimento'}. Poderia me ajudar?`
+  );
+  const whatsAppHelpUrl = cleanPhone ? `https://wa.me/${phoneWithCountry}?text=${defaultMsg}` : '#';
 
   return (
     <div className="space-y-5 animate-in fade-in duration-200">
@@ -178,6 +189,36 @@ export function ServiceStep({
           })
         )}
       </div>
+
+      {/* WhatsApp Help CTA Button */}
+      {businessPhone && (
+        <div className="pt-2">
+          <a
+            href={whatsAppHelpUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="w-full p-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100/90 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 transition-all flex items-center justify-between gap-3 group cursor-pointer shadow-xs"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                <MessageCircle className="w-5 h-5" />
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-100">
+                  Dúvidas sobre qual serviço precisa?
+                </p>
+                <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                  Fale conosco no WhatsApp para tirar dúvidas e receber orientação
+                </p>
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xs group-hover:bg-emerald-700 transition-colors">
+              <span className="hidden sm:inline">Fale Conosco</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </div>
+          </a>
+        </div>
+      )}
     </div>
   );
 }

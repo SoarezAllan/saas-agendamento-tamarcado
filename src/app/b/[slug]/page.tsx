@@ -316,6 +316,8 @@ export default function PublicBookingPage({
               selectedService={selectedService}
               onSelectService={handleSelectService}
               primaryColor={primaryColor}
+              businessPhone={business.phone}
+              businessName={business.name}
             />
           )}
 
