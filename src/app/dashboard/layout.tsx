@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Loader2, Menu, X, ExternalLink } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function DashboardLayout({
   children,
@@ -91,17 +92,20 @@ export default function DashboardLayout({
           <span className="font-bold text-sm truncate max-w-[200px]">
             {user.business?.name || 'SaaS Agendamento'}
           </span>
-          {user.business?.slug && (
-            <a
-              href={`/b/${user.business.slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-              title="Abrir página pública"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          )}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {user.business?.slug && (
+              <a
+                href={`/b/${user.business.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg"
+                title="Abrir página pública"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+          </div>
         </header>
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">

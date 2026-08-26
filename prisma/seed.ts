@@ -100,7 +100,7 @@ async function main() {
       address: 'Rua Augusta, 1250 - Consolação, São Paulo - SP',
       phone: '(11) 98765-4321',
       email: 'contato@barbeariavintage.com.br',
-      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       subscription: {
         create: {
           plan: 'PRO',

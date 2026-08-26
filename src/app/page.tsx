@@ -18,37 +18,39 @@ import {
   Clock,
   Users,
   MessageCircle,
+  PlayCircle,
+  FlaskConical,
 } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function LandingPage() {
   const demoBusinesses = [
     {
       name: 'Barbearia Vintage Club',
       slug: 'barbearia-vintage',
-      category: 'Barbearia',
+      category: 'Barbearia (Demonstração)',
       color: '#b45309',
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&auto=format&fit=crop&q=80',
       icon: Scissors,
-      desc: 'Cortes degradê, barba terapia e estilo clássico.',
+      desc: 'Demonstração de cortes degradê, barba terapia e múltiplos profissionais.',
     },
     {
-      name: 'Clínica Estética Glow',
+      name: 'Clínica Estética Glow & Spa',
       slug: 'clinica-estetica-glow',
-      category: 'Clínica de Estética',
+      category: 'Clínica de Estética (Demonstração)',
       color: '#db2777',
       image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&auto=format&fit=crop&q=80',
       icon: HeartPulse,
-      desc: 'Limpeza de pele, massagens e tratamentos faciais.',
+      desc: 'Demonstração de procedimentos faciais, massagens e agendamento por horário.',
     },
     {
       name: 'Dr. Sorriso Odontologia',
       slug: 'dr-odonto',
-      category: 'Consultório Odontológico',
+      category: 'Consultório Odontológico (Demonstração)',
       color: '#0284c7',
       image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&auto=format&fit=crop&q=80',
       icon: Smile,
-      desc: 'Consultas de avaliação, profilaxia e estética dental.',
+      desc: 'Demonstração de consultas de avaliação, profilaxia e estética dental.',
     },
   ];
 
@@ -64,16 +66,19 @@ export default function LandingPage() {
             <span className="text-xl font-black tracking-tight">SaaS Agendamento</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Theme Toggle Button */}
+            <ThemeToggle />
+
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               Entrar no Painel
             </Link>
             <Link
               href="/register"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
+              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
             >
               <span>Criar Conta Grátis</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -111,31 +116,35 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               <Zap className="w-4 h-4" />
-              <span>Criar Minha Página de Agendamento (14 dias Grátis)</span>
+              <span>Criar Minha Página de Agendamento (7 Dias Grátis)</span>
             </Link>
 
             <Link
               href="/login"
               className="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
             >
-              <span>Testar Painel com Contas Demo</span>
+              <PlayCircle className="w-4 h-4 text-blue-600" />
+              <span>Acessar Painel com Contas de Demonstração</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Live Demonstration Cards */}
+      {/* Live Demonstration Showcase Section */}
       <section className="py-16 bg-zinc-50 dark:bg-zinc-900/50 border-y border-zinc-100 dark:border-zinc-800 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="text-center space-y-2">
-            <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">
-              Experiência Real ao Vivo
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black">
-              Veja as páginas públicas dos negócios de demonstração
+          {/* Prominent Demo Mode Explainer Banner */}
+          <div className="p-6 rounded-3xl bg-linear-to-r from-amber-500/10 via-orange-500/10 to-amber-600/10 border-2 border-amber-500/30 text-center space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black uppercase tracking-wider shadow-xs">
+              <FlaskConical className="w-4 h-4" />
+              Ambiente de Demonstração & Testes Interativos
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-100">
+              Experimente a Página Pública de Clientes em Lojas de Exemplo
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 max-w-xl mx-auto">
-              Clique em qualquer estabelecimento abaixo para testar o fluxo de agendamento em 4 etapas como se fosse um cliente final:
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+              As empresas abaixo são <strong>estabelecimentos fictícios criados para você testar</strong>.
+              Você pode clicar em qualquer um deles, escolher serviços, selecionar horários e concluir agendamentos de teste para ver como seus futuros clientes serão atendidos!
             </p>
           </div>
 
@@ -146,18 +155,25 @@ export default function LandingPage() {
               return (
                 <div
                   key={biz.slug}
-                  className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-200/80 dark:border-zinc-800 shadow-lg shadow-zinc-200/40 dark:shadow-none flex flex-col justify-between group hover:-translate-y-1 transition-all"
+                  className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border-2 border-amber-200 dark:border-amber-900/50 shadow-lg shadow-zinc-200/40 dark:shadow-none flex flex-col justify-between group hover:-translate-y-1 transition-all relative"
                 >
+                  {/* Demo Watermark Badge */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black bg-amber-500 text-white shadow-md flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" /> DEMO
+                    </span>
+                  </div>
+
                   <div>
                     <div className="h-44 w-full relative overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={biz.image}
                         alt={biz.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                       />
-                      <div className="absolute top-3 left-3">
-                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black/60 text-white backdrop-blur-xs">
+                      <div className="absolute bottom-3 left-3">
+                        <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs">
                           {biz.category}
                         </span>
                       </div>
@@ -166,7 +182,7 @@ export default function LandingPage() {
                     <div className="p-6 space-y-2">
                       <div className="flex items-center gap-2">
                         <div
-                          className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0"
+                          className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs"
                           style={{ backgroundColor: biz.color }}
                         >
                           <Icon className="w-4 h-4" />
@@ -175,20 +191,21 @@ export default function LandingPage() {
                           {biz.name}
                         </h3>
                       </div>
-                      <p className="text-xs text-zinc-500">{biz.desc}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{biz.desc}</p>
                     </div>
                   </div>
 
-                  <div className="p-6 pt-0">
+                  <div className="p-6 pt-0 space-y-2">
                     <a
                       href={`/b/${biz.slug}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                       style={{ backgroundColor: biz.color }}
                     >
-                      <span>Testar Agendamento</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      <PlayCircle className="w-4 h-4" />
+                      <span>Abrir Demonstração do Agendamento</span>
+                      <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                     </a>
                   </div>
                 </div>
@@ -285,7 +302,7 @@ export default function LandingPage() {
             href="/register"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl text-sm font-bold text-zinc-900 bg-white hover:bg-zinc-100 shadow-lg transition-transform transform hover:scale-105"
           >
-            <span>Iniciar Teste Grátis de 14 Dias</span>
+            <span>Iniciar Teste Grátis de 7 Dias</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -304,7 +321,7 @@ export default function LandingPage() {
               Painel
             </Link>
             <Link href="/register" className="hover:underline">
-              Cadastrar Negócio
+              Cadastrar Negócio (7 Dias Grátis)
             </Link>
             <Link href="/superadmin" className="hover:underline text-amber-600">
               Super Admin

@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await hashPassword(password);
 
-    // 1. Create Business
+    // 1. Create Business (7 days free trial)
     const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+    trialEndsAt.setDate(trialEndsAt.getDate() + 7);
 
     const business = await db.business.create({
       data: {

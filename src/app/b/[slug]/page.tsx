@@ -20,6 +20,8 @@ import { ProfessionalStep } from '@/components/booking/professional-step';
 import { DateTimeStep } from '@/components/booking/datetime-step';
 import { CustomerStep } from '@/components/booking/customer-step';
 import { ConfirmationStep } from '@/components/booking/confirmation-step';
+import { DemoBanner } from '@/components/ui/demo-banner';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { format } from 'date-fns';
 
 interface BusinessData {
@@ -182,8 +184,13 @@ export default function PublicBookingPage({
           name: 'Profissional',
         };
 
+  const isDemoSlug = ['barbearia-vintage', 'clinica-estetica-glow', 'dr-odonto'].includes(slug);
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between">
+      {/* Demo Mode Notice Banner */}
+      {isDemoSlug && <DemoBanner businessName={business.name} />}
+
       {/* Background Accent Gradient */}
       <div
         className="h-44 w-full absolute top-0 left-0 opacity-15 pointer-events-none"
@@ -193,6 +200,18 @@ export default function PublicBookingPage({
       />
 
       <div className="relative w-full max-w-xl mx-auto px-4 py-8 sm:py-12">
+        {/* Top Controls: Theme Toggle & Demo indicator */}
+        <div className="flex items-center justify-between mb-3 px-1">
+          {isDemoSlug ? (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+              <Sparkles className="w-3.5 h-3.5" /> Estabelecimento de Demonstração
+            </span>
+          ) : (
+            <span />
+          )}
+          <ThemeToggle />
+        </div>
+
         {/* Business Header Card */}
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">

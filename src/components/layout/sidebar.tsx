@@ -20,6 +20,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface SidebarProps {
   user: {
@@ -236,7 +237,7 @@ export function Sidebar({ user }: SidebarProps) {
       </nav>
 
       {/* User Footer */}
-      <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30">
+      <div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-2">
         <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 truncate">
@@ -248,14 +249,17 @@ export function Sidebar({ user }: SidebarProps) {
               </span>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            title="Sair da Conta"
-            className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              title="Sair da Conta"
+              className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </aside>

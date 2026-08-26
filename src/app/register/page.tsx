@@ -17,6 +17,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { slugify } from '@/lib/utils';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -86,7 +87,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+      {/* Top Floating Theme Toggle */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-xl text-center">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
@@ -100,7 +106,7 @@ export default function RegisterPage() {
           Cadastre seu Negócio Gratuitamente
         </h2>
         <p className="mt-1 text-xs text-zinc-500 max-w-md mx-auto">
-          Crie sua conta em 1 minuto e ganhe 14 dias de teste grátis com página pública e agendamentos ilimitados!
+          Crie sua conta em 1 minuto e ganhe 7 dias de teste grátis com página pública e agendamentos ilimitados!
         </p>
       </div>
 

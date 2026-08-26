@@ -101,3 +101,4 @@ Se você possui um servidor Ubuntu (DigitalOcean, Hetzner, AWS, Linode, Hostinge
 - [x] Otimização de imagens no `next.config.ts`.
 - [x] Rotas de API e páginas testadas com `npm run build`.
 - [x] Tokens JWT e cookies seguros configurados para `secure: true` em ambiente de produção.
+

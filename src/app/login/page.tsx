@@ -13,7 +13,9 @@ import {
   ShieldCheck,
   Scissors,
   HeartPulse,
+  FlaskConical,
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,7 +64,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
+      {/* Top Floating Theme Toggle */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
@@ -140,62 +147,67 @@ export default function LoginPage() {
           </form>
 
           {/* Quick 1-Click Demo Logins */}
-          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-2.5">
-            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block text-center">
-              ⚡ Teste Rápido em 1 Clique (Demonstração):
-            </span>
+          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-1">
+              <span className="text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center justify-center gap-1.5">
+                <FlaskConical className="w-3.5 h-3.5" /> Contas de Demonstração (1 Clique)
+              </span>
+              <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
+                Clique em qualquer perfil fictício abaixo para entrar imediatamente no painel de teste:
+              </p>
+            </div>
 
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => handleDemoLogin('admin@barbearia.com', 'admin123')}
-                className="p-2.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-100/70 text-amber-900 text-left transition-all cursor-pointer text-xs"
+                className="p-2.5 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50/70 dark:bg-amber-950/30 hover:bg-amber-100/80 text-amber-950 dark:text-amber-200 text-left transition-all cursor-pointer text-xs"
               >
                 <span className="font-bold block flex items-center gap-1">
-                  <Scissors className="w-3.5 h-3.5 text-amber-700" /> Barbearia
+                  <Scissors className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" /> Barbearia
                 </span>
-                <span className="text-[10px] text-amber-700 opacity-80 block">Admin do Negócio</span>
+                <span className="text-[10px] text-amber-700 dark:text-amber-400 opacity-80 block">Admin do Negócio</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoLogin('carlos@barbearia.com', 'pro123')}
-                className="p-2.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-left transition-all cursor-pointer text-xs"
+                className="p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-left transition-all cursor-pointer text-xs"
               >
                 <span className="font-bold block flex items-center gap-1">
                   👤 Carlos Pro
                 </span>
-                <span className="text-[10px] text-zinc-500 block">Profissional da equipe</span>
+                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">Profissional da equipe</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoLogin('admin@glow.com', 'admin123')}
-                className="p-2.5 rounded-xl border border-pink-200 bg-pink-50/50 hover:bg-pink-100/70 text-pink-900 text-left transition-all cursor-pointer text-xs"
+                className="p-2.5 rounded-xl border border-pink-200 dark:border-pink-900 bg-pink-50/70 dark:bg-pink-950/30 hover:bg-pink-100/80 text-pink-950 dark:text-pink-200 text-left transition-all cursor-pointer text-xs"
               >
                 <span className="font-bold block flex items-center gap-1">
-                  <HeartPulse className="w-3.5 h-3.5 text-pink-600" /> Estética Glow
+                  <HeartPulse className="w-3.5 h-3.5 text-pink-600 dark:text-pink-400" /> Estética Glow
                 </span>
-                <span className="text-[10px] text-pink-700 opacity-80 block">Admin da Clínica</span>
+                <span className="text-[10px] text-pink-700 dark:text-pink-400 opacity-80 block">Admin da Clínica</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoLogin('superadmin@saas.com', 'super123')}
-                className="p-2.5 rounded-xl border border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/70 text-indigo-900 text-left transition-all cursor-pointer text-xs"
+                className="p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/70 dark:bg-indigo-950/30 hover:bg-indigo-100/80 text-indigo-950 dark:text-indigo-200 text-left transition-all cursor-pointer text-xs"
               >
                 <span className="font-bold block flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" /> Super Admin
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> Super Admin
                 </span>
-                <span className="text-[10px] text-indigo-700 opacity-80 block">Dono da Plataforma</span>
+                <span className="text-[10px] text-indigo-700 dark:text-indigo-400 opacity-80 block">Dono da Plataforma</span>
               </button>
             </div>
           </div>
 
-          <div className="pt-2 text-center text-xs text-zinc-500">
+          <div className="pt-2 text-center text-xs text-zinc-500 dark:text-zinc-400">
             Ainda não tem conta para o seu negócio?{' '}
             <Link href="/register" className="text-blue-600 font-bold hover:underline">
-              Cadastre seu negócio grátis
+              Cadastre seu negócio (7 dias grátis)
             </Link>
           </div>
         </div>
