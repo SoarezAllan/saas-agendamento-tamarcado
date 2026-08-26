@@ -14,9 +14,9 @@ export function ThemeToggle({ showLabel = false, className = '' }: ThemeTogglePr
 
   useEffect(() => {
     setMounted(true);
-    // Check initial stored theme or system preference
+    // Padrão: Tema Claro (a menos que o usuário tenha escolhido explicitamente 'dark')
     const stored = localStorage.getItem('theme');
-    if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (stored === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
     } else {

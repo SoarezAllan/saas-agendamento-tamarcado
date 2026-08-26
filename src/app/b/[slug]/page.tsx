@@ -368,7 +368,7 @@ export default function PublicBookingPage({
       {/* Public Footer */}
       <footer className="py-6 text-center text-xs text-zinc-400">
         <p>
-          Agendamento Online powered by <strong className="text-zinc-600 dark:text-zinc-300">SaaS Agendamento</strong>
+          Agendamento Online powered by <strong className="text-zinc-600 dark:text-zinc-300">TáMarcado</strong>
         </p>
       </footer>
     </div>

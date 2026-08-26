@@ -90,7 +90,7 @@ export default function DashboardLayout({
             <Menu className="w-5 h-5" />
           </button>
           <span className="font-bold text-sm truncate max-w-[200px]">
-            {user.business?.name || 'SaaS Agendamento'}
+            {user.business?.name || 'TáMarcado'}
           </span>
           <div className="flex items-center gap-2">
             <ThemeToggle />

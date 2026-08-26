@@ -76,7 +76,7 @@ export default function LoginPage() {
             <Calendar className="w-5 h-5" />
           </div>
           <span className="text-xl font-black text-zinc-900 dark:text-zinc-100">
-            SaaS Agendamento
+            TáMarcado
           </span>
         </Link>
         <h2 className="mt-4 text-2xl font-black text-zinc-900 dark:text-zinc-100">

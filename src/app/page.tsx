@@ -161,7 +161,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
               <Calendar className="w-5 h-5" />
             </div>
-            <span className="text-xl font-black tracking-tight">SaaS Agendamento</span>
+            <span className="text-xl font-black tracking-tight">TáMarcado</span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -191,7 +191,7 @@ export default function LandingPage() {
         <div className="relative max-w-4xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
             <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>SaaS Multi-Negócio: Advocacia, Arquitetura, Clínicas, Beleza & Consultorias</span>
+            <span>TáMarcado - Agendamento Inteligente para Negócios & Especialistas</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
@@ -461,9 +461,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
             <Calendar className="w-4 h-4 text-blue-600" />
-            <span>SaaS Agendamento Multi-Negócio</span>
+            <span>TáMarcado • Plataforma de Agendamentos</span>
           </div>
-          <p>© {new Date().getFullYear()} SaaS Agendamento. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} TáMarcado. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:underline">
               Painel

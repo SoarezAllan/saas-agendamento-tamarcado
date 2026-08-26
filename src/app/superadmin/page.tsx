@@ -84,7 +84,7 @@ export default function SuperAdminPage() {
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black mt-1">
-              Painel do Dono do SaaS (Super Admin)
+              Painel Super Admin - TáMarcado
             </h1>
             <p className="text-xs text-zinc-500 mt-1">
               Visão macro de todos os negócios cadastrados, assinaturas e receita recorrente

@@ -75,7 +75,7 @@ export function generateCustomerConfirmationEmail(data: BookingNotificationData)
         </div>
 
         <p style="color: #9ca3af; font-size: 12px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px;">
-          Enviado automaticamente por ${data.businessName} via plataforma de agendamento online.
+          Enviado automaticamente por ${data.businessName} via plataforma TáMarcado.
         </p>
       </div>
     `,

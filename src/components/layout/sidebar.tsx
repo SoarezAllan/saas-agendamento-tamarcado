@@ -148,7 +148,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
-              {business?.name || 'Painel SaaS'}
+              {business?.name || 'TáMarcado'}
             </h2>
             <span className="inline-block text-xs text-zinc-500 dark:text-zinc-400 truncate">
               {business?.category || (isSuperAdmin ? 'Super Admin' : 'Profissional')}
