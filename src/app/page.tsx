@@ -34,6 +34,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Logo } from '@/components/ui/logo';
 
 export default function LandingPage() {
   const demoBusinesses = [
@@ -131,12 +132,7 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <span className="text-xl font-black tracking-tight">TáMarcado</span>
-          </div>
+          <Logo href="/" size="md" />
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
@@ -419,10 +415,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8 px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 font-bold text-zinc-900 dark:text-zinc-100">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span>TáMarcado • Plataforma de Agendamentos</span>
-          </div>
+          <Logo href="/" size="sm" />
           <p>© {new Date().getFullYear()} TáMarcado. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:underline">

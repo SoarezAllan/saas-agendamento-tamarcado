@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TáMarcado - Agendamento Online para Negócios & Especialistas",
   description: "A plataforma completa de agendamento online inteligente para escritórios de advocacia, arquitetura, clínicas, salões, consultorias e personal trainers.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

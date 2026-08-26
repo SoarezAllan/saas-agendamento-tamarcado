@@ -16,6 +16,7 @@ import {
   FlaskConical,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Logo } from '@/components/ui/logo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -71,14 +72,7 @@ export default function LoginPage() {
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
-            <Calendar className="w-5 h-5" />
-          </div>
-          <span className="text-xl font-black text-zinc-900 dark:text-zinc-100">
-            TáMarcado
-          </span>
-        </Link>
+        <Logo href="/" size="lg" className="justify-center" />
         <h2 className="mt-4 text-2xl font-black text-zinc-900 dark:text-zinc-100">
           Acesse seu Painel
         </h2>

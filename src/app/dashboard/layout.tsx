@@ -89,9 +89,13 @@ export default function DashboardLayout({
           >
             <Menu className="w-5 h-5" />
           </button>
-          <span className="font-bold text-sm truncate max-w-[200px]">
-            {user.business?.name || 'TáMarcado'}
-          </span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain shrink-0" />
+            <span className="font-bold text-sm truncate max-w-[180px]">
+              {user.business?.name || 'TáMarcado'}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             {user.business?.slug && (
