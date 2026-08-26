@@ -31,3 +31,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ valid: false, error: 'Erro ao verificar token' }, { status: 500 });
   }
 }
+

@@ -11,6 +11,13 @@ import {
   ExternalLink,
   Loader2,
   ArrowLeft,
+  CreditCard,
+  QrCode,
+  Lock,
+  CheckCircle,
+  Copy,
+  Check,
+  Sparkles,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -140,6 +147,70 @@ export default function SuperAdminPage() {
               {stats.totalProfessionals || 0}
             </p>
             <span className="text-[11px] text-zinc-400 block">Usuários com agenda ativa</span>
+          </div>
+        </div>
+
+        {/* Mercado Pago Gateway & Payout Info */}
+        <div className="p-6 rounded-3xl bg-linear-to-r from-sky-900/40 via-blue-900/30 to-indigo-900/30 border border-sky-500/30 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-sky-500/20">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center border border-sky-500/30">
+                <CreditCard className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                  Gateway de Pagamento • Mercado Pago
+                </h2>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Recebimento automático de mensalidades via Pix, Cartão de Crédito e Boleto
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Módulo Ativo
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-zinc-900/60 border border-sky-500/20 space-y-1">
+              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                Webhook URL (Notificações)
+              </span>
+              <p className="font-mono text-[11px] text-sky-600 dark:text-sky-400 select-all truncate">
+                /api/webhooks/mercadopago
+              </p>
+              <span className="text-[10px] text-zinc-400 block">
+                Processa aprovações de pagamento em tempo real
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-zinc-900/60 border border-sky-500/20 space-y-1">
+              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                Repasse Financeiro
+              </span>
+              <p className="font-bold text-zinc-800 dark:text-zinc-200">
+                Conta Bancária / Saldo Mercado Pago
+              </p>
+              <span className="text-[10px] text-zinc-400 block">
+                Transferência via Pix do saldo direto para seu banco
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/60 dark:bg-zinc-900/60 border border-sky-500/20 space-y-1">
+              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                Configuração das Credenciais
+              </span>
+              <p className="font-mono text-[11px] text-zinc-700 dark:text-zinc-300">
+                Arquivo .env
+              </p>
+              <span className="text-[10px] text-zinc-400 block">
+                Defina <code className="text-sky-600">MERCADO_PAGO_ACCESS_TOKEN</code> com seu token
+              </span>
+            </div>
           </div>
         </div>
 
