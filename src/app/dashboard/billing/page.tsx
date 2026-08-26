@@ -141,10 +141,10 @@ function BillingContent() {
           </p>
         </div>
 
-        {/* Mercado Pago Trust Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-300 text-xs font-semibold self-start sm:self-auto">
-          <Lock className="w-3.5 h-3.5 text-sky-600" />
-          <span>Pagamentos Seguros via <strong>Mercado Pago</strong></span>
+        {/* Trust Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold self-start sm:self-auto">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Pagamentos Seguros & Criptografados</span>
         </div>
       </div>
 
@@ -179,8 +179,8 @@ function BillingContent() {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-zinc-300 bg-zinc-800/80 px-3.5 py-2 rounded-xl border border-zinc-700">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Processado via Mercado Pago</span>
+            <Lock className="w-4 h-4 text-emerald-400" />
+            <span>Ambiente Seguro</span>
           </div>
         </div>
 
@@ -205,7 +205,7 @@ function BillingContent() {
       <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs">
         <span className="font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
           <Sparkles className="w-4 h-4 text-blue-600" />
-          <span>Formas de pagamento aceitas pelo Mercado Pago:</span>
+          <span>Formas de pagamento aceitas:</span>
         </span>
         <div className="flex items-center gap-3 text-zinc-600 dark:text-zinc-400">
           <span className="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
@@ -285,7 +285,7 @@ function BillingContent() {
                 ) : (
                   <>
                     <Zap className="w-4 h-4 text-amber-300" />
-                    <span>Assinar via Mercado Pago</span>
+                    <span>Assinar Plano</span>
                   </>
                 )}
               </button>
