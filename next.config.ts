@@ -24,6 +24,16 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: [
+    '172.31.104.69',
+    '172.31.104.69:3000',
+    'localhost',
+    'localhost:3000',
+    '*.loca.lt',
+    '*.ngrok-free.app',
+    '*.ngrok.io',
+    '*.trycloudflare.com',
+  ],
   output: process.env.DOCKER_BUILD ? 'standalone' : undefined,
   images: {
     remotePatterns: [
