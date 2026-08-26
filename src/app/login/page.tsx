@@ -1,23 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Lock,
   Mail,
   ArrowRight,
   Loader2,
+  Scissors,
+  User,
+  Shield,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    const emailParam = searchParams.get('email');
+
+    if (roleParam === 'owner' || emailParam === 'admin@barbearia.com') {
+      setEmail('admin@barbearia.com');
+      setPassword('admin123');
+    } else if (roleParam === 'professional' || emailParam === 'carlos@barbearia.com') {
+      setEmail('carlos@barbearia.com');
+      setPassword('pro123');
+    } else if (roleParam === 'superadmin' || emailParam === 'superadmin@saas.com') {
+      setEmail('superadmin@saas.com');
+      setPassword('super123');
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e?: React.FormEvent, customEmail?: string, customPassword?: string) => {
     if (e) e.preventDefault();
@@ -40,24 +61,125 @@ export default function LoginPage() {
       }
 
       if (data.user?.role === 'SUPERADMIN') {
-        router.push('/superadmin');
+        window.location.href = '/superadmin';
       } else {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }
-      router.refresh();
     } catch (err: any) {
       setError(err.message || 'Erro ao realizar login');
-    } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDemoLogin = (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    handleLogin(undefined, demoEmail, demoPass);
+  const handleQuickFill = (fillEmail: string, fillPass: string) => {
+    setEmail(fillEmail);
+    setPassword(fillPass);
+    handleLogin(undefined, fillEmail, fillPass);
   };
 
+  return (
+    <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6">
+      {/* Quick Test Demo Chips */}
+      <div className="space-y-2">
+        <span className="text-[11px] font-semibold text-zinc-400 block text-center">
+          ⚡ Contas de Teste Rápido (1 clique):
+        </span>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => handleQuickFill('admin@barbearia.com', 'admin123')}
+            className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-amber-100 transition-colors cursor-pointer"
+          >
+            <Scissors className="w-3.5 h-3.5" />
+            <span>Dono Barbearia</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickFill('carlos@barbearia.com', 'pro123')}
+            className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-emerald-100 transition-colors cursor-pointer"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Profissional</span>
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs font-medium border border-rose-200">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={(e) => handleLogin(e)} className="space-y-4">
+        <div>
+          <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
+            E-mail
+          </label>
+          <div className="relative">
+            <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="email"
+              required
+              placeholder="seuemail@exemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              Senha
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline"
+            >
+              Esqueceu a senha?
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="password"
+              required
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <>
+              <span>Entrar no Painel</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
+        Ainda não tem conta para o seu negócio?{' '}
+        <Link href="/register" className="text-blue-600 font-bold hover:underline">
+          Cadastre seu negócio (7 dias grátis)
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
       {/* Top Floating Theme Toggle */}
@@ -76,81 +198,16 @@ export default function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6">
-          {error && (
-            <div className="p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs font-medium border border-rose-200">
-              {error}
+        <Suspense
+          fallback={
+            <div className="bg-white dark:bg-zinc-900 py-12 px-6 rounded-3xl text-center">
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto" />
             </div>
-          )}
-
-          <form onSubmit={(e) => handleLogin(e)} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                E-mail
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  required
-                  placeholder="seuemail@exemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                  Senha
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs text-blue-600 dark:text-blue-400 font-semibold hover:underline"
-                >
-                  Esqueceu a senha?
-                </Link>
-              </div>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <>
-                  <span>Entrar no Painel</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
-            Ainda não tem conta para o seu negócio?{' '}
-            <Link href="/register" className="text-blue-600 font-bold hover:underline">
-              Cadastre seu negócio (7 dias grátis)
-            </Link>
-          </div>
-        </div>
+          }
+        >
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
 }
-

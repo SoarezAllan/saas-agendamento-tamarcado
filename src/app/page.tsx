@@ -413,24 +413,14 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                disabled={loggingInEmail !== null}
-                onClick={() => handleDemoLogin('admin@barbearia.com', 'admin123')}
-                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+              <Link
+                href="/login?role=owner"
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
-                {loggingInEmail === 'admin@barbearia.com' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <PlayCircle className="w-4 h-4" />
-                    <span>Entrar como Dono / Gestor</span>
-                  </>
-                )}
-              </button>
+                <PlayCircle className="w-4 h-4" />
+                <span>Entrar como Dono / Gestor</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
 
             {/* Card 2: Profissional da Equipe */}
@@ -475,24 +465,14 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                disabled={loggingInEmail !== null}
-                onClick={() => handleDemoLogin('carlos@barbearia.com', 'pro123')}
-                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+              <Link
+                href="/login?role=professional"
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
-                {loggingInEmail === 'carlos@barbearia.com' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <PlayCircle className="w-4 h-4" />
-                    <span>Entrar como Profissional</span>
-                  </>
-                )}
-              </button>
+                <PlayCircle className="w-4 h-4" />
+                <span>Entrar como Profissional</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>

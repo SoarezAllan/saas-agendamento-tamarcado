@@ -7,8 +7,8 @@ export async function POST(req: NextRequest) {
   try {
     const clientIp = getClientIp(req);
 
-    // Rate limiting: 5 login attempts per minute per IP
-    const rateCheck = checkRateLimit(`login_${clientIp}`, 5, 60 * 1000);
+    // Rate limiting: 30 login attempts per minute per IP
+    const rateCheck = checkRateLimit(`login_${clientIp}`, 30, 60 * 1000);
     if (!rateCheck.success) {
       const waitSeconds = Math.ceil((rateCheck.resetTime - Date.now()) / 1000);
       return NextResponse.json(
