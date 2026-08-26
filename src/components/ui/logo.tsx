@@ -18,17 +18,17 @@ export function Logo({
   className = '',
 }: LogoProps) {
   const sizeMap = {
-    sm: { text: 'text-lg', box: 'w-10 h-10', scale: 'scale-125' },
-    md: { text: 'text-2xl sm:text-3xl', box: 'w-14 h-14 sm:w-16 sm:h-16', scale: 'scale-135' },
-    lg: { text: 'text-3xl sm:text-4xl', box: 'w-24 h-24 sm:w-28 sm:h-28', scale: 'scale-140' },
-    xl: { text: 'text-4xl sm:text-5xl', box: 'w-32 h-32 sm:w-36 sm:h-36', scale: 'scale-150' },
+    sm: { text: 'text-base', box: 'w-10 h-10', scale: 'scale-130' },
+    md: { text: 'text-xl font-black', box: 'w-16 h-16', scale: 'scale-140' },
+    lg: { text: 'text-2xl font-black', box: 'w-24 h-24 sm:w-28 sm:h-28', scale: 'scale-145' },
+    xl: { text: 'text-3xl font-black', box: 'w-32 h-32 sm:w-36 sm:h-36', scale: 'scale-155' },
   };
 
   const currentSize = sizeMap[size] || sizeMap.md;
 
   const content = (
-    <div className={`inline-flex items-center gap-3 ${className}`}>
-      <div className={`relative ${currentSize.box} shrink-0 flex items-center justify-center`}>
+    <div className={`inline-flex items-center gap-1 sm:gap-1.5 ${className}`}>
+      <div className={`relative ${currentSize.box} shrink-0 flex items-center justify-center -mr-1`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.png"
@@ -38,7 +38,7 @@ export function Logo({
       </div>
 
       {showText && (
-        <span className={`font-black tracking-tight text-zinc-900 dark:text-zinc-100 ${currentSize.text}`}>
+        <span className={`tracking-tight text-zinc-900 dark:text-zinc-100 ${currentSize.text}`}>
           TáMarcado
         </span>
       )}
