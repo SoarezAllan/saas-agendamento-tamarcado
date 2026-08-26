@@ -14,27 +14,47 @@ export function ThemeToggle({ showLabel = false, className = '' }: ThemeTogglePr
 
   useEffect(() => {
     setMounted(true);
-    // Padrão: Tema Claro (a menos que o usuário tenha escolhido explicitamente 'dark')
-    const stored = localStorage.getItem('theme');
-    if (stored === 'dark') {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      setTheme('light');
-      document.documentElement.classList.remove('dark');
-    }
+    const syncTheme = () => {
+      if (typeof window === 'undefined') return;
+      const isDark =
+        document.documentElement.classList.contains('dark') ||
+        localStorage.getItem('theme') === 'dark';
+      setTheme(isDark ? 'dark' : 'light');
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    syncTheme();
+
+    const handleThemeEvent = () => syncTheme();
+    window.addEventListener('theme-change', handleThemeEvent);
+    window.addEventListener('storage', handleThemeEvent);
+
+    return () => {
+      window.removeEventListener('theme-change', handleThemeEvent);
+      window.removeEventListener('storage', handleThemeEvent);
+    };
   }, []);
 
-  const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark');
+  const toggleTheme = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+
+    if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      setTheme('light');
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+
+    window.dispatchEvent(new Event('theme-change'));
   };
 
   if (!mounted) {
@@ -70,4 +90,3 @@ export function ThemeToggle({ showLabel = false, className = '' }: ThemeTogglePr
     </button>
   );
 }
-
