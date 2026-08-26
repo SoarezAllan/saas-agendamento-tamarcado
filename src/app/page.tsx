@@ -19,6 +19,7 @@ import {
   Users,
   MessageCircle,
   PlayCircle,
+  LayoutDashboard,
   FlaskConical,
   Scale,
   Compass,
@@ -193,8 +194,8 @@ export default function LandingPage() {
               href="/login"
               className="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
             >
-              <PlayCircle className="w-4 h-4 text-blue-600" />
-              <span>Testar Painel com Contas de Demonstração</span>
+              <LayoutDashboard className="w-4 h-4 text-blue-600" />
+              <span>Acessar Painel de Gerenciamento do Negócio</span>
             </Link>
           </div>
         </div>
