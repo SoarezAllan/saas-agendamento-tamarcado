@@ -18,21 +18,21 @@ export function Logo({
   className = '',
 }: LogoProps) {
   const sizeMap = {
-    sm: { img: 28, text: 'text-base', box: 'w-7 h-7' },
-    md: { img: 36, text: 'text-xl', box: 'w-9 h-9' },
-    lg: { img: 48, text: 'text-2xl', box: 'w-12 h-12' },
+    sm: { text: 'text-base', box: 'w-8 h-8' },
+    md: { text: 'text-xl', box: 'w-10 h-10' },
+    lg: { text: 'text-2xl', box: 'w-14 h-14' },
   };
 
   const currentSize = sizeMap[size] || sizeMap.md;
 
   const content = (
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
-      <div className={`relative ${currentSize.box} rounded-xl overflow-hidden shadow-xs shrink-0 flex items-center justify-center`}>
+      <div className={`relative ${currentSize.box} rounded-2xl overflow-hidden shrink-0 flex items-center justify-center`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.png"
           alt="TáMarcado Logo"
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain transform scale-110"
         />
       </div>
 
@@ -54,3 +54,4 @@ export function Logo({
 
   return content;
 }
+
