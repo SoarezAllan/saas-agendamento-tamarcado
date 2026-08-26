@@ -45,7 +45,6 @@ export default function LandingPage() {
       image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=500&auto=format&fit=crop&q=80',
       icon: Scale,
       tag: 'Jurídico',
-      views: '1.420',
       desc: 'Consultas jurídicas, análise de contratos empresariais e assessoria tributária com advogados especialistas.',
     },
     {
@@ -56,7 +55,6 @@ export default function LandingPage() {
       image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&auto=format&fit=crop&q=80',
       icon: Smile,
       tag: 'Saúde',
-      views: '2.180',
       desc: 'Consultas de avaliação, clareamento dental a laser e procedimentos odontológicos modernos.',
     },
     {
@@ -67,7 +65,6 @@ export default function LandingPage() {
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500&auto=format&fit=crop&q=80',
       icon: Scissors,
       tag: 'Beleza',
-      views: '3.850',
       desc: 'Cortes clássicos, degradê na navalha, barboterapia e agendamento por profissional favorito.',
     },
   ];
@@ -249,7 +246,7 @@ export default function LandingPage() {
               Ambiente de Demonstração & Testes Interativos
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-100">
-              Veja a Página de Demonstração de diferentes negócios em Funcionamento
+              Veja a página de demonstração de diferentes negócios em funcionamento
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
               Clique em qualquer negócio de demonstração abaixo para testar o fluxo de agendamento em 4 passos. Sinta-se à vontade para agendar horários de teste sem custos!
@@ -303,17 +300,6 @@ export default function LandingPage() {
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
                         {biz.desc}
                       </p>
-
-                      {/* Views / Metrics Info Badge */}
-                      <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-[11px] text-zinc-500 dark:text-zinc-400">
-                        <span className="inline-flex items-center gap-1.5 font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">
-                          <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                          <strong className="text-zinc-800 dark:text-zinc-200">{biz.views}</strong> visualizações / mês
-                        </span>
-                        <span className="text-[10px] text-emerald-600 font-semibold">
-                          ● Online
-                        </span>
-                      </div>
                     </div>
                   </div>
 
