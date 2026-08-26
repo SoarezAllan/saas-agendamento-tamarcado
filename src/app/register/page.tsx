@@ -15,6 +15,7 @@ import {
   Loader2,
   Sparkles,
   CheckCircle,
+  HelpCircle,
 } from 'lucide-react';
 import { slugify } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -165,9 +166,18 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                    Link Personalizado (Slug)
-                  </label>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                      Digite o endereço que você deseja para sua página
+                    </label>
+                    <div className="relative group cursor-help inline-flex">
+                      <HelpCircle className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-600 transition-colors" />
+                      <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-64 p-2.5 bg-zinc-900 text-white text-[11px] font-normal leading-relaxed rounded-xl shadow-2xl z-50 text-center pointer-events-none">
+                        Este é o endereço que aparecerá no topo do navegador e que você enviará para seus clientes agendarem!
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900" />
+                      </div>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-1">
                     <span className="text-[11px] text-zinc-400 font-mono">/b/</span>
                     <input

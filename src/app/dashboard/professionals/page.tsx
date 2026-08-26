@@ -15,6 +15,8 @@ import {
   CheckCircle,
   Scissors,
   Check,
+  Upload,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Modal } from '@/components/ui/modal';
 import { DAYS_OF_WEEK } from '@/lib/utils';
@@ -174,6 +176,27 @@ export default function ProfessionalsPage() {
     } finally {
       setIsSavingAvail(false);
     }
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('A foto deve ter no máximo 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        setFormData((prev) => ({
+          ...prev,
+          avatarUrl: reader.result as string,
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const toggleService = (srvId: string) => {
@@ -391,17 +414,64 @@ export default function ProfessionalsPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-              URL da Foto / Avatar (opcional)
+          {/* Upload da Foto */}
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+              Upload da imagem do profissional
             </label>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={formData.avatarUrl}
-              onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
-              className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100"
-            />
+
+            {formData.avatarUrl ? (
+              <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden flex items-center justify-center shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={formData.avatarUrl}
+                    alt="Foto do Profissional"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 block truncate">
+                    Foto selecionada
+                  </span>
+                  <span className="text-[10px] text-zinc-400 block">
+                    Aparecerá para os clientes no agendamento
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, avatarUrl: '' })}
+                  className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors"
+                  title="Remover foto"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ) : null}
+
+            <label className="w-full px-4 py-2.5 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 hover:border-blue-500 bg-zinc-50 dark:bg-zinc-900 hover:bg-blue-50/30 text-xs font-semibold text-zinc-700 dark:text-zinc-300 flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <Upload className="w-4 h-4 text-blue-600" />
+              <span>Selecionar foto do computador...</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+            </label>
+
+            <div>
+              <span className="text-[10px] text-zinc-400 block mb-1">
+                Ou cole o link da foto:
+              </span>
+              <input
+                type="url"
+                placeholder="https://..."
+                value={formData.avatarUrl}
+                onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
+                className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100"
+              />
+            </div>
           </div>
 
           <div>
