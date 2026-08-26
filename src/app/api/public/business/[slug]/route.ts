@@ -38,6 +38,7 @@ export async function GET(
             description: true,
             durationMinutes: true,
             price: true,
+            priceOnRequest: true,
             category: true,
             professionals: {
               select: {

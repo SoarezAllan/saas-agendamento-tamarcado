@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Clock, Tag, Search, Check } from 'lucide-react';
+import { Clock, Tag, Search, Check, HelpCircle } from 'lucide-react';
 import { formatCurrency, formatDuration } from '@/lib/utils';
 
 interface ServiceItem {
@@ -10,6 +10,7 @@ interface ServiceItem {
   description?: string | null;
   durationMinutes: number;
   price: number;
+  priceOnRequest?: boolean;
   category?: string | null;
 }
 
@@ -134,9 +135,31 @@ export function ServiceStep({
                 </div>
 
                 <div className="text-right shrink-0 flex flex-col items-end gap-1.5">
-                  <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                    {formatCurrency(service.price)}
-                  </span>
+                  {service.priceOnRequest || service.price <= 0 ? (
+                    <div
+                      className="group/tooltip relative inline-flex items-center gap-1.5 py-1 px-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 cursor-help"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-xs sm:text-sm font-bold whitespace-nowrap">
+                        A combinar
+                      </span>
+                      <HelpCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+
+                      {/* Tooltip on Hover */}
+                      <div className="absolute right-0 bottom-full mb-2 hidden group-hover/tooltip:block z-50 w-64 p-3 rounded-2xl bg-zinc-900 dark:bg-zinc-800 text-white text-xs leading-relaxed shadow-2xl border border-zinc-700 pointer-events-none text-left animate-in fade-in zoom-in-95 duration-150">
+                        <p className="font-bold text-amber-400 mb-1 flex items-center gap-1">
+                          <HelpCircle className="w-3.5 h-3.5" /> Valor sob avaliação
+                        </p>
+                        <p className="text-zinc-300 text-[11px] leading-snug">
+                          O valor deste serviço é definido mediante avaliação personalizada ou orçamento prévio com a empresa.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                      {formatCurrency(service.price)}
+                    </span>
+                  )}
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                       isSelected

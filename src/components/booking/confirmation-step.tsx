@@ -115,7 +115,13 @@ export function ConfirmationStep({
             </p>
           </div>
           <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-            {formatCurrency(appointment.totalPrice)}
+            {appointment.totalPrice <= 0 ? (
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-md">
+                A combinar
+              </span>
+            ) : (
+              formatCurrency(appointment.totalPrice)
+            )}
           </span>
         </div>
 

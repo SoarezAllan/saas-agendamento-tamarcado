@@ -321,7 +321,8 @@ async function main() {
       name: 'Assessoria de Planejamento Tributário',
       description: 'Estruturação fiscal, redução lícita de carga tributária e conformidade fiscal para PMEs.',
       durationMinutes: 60,
-      price: 450.0,
+      price: 0.0,
+      priceOnRequest: true,
       category: 'Tributário',
     },
   });

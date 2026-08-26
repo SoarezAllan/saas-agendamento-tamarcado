@@ -104,6 +104,7 @@ model Service {
   description     String?
   durationMinutes Int                   @default(30)
   price           Float                 @default(0.0)
+  priceOnRequest  Boolean               @default(false)
   category        String?
   active          Boolean               @default(true)
   createdAt       DateTime              @default(now())

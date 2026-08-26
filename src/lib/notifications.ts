@@ -40,7 +40,8 @@ export function generateGoogleCalendarUrl(data: {
 }
 
 export function generateWhatsAppBookingUrl(data: BookingNotificationData): string {
-  const message = `👋 Olá *${data.customerName}*!\n\nSeu agendamento em *${data.businessName}* foi registrado com sucesso!\n\n📅 *Data:* ${data.dateFormatted}\n⏰ *Horário:* ${data.timeFormatted}\n✂️ *Serviço:* ${data.serviceName} (${formatCurrency(data.servicePrice)})\n👤 *Profissional:* ${data.professionalName}\n📍 *Endereço:* ${data.businessAddress || 'A combinar'}\n\n👉 *Gerenciar / Cancelar Agendamento:* ${data.manageUrl}\n\nTe esperamos lá! ✨`;
+  const priceDisplay = data.servicePrice > 0 ? `(${formatCurrency(data.servicePrice)})` : '(A combinar / sob avaliação)';
+  const message = `👋 Olá *${data.customerName}*!\n\nSeu agendamento em *${data.businessName}* foi registrado com sucesso!\n\n📅 *Data:* ${data.dateFormatted}\n⏰ *Horário:* ${data.timeFormatted}\n✂️ *Serviço:* ${data.serviceName} ${priceDisplay}\n👤 *Profissional:* ${data.professionalName}\n📍 *Endereço:* ${data.businessAddress || 'A combinar'}\n\n👉 *Gerenciar / Cancelar Agendamento:* ${data.manageUrl}\n\nTe esperamos lá! ✨`;
 
   const cleanPhone = data.customerPhone.replace(/\D/g, '');
   const phoneWithCountry = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
@@ -52,6 +53,8 @@ export function generateCustomerConfirmationEmail(data: BookingNotificationData)
   subject: string;
   html: string;
 } {
+  const priceDisplay = data.servicePrice > 0 ? formatCurrency(data.servicePrice) : 'A combinar (mediante avaliação)';
+
   return {
     subject: `Agendamento Confirmado - ${data.businessName}`,
     html: `
@@ -64,7 +67,7 @@ export function generateCustomerConfirmationEmail(data: BookingNotificationData)
           <p style="margin: 6px 0; color: #374151;"><strong>👤 Profissional:</strong> ${data.professionalName}</p>
           <p style="margin: 6px 0; color: #374151;"><strong>📅 Data:</strong> ${data.dateFormatted}</p>
           <p style="margin: 6px 0; color: #374151;"><strong>⏰ Horário:</strong> ${data.timeFormatted}</p>
-          <p style="margin: 6px 0; color: #374151;"><strong>💰 Valor:</strong> ${formatCurrency(data.servicePrice)}</p>
+          <p style="margin: 6px 0; color: #374151;"><strong>💰 Valor:</strong> ${priceDisplay}</p>
           ${data.businessAddress ? `<p style="margin: 6px 0; color: #374151;"><strong>📍 Endereço:</strong> ${data.businessAddress}</p>` : ''}
         </div>
 

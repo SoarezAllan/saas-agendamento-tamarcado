@@ -37,15 +37,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
     }
 
-    const { name, description, durationMinutes, price, category, professionalIds } =
+    const { name, description, durationMinutes, price, priceOnRequest, category, professionalIds } =
       await req.json();
 
-    if (!name || durationMinutes === undefined || price === undefined) {
+    if (!name || durationMinutes === undefined) {
       return NextResponse.json(
-        { error: 'Nome, duração e preço são obrigatórios' },
+        { error: 'Nome e duração são obrigatórios' },
         { status: 400 }
       );
     }
+
+    const isPriceOnRequest = Boolean(priceOnRequest) || price === null || price === undefined || price === '';
+    const numericPrice = isPriceOnRequest ? 0.0 : (parseFloat(price) || 0.0);
 
     const service = await db.service.create({
       data: {
@@ -53,7 +56,8 @@ export async function POST(req: NextRequest) {
         name: name.trim(),
         description: description ? description.trim() : null,
         durationMinutes: parseInt(durationMinutes, 10),
-        price: parseFloat(price),
+        price: numericPrice,
+        priceOnRequest: isPriceOnRequest,
         category: category ? category.trim() : 'Geral',
         active: true,
       },
@@ -96,7 +100,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
     }
 
-    const { id, name, description, durationMinutes, price, category, active, professionalIds } =
+    const { id, name, description, durationMinutes, price, priceOnRequest, category, active, professionalIds } =
       await req.json();
 
     if (!id) {
@@ -111,13 +115,22 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Serviço não encontrado' }, { status: 404 });
     }
 
+    const isPriceOnRequest = priceOnRequest !== undefined ? Boolean(priceOnRequest) : undefined;
+    let numericPrice: number | undefined = undefined;
+    if (isPriceOnRequest === true) {
+      numericPrice = 0.0;
+    } else if (price !== undefined && price !== '') {
+      numericPrice = parseFloat(price);
+    }
+
     await db.service.update({
       where: { id },
       data: {
         name: name !== undefined ? name.trim() : undefined,
         description: description !== undefined ? description?.trim() : undefined,
         durationMinutes: durationMinutes !== undefined ? parseInt(durationMinutes, 10) : undefined,
-        price: price !== undefined ? parseFloat(price) : undefined,
+        price: numericPrice,
+        priceOnRequest: isPriceOnRequest,
         category: category !== undefined ? category?.trim() : undefined,
         active: active !== undefined ? active : undefined,
       },

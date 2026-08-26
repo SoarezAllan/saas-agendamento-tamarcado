@@ -13,6 +13,7 @@ import {
   Loader2,
   Users,
   Tag,
+  HelpCircle,
 } from 'lucide-react';
 import { Modal } from '@/components/ui/modal';
 import { formatCurrency, formatDuration } from '@/lib/utils';
@@ -31,7 +32,8 @@ export default function ServicesPage() {
     name: '',
     description: '',
     durationMinutes: 30,
-    price: 50,
+    price: 50 as number | string,
+    priceOnRequest: false,
     category: 'Geral',
     active: true,
     professionalIds: [] as string[],
@@ -67,6 +69,7 @@ export default function ServicesPage() {
       description: '',
       durationMinutes: 30,
       price: 50,
+      priceOnRequest: false,
       category: 'Geral',
       active: true,
       professionalIds: professionals.map((p) => p.id), // select all by default
@@ -81,7 +84,8 @@ export default function ServicesPage() {
       name: service.name,
       description: service.description || '',
       durationMinutes: service.durationMinutes,
-      price: service.price,
+      price: service.priceOnRequest ? '' : service.price,
+      priceOnRequest: Boolean(service.priceOnRequest) || service.price === 0,
       category: service.category || 'Geral',
       active: service.active,
       professionalIds: service.professionals?.map((p: any) => p.professionalId) || [],
@@ -242,9 +246,15 @@ export default function ServicesPage() {
                       {service.name}
                     </h3>
                   </div>
-                  <span className="text-base font-black text-zinc-900 dark:text-zinc-100">
-                    {formatCurrency(service.price)}
-                  </span>
+                  {service.priceOnRequest || service.price <= 0 ? (
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg flex items-center gap-1 shrink-0" title="Valor mediante avaliação com a empresa">
+                      <HelpCircle className="w-3.5 h-3.5 text-amber-600" /> A combinar
+                    </span>
+                  ) : (
+                    <span className="text-base font-black text-zinc-900 dark:text-zinc-100">
+                      {formatCurrency(service.price)}
+                    </span>
+                  )}
                 </div>
 
                 {service.description && (
@@ -320,7 +330,7 @@ export default function ServicesPage() {
             <input
               type="text"
               required
-              placeholder="Ex: Corte Degradê, Limpeza de Pele..."
+              placeholder="Ex: Análise de Contrato, Corte Degradê, Avaliação..."
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500"
@@ -350,18 +360,20 @@ export default function ServicesPage() {
 
             <div>
               <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                Preço (R$) <span className="text-rose-500">*</span>
+                Preço (R$) {!formData.priceOnRequest && <span className="text-rose-500">*</span>}
               </label>
               <input
                 type="number"
                 step="0.50"
                 min="0"
-                required
-                value={formData.price}
+                disabled={formData.priceOnRequest}
+                required={!formData.priceOnRequest}
+                placeholder={formData.priceOnRequest ? 'Sob avaliação' : '0.00'}
+                value={formData.priceOnRequest ? '' : formData.price}
                 onChange={(e) =>
-                  setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
+                  setFormData({ ...formData, price: e.target.value })
                 }
-                className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100"
+                className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 disabled:opacity-50 disabled:bg-zinc-100 dark:disabled:bg-zinc-800"
               />
             </div>
 
@@ -371,12 +383,39 @@ export default function ServicesPage() {
               </label>
               <input
                 type="text"
-                placeholder="Ex: Cabelo, Barba, Facial"
+                placeholder="Ex: Contratos, Cabelo..."
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100"
               />
             </div>
+          </div>
+
+          {/* Price on Request Checkbox */}
+          <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="priceOnRequestCheckbox"
+              checked={formData.priceOnRequest}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setFormData({
+                  ...formData,
+                  priceOnRequest: checked,
+                  price: checked ? '' : (formData.price || 50),
+                });
+              }}
+              className="mt-0.5 rounded-md border-amber-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+            />
+            <label
+              htmlFor="priceOnRequestCheckbox"
+              className="text-xs text-amber-900 dark:text-amber-200 cursor-pointer select-none leading-relaxed"
+            >
+              <strong className="block font-bold">Preço sob consulta / Mediante avaliação com a empresa</strong>
+              <span className="text-[11px] text-amber-700 dark:text-amber-400">
+                Marque esta opção se o valor do serviço depender de avaliação, orçamento ou não precisar ter preço fixo na página pública.
+              </span>
+            </label>
           </div>
 
           <div>

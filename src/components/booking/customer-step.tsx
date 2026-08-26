@@ -11,6 +11,7 @@ interface CustomerStepProps {
     name: string;
     durationMinutes: number;
     price: number;
+    priceOnRequest?: boolean;
     category?: string | null;
   };
   professionalName: string;
@@ -137,10 +138,16 @@ export function CustomerStep({
 
         <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            Valor Total a Pagar no Local:
+            Valor do Serviço:
           </span>
-          <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            {formatCurrency(service.price)}
+          <span className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            {service.priceOnRequest || service.price <= 0 ? (
+              <span className="text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-2.5 py-1 rounded-lg">
+                A combinar (sob avaliação)
+              </span>
+            ) : (
+              formatCurrency(service.price)
+            )}
           </span>
         </div>
       </div>
