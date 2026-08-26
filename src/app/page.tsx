@@ -598,13 +598,10 @@ export default function LandingPage() {
           <p>© {new Date().getFullYear()} TáMarcado. Todos os direitos reservados.</p>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:underline">
-              Painel
+              Entrar
             </Link>
             <Link href="/register" className="hover:underline">
-              Cadastrar Negócio (7 Dias Grátis)
-            </Link>
-            <Link href="/superadmin" className="hover:underline text-amber-600">
-              Super Admin
+              Cadastrar Negócio
             </Link>
           </div>
         </div>
