@@ -202,8 +202,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto">
-            Seja você um <strong>escritório de advocacia</strong>, <strong>estúdio de arquitetura</strong>, <strong>clínica médica</strong>, <strong>consultoria</strong>, <strong>salão de beleza</strong> ou <strong>personal trainer</strong>:
-            automatize sua agenda com página pública exclusiva, termos personalizados e cálculo de horários livres em tempo real.
+            Seja você um <strong>escritório de advocacia</strong>, <strong>clínica médica</strong>, <strong>consultoria</strong>, <strong>salão de beleza</strong>, <strong>barbearia</strong> ou <strong>personal trainer</strong>: automatize sua agenda com uma página pública exclusiva, termos personalizados e cálculo de horários livres em tempo real.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
