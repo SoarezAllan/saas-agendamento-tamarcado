@@ -401,7 +401,7 @@ export default function LandingPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
         <div className="p-10 sm:p-14 rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-teal-700 text-white shadow-2xl space-y-6">
           <h2 className="text-3xl sm:text-4xl font-black">
-            Comece a receber agendamentos online no seu escritório ou clínica
+            Comece a receber agendamentos online no seu negócio
           </h2>
           <p className="text-sm sm:text-base text-blue-100 max-w-xl mx-auto">
             Leva menos de 2 minutos para configurar sua página pública e compartilhar seu link com seus clientes e parceiros.
