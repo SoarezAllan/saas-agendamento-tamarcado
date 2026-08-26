@@ -19,11 +19,13 @@ import { DAYS_OF_WEEK } from '@/lib/utils';
 
 const COLOR_PRESETS = [
   { label: 'Azul Moderno', value: '#2563eb' },
+  { label: 'Azul Marinho Advocacia', value: '#1e3a8a' },
+  { label: 'Verde Petróleo Arquitetura', value: '#0f766e' },
   { label: 'Âmbar Barbearia', value: '#b45309' },
   { label: 'Rosa Estética & Spa', value: '#db2777' },
   { label: 'Esmeralda Saúde', value: '#059669' },
   { label: 'Azul Céu Dr. Odonto', value: '#0284c7' },
-  { label: 'Roxo Premium', value: '#7c3aed' },
+  { label: 'Roxo Terapia & Mente', value: '#7c3aed' },
   { label: 'Preto Elegance', value: '#18181b' },
 ];
 
@@ -263,15 +265,21 @@ export default function SettingsPage() {
                   onChange={(e) => setProfileData({ ...profileData, category: e.target.value })}
                   className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100"
                 >
+                  <option value="Escritório de Advocacia">Escritório de Advocacia / Jurídico</option>
+                  <option value="Arquitetura & Design">Arquitetura, Engenharia & Design</option>
+                  <option value="Consultoria Empresarial">Consultoria Empresarial & Contabilidade</option>
+                  <option value="Psicologia & Terapia">Psicologia, Terapia & TCC</option>
+                  <option value="Clínica Médica">Clínica Médica & Saúde</option>
+                  <option value="Consultório Odontológico">Consultório Odontológico</option>
                   <option value="Barbearia">Barbearia</option>
                   <option value="Salão de Beleza">Salão de Beleza</option>
-                  <option value="Clínica de Estética">Clínica de Estética</option>
-                  <option value="Consultório Odontológico">Consultório Odontológico</option>
-                  <option value="Clínica Médica">Clínica Médica</option>
-                  <option value="Pet Shop (Banho e Tosa)">Pet Shop (Banho e Tosa)</option>
-                  <option value="Personal Trainer / Fitness">Personal Trainer / Fitness</option>
+                  <option value="Clínica de Estética">Clínica de Estética & Spa</option>
+                  <option value="Pet Shop (Banho e Tosa)">Pet Shop & Veterinária</option>
+                  <option value="Personal Trainer / Fitness">Personal Trainer & Estúdio Fitness</option>
+                  <option value="Fotografia & Estúdio">Fotografia & Audiovisual</option>
+                  <option value="Aulas Particulares">Aulas Particulares & Mentoria</option>
                   <option value="Estúdio de Tatuagem">Estúdio de Tatuagem</option>
-                  <option value="Geral">Outro / Geral</option>
+                  <option value="Geral">Outro Negócio / Serviços Gerais</option>
                 </select>
               </div>
 

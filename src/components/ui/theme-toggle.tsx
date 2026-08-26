@@ -70,3 +70,4 @@ export function ThemeToggle({ showLabel = false, className = '' }: ThemeTogglePr
     </button>
   );
 }
+

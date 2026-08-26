@@ -33,6 +33,8 @@ model Business {
   address      String?
   phone        String?
   email        String?
+  serviceTerm  String         @default("Serviço") // Ex: Serviço, Consulta, Reunião, Sessão, Procedimento, Aula
+  proTerm      String         @default("Profissional") // Ex: Profissional, Advogado(a), Arquiteto(a), Especialista, Médico(a), Terapeuta
   trialEndsAt  DateTime?
   planId       String?
   createdAt    DateTime       @default(now())

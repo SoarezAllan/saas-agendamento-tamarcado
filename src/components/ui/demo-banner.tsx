@@ -38,3 +38,4 @@ export function DemoBanner({ businessName }: DemoBannerProps) {
     </div>
   );
 }
+

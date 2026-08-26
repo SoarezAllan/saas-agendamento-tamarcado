@@ -88,33 +88,51 @@ async function main() {
   }
   console.log('✅ SaaS Plans created');
 
-  // 3. Create Business 1: Barbearia Vintage
+  // Helper for 7 days hours
+  const createDefaultHours = (bizId: string) => [
+    { businessId: bizId, dayOfWeek: 0, isOpen: false, openTime: '09:00', closeTime: '18:00' },
+    { businessId: bizId, dayOfWeek: 1, isOpen: true, openTime: '08:00', closeTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { businessId: bizId, dayOfWeek: 2, isOpen: true, openTime: '08:00', closeTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { businessId: bizId, dayOfWeek: 3, isOpen: true, openTime: '08:00', closeTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { businessId: bizId, dayOfWeek: 4, isOpen: true, openTime: '08:00', closeTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { businessId: bizId, dayOfWeek: 5, isOpen: true, openTime: '08:00', closeTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { businessId: bizId, dayOfWeek: 6, isOpen: true, openTime: '08:00', closeTime: '18:00', breakStart: '12:00', breakEnd: '13:00' },
+  ];
+
+  const createDefaultProAvailability = (proId: string) => [
+    { professionalId: proId, dayOfWeek: 0, isAvailable: false, startTime: '09:00', endTime: '18:00' },
+    { professionalId: proId, dayOfWeek: 1, isAvailable: true, startTime: '09:00', endTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { professionalId: proId, dayOfWeek: 2, isAvailable: true, startTime: '09:00', endTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { professionalId: proId, dayOfWeek: 3, isAvailable: true, startTime: '09:00', endTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { professionalId: proId, dayOfWeek: 4, isAvailable: true, startTime: '09:00', endTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { professionalId: proId, dayOfWeek: 5, isAvailable: true, startTime: '09:00', endTime: '19:00', breakStart: '12:00', breakEnd: '13:00' },
+    { professionalId: proId, dayOfWeek: 6, isAvailable: true, startTime: '09:00', endTime: '18:00', breakStart: '12:00', breakEnd: '13:00' },
+  ];
+
+  // ==========================================
+  // BUSINESS 1: Barbearia Vintage Club
+  // ==========================================
   const barbearia = await prisma.business.create({
     data: {
       name: 'Barbearia Vintage Club',
       slug: 'barbearia-vintage',
       category: 'Barbearia',
+      serviceTerm: 'Serviço',
+      proTerm: 'Barbeiro',
       description: 'Estilo clássico, atendimento moderno e os melhores profissionais da cidade.',
-      primaryColor: '#b45309', // Amber-700
+      primaryColor: '#b45309',
       logoUrl: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=200&auto=format&fit=crop&q=80',
       address: 'Rua Augusta, 1250 - Consolação, São Paulo - SP',
       phone: '(11) 98765-4321',
       email: 'contato@barbeariavintage.com.br',
       trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      subscription: {
-        create: {
-          plan: 'PRO',
-          status: 'ACTIVE',
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        },
-      },
+      subscription: { create: { plan: 'PRO', status: 'ACTIVE' } },
     },
   });
 
-  // Admin for Barbearia
   await prisma.user.create({
     data: {
-      name: 'Marcelo Vintage (Dono)',
+      name: 'Roberto Vintage (Dono)',
       email: 'admin@barbearia.com',
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
@@ -122,262 +140,334 @@ async function main() {
     },
   });
 
-  // Working hours for Barbearia (Mon to Sat: 09:00 - 20:00, Sun: Closed)
-  for (let day = 0; day <= 6; day++) {
-    await prisma.businessHours.create({
-      data: {
-        businessId: barbearia.id,
-        dayOfWeek: day,
-        isOpen: day >= 1 && day <= 6, // Closed on Sunday (0)
-        openTime: '09:00',
-        closeTime: '20:00',
-        breakStart: '13:00',
-        breakEnd: '14:00',
-      },
-    });
-  }
+  await prisma.businessHours.createMany({ data: createDefaultHours(barbearia.id) });
 
-  // Professionals for Barbearia
-  const profCarlos = await prisma.professional.create({
+  const proCarlos = await prisma.professional.create({
     data: {
       businessId: barbearia.id,
-      name: 'Carlos Mestre da Navalha',
+      name: 'Carlos Navalha',
       email: 'carlos@barbearia.com',
-      phone: '(11) 99111-2222',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-      bio: 'Especialista em cortes clássicos, fade degradê e alinhamento de barba com toalha quente.',
-      active: true,
+      phone: '(11) 91111-2222',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      bio: 'Especialista em degradê na navalha, corte clássico e barba alinhada.',
     },
   });
-
-  // Create login for Carlos
   await prisma.user.create({
     data: {
-      name: 'Carlos Mestre da Navalha',
+      name: 'Carlos Navalha',
       email: 'carlos@barbearia.com',
       passwordHash: proPasswordHash,
       role: 'PROFESSIONAL',
       businessId: barbearia.id,
-      professionalId: profCarlos.id,
+      professionalId: proCarlos.id,
     },
   });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(proCarlos.id) });
 
-  const profRafael = await prisma.professional.create({
+  const proRafael = await prisma.professional.create({
     data: {
       businessId: barbearia.id,
-      name: 'Rafael Cortes',
+      name: 'Rafael Tesoura de Ouro',
       email: 'rafael@barbearia.com',
-      phone: '(11) 99222-3333',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
-      bio: 'Especialista em visagismo masculino, cortes tesoura e tratamentos capilares.',
-      active: true,
+      phone: '(11) 92222-3333',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      bio: '10 anos de experiência em cortes modernos, freestyle e química capilar.',
     },
   });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(proRafael.id) });
 
-  const profThiago = await prisma.professional.create({
-    data: {
-      businessId: barbearia.id,
-      name: 'Thiago Barba & Arte',
-      email: 'thiago@barbearia.com',
-      phone: '(11) 99333-4444',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
-      bio: 'Barbeiro experiente em pigmentação, selagem e design de sobrancelha masculina.',
-      active: true,
-    },
-  });
-
-  // Add individual availability for professionals
-  for (const prof of [profCarlos, profRafael, profThiago]) {
-    for (let day = 0; day <= 6; day++) {
-      await prisma.professionalAvailability.create({
-        data: {
-          professionalId: prof.id,
-          dayOfWeek: day,
-          isAvailable: day >= 1 && day <= 6,
-          startTime: '09:00',
-          endTime: '19:30',
-          breakStart: '13:00',
-          breakEnd: '14:00',
-        },
-      });
-    }
-  }
-
-  // Services for Barbearia
   const srvCorte = await prisma.service.create({
     data: {
       businessId: barbearia.id,
-      name: 'Corte Cabelo Degradê / Fade',
-      description: 'Corte moderno com máquina e tesoura, finalização com pomada e secador.',
-      durationMinutes: 30,
+      name: 'Corte de Cabelo Clássico / Degradê',
+      description: 'Corte completo com lavagem, finalização com pomada e toalha quente.',
+      durationMinutes: 45,
       price: 55.0,
       category: 'Cabelo',
-      active: true,
     },
   });
-
   const srvBarba = await prisma.service.create({
     data: {
       businessId: barbearia.id,
-      name: 'Barba Terapia com Toalha Quente',
-      description: 'Desenho preciso com navalha descartável, óleos essenciais e toalha vaporizada.',
-      durationMinutes: 30,
+      name: 'Barboterapia Completa',
+      description: 'Tratamento com toalha quente, óleos essenciais, massagem e navalha afiada.',
+      durationMinutes: 35,
       price: 45.0,
       category: 'Barba',
-      active: true,
     },
   });
-
   const srvCombo = await prisma.service.create({
     data: {
       businessId: barbearia.id,
-      name: 'Combo Completo (Cabelo + Barba)',
-      description: 'Experiência completa com corte de cabelo, barba terapia e lavagem.',
-      durationMinutes: 60,
+      name: 'Combo Cabelo + Barba + Sobrancelha',
+      description: 'O pacote completo para sair renovado. Inclui toalha quente e bebida cortesia.',
+      durationMinutes: 75,
       price: 90.0,
       category: 'Combos',
-      active: true,
     },
   });
 
-  const srvPigmentacao = await prisma.service.create({
+  await prisma.serviceProfessional.createMany({
+    data: [
+      { serviceId: srvCorte.id, professionalId: proCarlos.id },
+      { serviceId: srvCorte.id, professionalId: proRafael.id },
+      { serviceId: srvBarba.id, professionalId: proCarlos.id },
+      { serviceId: srvBarba.id, professionalId: proRafael.id },
+      { serviceId: srvCombo.id, professionalId: proCarlos.id },
+      { serviceId: srvCombo.id, professionalId: proRafael.id },
+    ],
+  });
+
+  // Sample Appointments for Barbearia
+  const today = new Date();
+  await prisma.appointment.create({
     data: {
       businessId: barbearia.id,
-      name: 'Pigmentação de Barba / Cabelo',
-      description: 'Correção de falhas e realce dos contornos com tintura semi-permanente.',
-      durationMinutes: 30,
-      price: 40.0,
-      category: 'Tratamentos',
-      active: true,
+      professionalId: proCarlos.id,
+      serviceId: srvCombo.id,
+      customerName: 'Lucas Ferreira',
+      customerPhone: '(11) 99887-1122',
+      customerEmail: 'lucas@gmail.com',
+      startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 10, 0),
+      endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 11, 15),
+      status: 'CONFIRMED',
+      totalPrice: 90.0,
+      manageToken: crypto.randomUUID(),
     },
   });
 
-  // Link services to professionals
-  for (const prof of [profCarlos, profRafael, profThiago]) {
-    await prisma.serviceProfessional.create({ data: { serviceId: srvCorte.id, professionalId: prof.id } });
-    await prisma.serviceProfessional.create({ data: { serviceId: srvBarba.id, professionalId: prof.id } });
-    await prisma.serviceProfessional.create({ data: { serviceId: srvCombo.id, professionalId: prof.id } });
-  }
-  await prisma.serviceProfessional.create({ data: { serviceId: srvPigmentacao.id, professionalId: profCarlos.id } });
-  await prisma.serviceProfessional.create({ data: { serviceId: srvPigmentacao.id, professionalId: profThiago.id } });
+  // ==========================================
+  // BUSINESS 2: Albuquerque & Associados - Advocacia
+  // ==========================================
+  const advocacia = await prisma.business.create({
+    data: {
+      name: 'Albuquerque & Associados Advocacia',
+      slug: 'albuquerque-advogados',
+      category: 'Escritório de Advocacia',
+      serviceTerm: 'Consulta Jurídica',
+      proTerm: 'Advogado(a)',
+      description: 'Consultoria e assessoria jurídica especializada em Direito Cível, Trabalhista, Contratos e Tributário.',
+      primaryColor: '#1e3a8a', // Blue-900 / Navy
+      logoUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&auto=format&fit=crop&q=80',
+      address: 'Av. Paulista, 2000 - Edifício Paulista Tower, Conjunto 142 - São Paulo - SP',
+      phone: '(11) 3254-9000',
+      email: 'contato@albuquerqueadv.com.br',
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      subscription: { create: { plan: 'ENTERPRISE', status: 'ACTIVE' } },
+    },
+  });
 
-  // Sample Appointments for Barbearia (past and upcoming)
-  const today = new Date();
-  const sampleAppointments = [
-    {
-      customerName: 'Gabriel Medeiros',
-      customerPhone: '(11) 98111-5555',
-      customerEmail: 'gabriel@exemplo.com',
-      serviceId: srvCombo.id,
-      professionalId: profCarlos.id,
-      hoursOffset: -24,
-      startHour: 10,
-      status: 'COMPLETED',
-      totalPrice: 90.0,
+  await prisma.user.create({
+    data: {
+      name: 'Dra. Mariana Albuquerque',
+      email: 'admin@advocacia.com',
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+      businessId: advocacia.id,
     },
-    {
-      customerName: 'Lucas Ferreira',
-      customerPhone: '(11) 98222-6666',
-      customerEmail: 'lucas.ferreira@exemplo.com',
-      serviceId: srvCorte.id,
-      professionalId: profRafael.id,
-      hoursOffset: -24,
-      startHour: 14,
-      status: 'COMPLETED',
-      totalPrice: 55.0,
+  });
+
+  await prisma.businessHours.createMany({ data: createDefaultHours(advocacia.id) });
+
+  const advMariana = await prisma.professional.create({
+    data: {
+      businessId: advocacia.id,
+      name: 'Dra. Mariana Albuquerque',
+      email: 'mariana@albuquerqueadv.com.br',
+      phone: '(11) 98888-1111',
+      avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+      bio: 'Sócia fundadora. Mestre pela USP em Direito Empresarial, Contratos e Resolução de Conflitos.',
     },
-    {
-      customerName: 'Bruno Henrique',
-      customerPhone: '(11) 98333-7777',
-      customerEmail: 'bruno.h@exemplo.com',
-      serviceId: srvCorte.id,
-      professionalId: profCarlos.id,
-      hoursOffset: 0,
-      startHour: 11,
+  });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(advMariana.id) });
+
+  const advFernando = await prisma.professional.create({
+    data: {
+      businessId: advocacia.id,
+      name: 'Dr. Fernando Costa',
+      email: 'fernando@albuquerqueadv.com.br',
+      phone: '(11) 97777-2222',
+      avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+      bio: 'Especialista em Direito Tributário, Planejamento Patrimonial e Relações Trabalhistas.',
+    },
+  });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(advFernando.id) });
+
+  const srvConsultaJuridica = await prisma.service.create({
+    data: {
+      businessId: advocacia.id,
+      name: 'Consulta Jurídica Inicial (Presencial ou Online)',
+      description: 'Análise aprofundada do caso, diagnóstico legal preliminar e orientação estratégica de medidas.',
+      durationMinutes: 60,
+      price: 350.0,
+      category: 'Consultoria',
+    },
+  });
+
+  const srvAnaliseContrato = await prisma.service.create({
+    data: {
+      businessId: advocacia.id,
+      name: 'Análise e Parecer de Contrato Empresarial',
+      description: 'Auditoria de cláusulas, riscos de inadimplência, responsabilidade civil e proteção jurídica.',
+      durationMinutes: 90,
+      price: 600.0,
+      category: 'Contratos',
+    },
+  });
+
+  const srvAssessoriaTributaria = await prisma.service.create({
+    data: {
+      businessId: advocacia.id,
+      name: 'Assessoria de Planejamento Tributário',
+      description: 'Estruturação fiscal, redução lícita de carga tributária e conformidade fiscal para PMEs.',
+      durationMinutes: 60,
+      price: 450.0,
+      category: 'Tributário',
+    },
+  });
+
+  await prisma.serviceProfessional.createMany({
+    data: [
+      { serviceId: srvConsultaJuridica.id, professionalId: advMariana.id },
+      { serviceId: srvConsultaJuridica.id, professionalId: advFernando.id },
+      { serviceId: srvAnaliseContrato.id, professionalId: advMariana.id },
+      { serviceId: srvAssessoriaTributaria.id, professionalId: advFernando.id },
+    ],
+  });
+
+  await prisma.appointment.create({
+    data: {
+      businessId: advocacia.id,
+      professionalId: advMariana.id,
+      serviceId: srvConsultaJuridica.id,
+      customerName: 'Construtora Horizonte Ltda',
+      customerPhone: '(11) 94444-5555',
+      customerEmail: 'diretoria@horizonte.com.br',
+      startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 14, 0),
+      endTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 15, 0),
       status: 'CONFIRMED',
-      totalPrice: 55.0,
+      totalPrice: 350.0,
+      manageToken: crypto.randomUUID(),
     },
-    {
-      customerName: 'Matheus Albuquerque',
-      customerPhone: '(11) 98444-8888',
-      customerEmail: 'matheus@exemplo.com',
-      serviceId: srvBarba.id,
-      professionalId: profRafael.id,
-      hoursOffset: 0,
-      startHour: 15,
-      status: 'PENDING',
-      totalPrice: 45.0,
+  });
+
+  // ==========================================
+  // BUSINESS 3: Studio Vanguarda Arquitetura & Design
+  // ==========================================
+  const arquitetura = await prisma.business.create({
+    data: {
+      name: 'Studio Vanguarda Arquitetura',
+      slug: 'vanguarda-arquitetura',
+      category: 'Arquitetura & Design de Interiores',
+      serviceTerm: 'Etapa / Reunião',
+      proTerm: 'Arquiteto(a)',
+      description: 'Projetos arquitetônicos residenciais, reformas comerciais e design de interiores contemporâneo.',
+      primaryColor: '#0f766e', // Teal-700
+      logoUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&auto=format&fit=crop&q=80',
+      address: 'Rua Harmonia, 450 - Vila Madalena, São Paulo - SP',
+      phone: '(11) 3812-4000',
+      email: 'contato@vanguardaarq.com.br',
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      subscription: { create: { plan: 'PRO', status: 'ACTIVE' } },
     },
-    {
-      customerName: 'Rodrigo Silveira',
-      customerPhone: '(11) 98555-9999',
-      customerEmail: 'rodrigo.silv@exemplo.com',
-      serviceId: srvCombo.id,
-      professionalId: profThiago.id,
-      hoursOffset: 24,
-      startHour: 10,
-      status: 'CONFIRMED',
-      totalPrice: 90.0,
+  });
+
+  await prisma.user.create({
+    data: {
+      name: 'Arq. Lucas Mendes',
+      email: 'admin@arquitetura.com',
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+      businessId: arquitetura.id,
     },
-    {
-      customerName: 'Felipe Santana',
-      customerPhone: '(11) 98666-0000',
-      customerEmail: 'felipe.s@exemplo.com',
-      serviceId: srvPigmentacao.id,
-      professionalId: profCarlos.id,
-      hoursOffset: 48,
-      startHour: 16,
-      status: 'CONFIRMED',
-      totalPrice: 40.0,
+  });
+
+  await prisma.businessHours.createMany({ data: createDefaultHours(arquitetura.id) });
+
+  const arqLucas = await prisma.professional.create({
+    data: {
+      businessId: arquitetura.id,
+      name: 'Arq. Lucas Mendes',
+      email: 'lucas@vanguardaarq.com.br',
+      phone: '(11) 96666-1111',
+      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+      bio: 'Especialista em arquitetura residencial contemporânea, eficiência energética e iluminação natural.',
     },
-  ];
+  });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(arqLucas.id) });
 
-  for (const item of sampleAppointments) {
-    const apptDate = new Date(today);
-    apptDate.setDate(apptDate.getDate() + Math.floor(item.hoursOffset / 24));
-    apptDate.setHours(item.startHour, 0, 0, 0);
+  const desBeatriz = await prisma.professional.create({
+    data: {
+      businessId: arquitetura.id,
+      name: 'Designer Beatriz Rocha',
+      email: 'beatriz@vanguardaarq.com.br',
+      phone: '(11) 95555-2222',
+      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+      bio: 'Design de interiores, mobiliário sob medida e paletas sensoriais de acabamentos.',
+    },
+  });
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(desBeatriz.id) });
 
-    const apptEndDate = new Date(apptDate);
-    const service = [srvCorte, srvBarba, srvCombo, srvPigmentacao].find((s) => s.id === item.serviceId)!;
-    apptEndDate.setMinutes(apptEndDate.getMinutes() + service.durationMinutes);
+  const srvBriefing = await prisma.service.create({
+    data: {
+      businessId: arquitetura.id,
+      name: 'Briefing e Alinhamento de Projeto Residencial',
+      description: 'Entrevista de necessidades, estudo de viabilidade do terreno/imóvel e estimativa de cronograma.',
+      durationMinutes: 60,
+      price: 250.0,
+      category: 'Projetos',
+    },
+  });
 
-    await prisma.appointment.create({
-      data: {
-        businessId: barbearia.id,
-        professionalId: item.professionalId,
-        serviceId: item.serviceId,
-        customerName: item.customerName,
-        customerPhone: item.customerPhone,
-        customerEmail: item.customerEmail,
-        startTime: apptDate,
-        endTime: apptEndDate,
-        status: item.status,
-        totalPrice: item.totalPrice,
-        manageToken: crypto.randomUUID(),
-      },
-    });
-  }
+  const srvConsultoriaInteriores = await prisma.service.create({
+    data: {
+      businessId: arquitetura.id,
+      name: 'Consultoria de Interiores & Moodboard',
+      description: 'Reunião imersiva com orientações de layout, cores, revestimentos e compras de mobiliário.',
+      durationMinutes: 90,
+      price: 400.0,
+      category: 'Interiores',
+    },
+  });
 
-  // 4. Create Business 2: Clínica Estética Glow
-  const glow = await prisma.business.create({
+  const srvVisitaTecnica = await prisma.service.create({
+    data: {
+      businessId: arquitetura.id,
+      name: 'Visita Técnica e Medição no Imóvel',
+      description: 'Visita presencial para levantamento métrico, conferência estrutural e fotos técnicas.',
+      durationMinutes: 120,
+      price: 500.0,
+      category: 'Técnico',
+    },
+  });
+
+  await prisma.serviceProfessional.createMany({
+    data: [
+      { serviceId: srvBriefing.id, professionalId: arqLucas.id },
+      { serviceId: srvBriefing.id, professionalId: desBeatriz.id },
+      { serviceId: srvConsultoriaInteriores.id, professionalId: desBeatriz.id },
+      { serviceId: srvVisitaTecnica.id, professionalId: arqLucas.id },
+    ],
+  });
+
+  // ==========================================
+  // BUSINESS 4: Clínica Estética Glow & Spa
+  // ==========================================
+  const clinica = await prisma.business.create({
     data: {
       name: 'Clínica Estética Glow & Spa',
       slug: 'clinica-estetica-glow',
       category: 'Clínica de Estética',
-      description: 'Cuidados avançados para sua pele, bem-estar e relaxamento total.',
+      serviceTerm: 'Procedimento',
+      proTerm: 'Especialista',
+      description: 'Tratamentos estéticos faciais e corporais com tecnologia de ponta e cuidado humanizado.',
       primaryColor: '#db2777', // Pink-600
       logoUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&auto=format&fit=crop&q=80',
-      address: 'Av. Paulista, 2000 - Cj 802 - Bela Vista, São Paulo - SP',
-      phone: '(11) 97777-8888',
-      email: 'contato@glowestetica.com.br',
-      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      subscription: {
-        create: {
-          plan: 'PRO',
-          status: 'ACTIVE',
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        },
-      },
+      address: 'Alameda dos Anapurus, 800 - Moema, São Paulo - SP',
+      phone: '(11) 97766-5544',
+      email: 'contato@clinicaglow.com.br',
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      subscription: { create: { plan: 'PRO', status: 'ACTIVE' } },
     },
   });
 
@@ -387,97 +477,76 @@ async function main() {
       email: 'admin@glow.com',
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
-      businessId: glow.id,
+      businessId: clinica.id,
     },
   });
 
-  for (let day = 0; day <= 6; day++) {
-    await prisma.businessHours.create({
-      data: {
-        businessId: glow.id,
-        dayOfWeek: day,
-        isOpen: day >= 1 && day <= 5, // Mon to Fri
-        openTime: '08:30',
-        closeTime: '19:00',
-      },
-    });
-  }
+  await prisma.businessHours.createMany({ data: createDefaultHours(clinica.id) });
 
-  const profVanessa = await prisma.professional.create({
+  const proVanessa = await prisma.professional.create({
     data: {
-      businessId: glow.id,
-      name: 'Dra. Vanessa Toledo',
+      businessId: clinica.id,
+      name: 'Dra. Vanessa Miranda',
       email: 'vanessa@glow.com',
-      phone: '(11) 97111-3333',
-      avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&auto=format&fit=crop&q=80',
-      bio: 'Biomédica esteta especializada em rejuvenescimento facial, peelings e harmonização.',
-      active: true,
+      phone: '(11) 97777-8888',
+      avatarUrl: 'https://images.unsplash.com/photo-1594824813593-57351ffbb393?w=150&auto=format&fit=crop&q=80',
+      bio: 'Biomédica esteta com especialização em rejuvenescimento facial e harmonização.',
     },
   });
-
-  for (let day = 0; day <= 6; day++) {
-    await prisma.professionalAvailability.create({
-      data: {
-        professionalId: profVanessa.id,
-        dayOfWeek: day,
-        isAvailable: day >= 1 && day <= 5,
-        startTime: '08:30',
-        endTime: '18:30',
-      },
-    });
-  }
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(proVanessa.id) });
 
   const srvLimpeza = await prisma.service.create({
     data: {
-      businessId: glow.id,
-      name: 'Limpeza de Pele Profunda + Fototerapia',
-      description: 'Remoção de cravos e impurezas, esfoliação ultrassônica e máscara de LED.',
+      businessId: clinica.id,
+      name: 'Limpeza de Pele Profunda + LEDterapia',
+      description: 'Higienização, extração de cravos indolor, máscara calmante e máscara de LED.',
       durationMinutes: 60,
-      price: 160.0,
+      price: 150.0,
       category: 'Facial',
-      active: true,
     },
   });
-
-  const srvMassagem = await prisma.service.create({
+  const srvPeeling = await prisma.service.create({
     data: {
-      businessId: glow.id,
-      name: 'Massagem Relaxante com Aromaterapia',
-      description: 'Técnicas manuais suaves, óleos aromáticos e alívio das tensões musculares.',
-      durationMinutes: 60,
-      price: 180.0,
-      category: 'Corporal',
-      active: true,
+      businessId: clinica.id,
+      name: 'Peeling Químico Renovador',
+      description: 'Esfoliação química para renovação celular, redução de manchas e linhas finas.',
+      durationMinutes: 45,
+      price: 220.0,
+      category: 'Facial',
     },
   });
 
-  await prisma.serviceProfessional.create({ data: { serviceId: srvLimpeza.id, professionalId: profVanessa.id } });
-  await prisma.serviceProfessional.create({ data: { serviceId: srvMassagem.id, professionalId: profVanessa.id } });
+  await prisma.serviceProfessional.createMany({
+    data: [
+      { serviceId: srvLimpeza.id, professionalId: proVanessa.id },
+      { serviceId: srvPeeling.id, professionalId: proVanessa.id },
+    ],
+  });
 
-  // 5. Create Business 3: Dr. Odontologia
+  // ==========================================
+  // BUSINESS 5: Dr. Sorriso Odontologia Integrada
+  // ==========================================
   const odonto = await prisma.business.create({
     data: {
-      name: 'Dr. Sorriso Odontologia Integrada',
+      name: 'Dr. Sorriso Odontologia',
       slug: 'dr-odonto',
       category: 'Consultório Odontológico',
-      description: 'Seu sorriso em mãos experientes. Odontologia preventiva e estética moderna.',
+      serviceTerm: 'Consulta / Procedimento',
+      proTerm: 'Dentista',
+      description: 'Odontologia moderna, prevenção, implantes, clareamento e estética dental.',
       primaryColor: '#0284c7', // Sky-600
-      address: 'Rua das Flores, 450 - Jardins, São Paulo - SP',
-      phone: '(11) 96666-5555',
+      logoUrl: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=200&auto=format&fit=crop&q=80',
+      address: 'Rua Bela Cintra, 900 - Consolação, São Paulo - SP',
+      phone: '(11) 3100-2020',
       email: 'contato@drsorriso.com.br',
-      trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-      subscription: {
-        create: {
-          plan: 'STARTER',
-          status: 'ACTIVE',
-        },
-      },
+      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      subscription: { create: { plan: 'STARTER', status: 'ACTIVE' } },
     },
   });
 
   await prisma.user.create({
     data: {
-      name: 'Dr. Lucas Odonto',
+      name: 'Dr. Lucas Silva (Dentista Chefe)',
       email: 'admin@odonto.com',
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
@@ -485,73 +554,53 @@ async function main() {
     },
   });
 
-  for (let day = 0; day <= 6; day++) {
-    await prisma.businessHours.create({
-      data: {
-        businessId: odonto.id,
-        dayOfWeek: day,
-        isOpen: day >= 1 && day <= 5,
-        openTime: '08:00',
-        closeTime: '18:00',
-      },
-    });
-  }
+  await prisma.businessHours.createMany({ data: createDefaultHours(odonto.id) });
 
-  const profLucas = await prisma.professional.create({
+  const proLucas = await prisma.professional.create({
     data: {
       businessId: odonto.id,
-      name: 'Dr. Lucas Silva (Dentista)',
+      name: 'Dr. Lucas Silva',
       email: 'lucas@drsorriso.com.br',
-      phone: '(11) 96111-2222',
-      avatarUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&auto=format&fit=crop&q=80',
-      bio: 'Cirurgião Dentista especialista em reabilitação oral e clareamento.',
-      active: true,
+      avatarUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+      bio: 'Cirurgião-dentista com foco em reabilitação oral e clareamento a laser.',
     },
   });
-
-  for (let day = 0; day <= 6; day++) {
-    await prisma.professionalAvailability.create({
-      data: {
-        professionalId: profLucas.id,
-        dayOfWeek: day,
-        isAvailable: day >= 1 && day <= 5,
-        startTime: '08:00',
-        endTime: '18:00',
-      },
-    });
-  }
+  await prisma.professionalAvailability.createMany({ data: createDefaultProAvailability(proLucas.id) });
 
   const srvAvaliacao = await prisma.service.create({
     data: {
       businessId: odonto.id,
-      name: 'Consulta e Avaliação Odontológica',
-      description: 'Checkup digital, exame clínico e planejamento de tratamento.',
-      durationMinutes: 30,
+      name: 'Consulta de Avaliação & Check-up Digital',
+      description: 'Exame clínico minucioso com câmera intraoral e planejamento do plano de tratamento.',
+      durationMinutes: 40,
       price: 120.0,
-      category: 'Clínica Geral',
-      active: true,
+      category: 'Avaliação',
     },
   });
-
-  const srvLimpezaOdonto = await prisma.service.create({
+  const srvClareamento = await prisma.service.create({
     data: {
       businessId: odonto.id,
-      name: 'Profilaxia e Limpeza com Ultrassom',
-      description: 'Remoção de tártaro, polimento coronário e aplicação de flúor.',
-      durationMinutes: 45,
-      price: 190.0,
-      category: 'Prevenção',
-      active: true,
+      name: 'Clareamento Dental a Laser em Consultório',
+      description: 'Sessão com gel clareador de alta performance ativado por laser para dentes mais brancos.',
+      durationMinutes: 60,
+      price: 650.0,
+      category: 'Estética',
     },
   });
 
-  await prisma.serviceProfessional.create({ data: { serviceId: srvAvaliacao.id, professionalId: profLucas.id } });
-  await prisma.serviceProfessional.create({ data: { serviceId: srvLimpezaOdonto.id, professionalId: profLucas.id } });
+  await prisma.serviceProfessional.createMany({
+    data: [
+      { serviceId: srvAvaliacao.id, professionalId: proLucas.id },
+      { serviceId: srvClareamento.id, professionalId: proLucas.id },
+    ],
+  });
 
   console.log('🎉 Seed completed successfully!');
   console.log('----------------------------------------------------');
   console.log('📌 Credenciais de Acesso para Testes Rápidos:');
   console.log('👑 Super Admin: superadmin@saas.com | super123');
+  console.log('⚖️ Admin Advocacia: admin@advocacia.com | admin123 (Slug: /b/albuquerque-advogados)');
+  console.log('📐 Admin Arquitetura: admin@arquitetura.com | admin123 (Slug: /b/vanguarda-arquitetura)');
   console.log('💈 Admin Barbearia: admin@barbearia.com | admin123 (Slug: /b/barbearia-vintage)');
   console.log('✂️ Profissional Carlos: carlos@barbearia.com | pro123');
   console.log('💆 Admin Clínica Glow: admin@glow.com | admin123 (Slug: /b/clinica-estetica-glow)');
@@ -561,10 +610,9 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Error during seed:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
   });
-

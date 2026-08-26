@@ -35,6 +35,8 @@ interface BusinessData {
   address?: string | null;
   phone?: string | null;
   email?: string | null;
+  serviceTerm?: string | null;
+  proTerm?: string | null;
   services: any[];
   professionals: any[];
   businessHours: any[];
@@ -184,7 +186,13 @@ export default function PublicBookingPage({
           name: 'Profissional',
         };
 
-  const isDemoSlug = ['barbearia-vintage', 'clinica-estetica-glow', 'dr-odonto'].includes(slug);
+  const isDemoSlug = [
+    'barbearia-vintage',
+    'clinica-estetica-glow',
+    'dr-odonto',
+    'albuquerque-advogados',
+    'vanguarda-arquitetura',
+  ].includes(slug);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between">

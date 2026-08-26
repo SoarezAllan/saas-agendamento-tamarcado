@@ -25,6 +25,8 @@ export async function GET(
         address: true,
         phone: true,
         email: true,
+        serviceTerm: true,
+        proTerm: true,
         businessHours: {
           orderBy: { dayOfWeek: 'asc' },
         },

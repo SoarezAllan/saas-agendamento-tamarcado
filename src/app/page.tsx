@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   Calendar,
@@ -20,39 +20,137 @@ import {
   MessageCircle,
   PlayCircle,
   FlaskConical,
+  Scale,
+  Compass,
+  Brain,
+  Stethoscope,
+  Briefcase,
+  Dog,
+  Dumbbell,
+  GraduationCap,
+  Layers,
+  Video,
+  Building,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function LandingPage() {
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
+
   const demoBusinesses = [
+    {
+      name: 'Albuquerque & Associados Advocacia',
+      slug: 'albuquerque-advogados',
+      category: 'Escritório de Advocacia',
+      color: '#1e3a8a',
+      image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=500&auto=format&fit=crop&q=80',
+      icon: Scale,
+      tag: 'Jurídico',
+      desc: 'Consultas jurídicas, análise de contratos empresariais e assessoria tributária com advogados especialistas.',
+    },
+    {
+      name: 'Studio Vanguarda Arquitetura',
+      slug: 'vanguarda-arquitetura',
+      category: 'Arquitetura & Design de Interiores',
+      color: '#0f766e',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&auto=format&fit=crop&q=80',
+      icon: Compass,
+      tag: 'Arquitetura',
+      desc: 'Briefing de projetos residenciais, consultoria de interiores e visitas técnicas presenciais no imóvel.',
+    },
     {
       name: 'Barbearia Vintage Club',
       slug: 'barbearia-vintage',
-      category: 'Barbearia (Demonstração)',
+      category: 'Barbearia & Estilo',
       color: '#b45309',
-      image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=400&auto=format&fit=crop&q=80',
+      image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500&auto=format&fit=crop&q=80',
       icon: Scissors,
-      desc: 'Demonstração de cortes degradê, barba terapia e múltiplos profissionais.',
+      tag: 'Beleza',
+      desc: 'Cortes clássicos, degradê na navalha, barboterapia e agendamento por profissional favorito.',
     },
     {
       name: 'Clínica Estética Glow & Spa',
       slug: 'clinica-estetica-glow',
-      category: 'Clínica de Estética (Demonstração)',
+      category: 'Clínica de Estética & Spa',
       color: '#db2777',
-      image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&auto=format&fit=crop&q=80',
+      image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&auto=format&fit=crop&q=80',
       icon: HeartPulse,
-      desc: 'Demonstração de procedimentos faciais, massagens e agendamento por horário.',
+      tag: 'Estética',
+      desc: 'Procedimentos faciais, limpeza de pele profunda, peelings e protocolos corporais.',
     },
     {
       name: 'Dr. Sorriso Odontologia',
       slug: 'dr-odonto',
-      category: 'Consultório Odontológico (Demonstração)',
+      category: 'Consultório Odontológico',
       color: '#0284c7',
-      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&auto=format&fit=crop&q=80',
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&auto=format&fit=crop&q=80',
       icon: Smile,
-      desc: 'Demonstração de consultas de avaliação, profilaxia e estética dental.',
+      tag: 'Saúde',
+      desc: 'Consultas de avaliação, clareamento dental a laser e procedimentos odontológicos modernos.',
     },
   ];
+
+  const niches = [
+    {
+      title: 'Escritórios de Advocacia',
+      desc: 'Agendamento de consultas jurídicas, reuniões presenciais ou por videoconferência com advogados por área de atuação.',
+      icon: Scale,
+      color: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+    },
+    {
+      title: 'Arquitetura & Engenharia',
+      desc: 'Briefing inicial, visitas técnicas em terrenos, apresentação de plantas 3D e consultoria de interiores.',
+      icon: Compass,
+      color: 'bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300 border-teal-200 dark:border-teal-800',
+    },
+    {
+      title: 'Psicologia, Terapia & TCC',
+      desc: 'Sessões individuais, terapia de casal e consultas semanais com respeito a sigilo e horários reservados.',
+      icon: Brain,
+      color: 'bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+    },
+    {
+      title: 'Clínicas & Consultórios Médicos',
+      desc: 'Consultas de rotina, avaliações especializadas, exames e procedimentos com histórico de cada paciente.',
+      icon: Stethoscope,
+      color: 'bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+    },
+    {
+      title: 'Consultorias & Contabilidade',
+      desc: 'Diagnósticos empresariais, planejamento tributário, auditorias e reuniões de alinhamento com clientes.',
+      icon: Briefcase,
+      color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+    },
+    {
+      title: 'Barbearias & Salões de Beleza',
+      desc: 'Cortes, barboterapia, penteados e tratamentos capilares com escolha de barbeiro ou cabeleireiro preferido.',
+      icon: Scissors,
+      color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    },
+    {
+      title: 'Estética, Spas & Massoterapia',
+      desc: 'Limpeza de pele, massagens relaxantes, drenagem linfática e procedimentos estéticos corporais.',
+      icon: HeartPulse,
+      color: 'bg-pink-50 text-pink-700 dark:bg-pink-950/50 dark:text-pink-300 border-pink-200 dark:border-pink-800',
+    },
+    {
+      title: 'Pet Shops & Veterinárias',
+      desc: 'Banho e tosa por porte, consultas veterinárias, vacinas e cuidados com animais de estimação.',
+      icon: Dog,
+      color: 'bg-orange-50 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300 border-orange-200 dark:border-orange-800',
+    },
+    {
+      title: 'Personal Trainers & Estúdios',
+      desc: 'Aulas particulares, treinos individuais, avaliação de bioimpedância e horários em academias/estúdios.',
+      icon: Dumbbell,
+      color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+    },
+  ];
+
+  const filteredDemos =
+    activeCategoryFilter === 'all'
+      ? demoBusinesses
+      : demoBusinesses.filter((b) => b.tag.toLowerCase() === activeCategoryFilter.toLowerCase());
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
@@ -67,7 +165,6 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Theme Toggle Button */}
             <ThemeToggle />
 
             <Link
@@ -89,25 +186,24 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-16 pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
-        {/* Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-500/15 blur-[120px] pointer-events-none rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-blue-500/15 blur-[130px] pointer-events-none rounded-full" />
 
         <div className="relative max-w-4xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
             <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>SaaS Multi-Negócio de Agendamento Online</span>
+            <span>SaaS Multi-Negócio: Advocacia, Arquitetura, Clínicas, Beleza & Consultorias</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
-            Automatize a agenda do seu negócio e receba clientes{' '}
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600">
-              24 horas por dia.
+            A plataforma de agendamentos que se adapta ao{' '}
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-indigo-600 to-teal-600">
+              seu modelo de negócio.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            A solução completa para barbearias, salões, clínicas, consultórios e pet shops.
-            Página de agendamento exclusiva, cálculo de horários livres em tempo real e relatórios financeiros completos.
+          <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto">
+            Seja você um <strong>escritório de advocacia</strong>, <strong>estúdio de arquitetura</strong>, <strong>clínica médica</strong>, <strong>consultoria</strong>, <strong>salão de beleza</strong> ou <strong>personal trainer</strong>:
+            automatize sua agenda com página pública exclusiva, termos personalizados e cálculo de horários livres em tempo real.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
@@ -124,9 +220,46 @@ export default function LandingPage() {
               className="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
             >
               <PlayCircle className="w-4 h-4 text-blue-600" />
-              <span>Acessar Painel com Contas de Demonstração</span>
+              <span>Testar Painel com Contas de Demonstração</span>
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Niches / Business Possibilities Grid */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+        <div className="text-center space-y-3">
+          <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">
+            Infinitas Possibilidades
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-zinc-100">
+            Perfeito para qualquer negócio que atende com hora marcada
+          </h2>
+          <p className="text-xs sm:text-sm text-zinc-500 max-w-2xl mx-auto">
+            O sistema é flexível: você pode personalizar termos (ex: Consulta, Briefing, Sessão, Aula ou Serviço) e cadastrar sua equipe com grades horárias independentes.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {niches.map((n) => {
+            const Icon = n.icon;
+            return (
+              <div
+                key={n.title}
+                className="p-5 rounded-3xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-800 transition-all space-y-2.5"
+              >
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border ${n.color}`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                  {n.title}
+                </h3>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  {n.desc}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -140,22 +273,38 @@ export default function LandingPage() {
               Ambiente de Demonstração & Testes Interativos
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-100">
-              Experimente a Página Pública de Clientes em Lojas de Exemplo
+              Veja a Página Pública de Cada Ramo em Funcionamento
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              As empresas abaixo são <strong>estabelecimentos fictícios criados para você testar</strong>.
-              Você pode clicar em qualquer um deles, escolher serviços, selecionar horários e concluir agendamentos de teste para ver como seus futuros clientes serão atendidos!
+              Clique em qualquer negócio de demonstração abaixo para testar o fluxo de agendamento em 4 passos. Sinta-se à vontade para agendar horários de teste sem custos!
             </p>
+
+            {/* Category Filter Chips */}
+            <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+              {['all', 'Jurídico', 'Arquitetura', 'Beleza', 'Estética', 'Saúde'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategoryFilter(cat)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeCategoryFilter.toLowerCase() === cat.toLowerCase()
+                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-700'
+                  }`}
+                >
+                  {cat === 'all' ? '✨ Ver Todos os Ramos' : cat}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {demoBusinesses.map((biz) => {
+            {filteredDemos.map((biz) => {
               const Icon = biz.icon;
 
               return (
                 <div
                   key={biz.slug}
-                  className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border-2 border-amber-200 dark:border-amber-900/50 shadow-lg shadow-zinc-200/40 dark:shadow-none flex flex-col justify-between group hover:-translate-y-1 transition-all relative"
+                  className="bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border-2 border-zinc-200 dark:border-zinc-800 shadow-lg shadow-zinc-200/40 dark:shadow-none flex flex-col justify-between group hover:-translate-y-1 transition-all relative"
                 >
                   {/* Demo Watermark Badge */}
                   <div className="absolute top-3 right-3 z-10">
@@ -187,11 +336,11 @@ export default function LandingPage() {
                         >
                           <Icon className="w-4 h-4" />
                         </div>
-                        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 truncate">
                           {biz.name}
                         </h3>
                       </div>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{biz.desc}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{biz.desc}</p>
                     </div>
                   </div>
 
@@ -204,7 +353,7 @@ export default function LandingPage() {
                       style={{ backgroundColor: biz.color }}
                     >
                       <PlayCircle className="w-4 h-4" />
-                      <span>Abrir Demonstração do Agendamento</span>
+                      <span>Testar Agendamento neste Ramo</span>
                       <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                     </a>
                   </div>
@@ -233,7 +382,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-base font-bold">Página Pública em 4 Passos</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Interface ultra rápida e mobile-first. Seu cliente escolhe serviço, profissional e horário sem precisar criar senha ou baixar aplicativo.
+              Interface ultra rápida e mobile-first. Seu cliente escolhe o serviço ou consulta, seleciona o profissional e reserva o melhor horário sem precisar criar senha ou baixar aplicativo.
             </p>
           </div>
 
@@ -243,7 +392,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-base font-bold">Motor Anti-Conflito de Horários</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Cálculo inteligente de disponibilidade que respeita intervalos de almoço, folgas, duração de serviços e bloqueios de cada colaborador.
+              Cálculo inteligente de disponibilidade que respeita intervalos de almoço, folgas, duração de atendimentos e bloqueios de cada advogado, arquiteto ou colaborador.
             </p>
           </div>
 
@@ -253,7 +402,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-base font-bold">Relatórios Financeiros & Métricas</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Acompanhe o faturamento realizado, receita prevista, comissões por profissional, serviços mais vendidos e ticket médio.
+              Acompanhe honorários e faturamento realizado, receita prevista do mês, divisão por profissional e ticket médio dos seus atendimentos.
             </p>
           </div>
 
@@ -263,7 +412,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-base font-bold">Multi-Profissional & Portais</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Cada profissional pode ter seu login para visualizar apenas sua própria agenda, enquanto o administrador tem controle global do negócio.
+              Cada sócio, advogado ou profissional da equipe tem seu login individual para visualizar apenas seus próprios compromissos, com controle global para os administradores.
             </p>
           </div>
 
@@ -273,7 +422,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-base font-bold">WhatsApp & Google Calendar</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Confirmações instantâneas, link direto para sincronizar na agenda do Google e link seguro para o próprio cliente remarcar se precisar.
+              Confirmações instantâneas, link direto para sincronizar na agenda do Google e link seguro para o próprio cliente remarcar ou cancelar com antecedência.
             </p>
           </div>
 
@@ -281,9 +430,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold">Multi-Tenant Seguro</h3>
+            <h3 className="text-base font-bold">Multi-Tenant Seguro & Personalizável</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Isolamento total dos dados de cada negócio. Personalize suas cores, logotipo e tenha seu próprio endereço web exclusivo.
+              Isolamento total dos dados de cada empresa. Personalize sua paleta de cores institucional, logotipo e tenha seu próprio endereço web exclusivo.
             </p>
           </div>
         </div>
@@ -291,12 +440,12 @@ export default function LandingPage() {
 
       {/* CTA Bottom Banner */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
-        <div className="p-10 sm:p-14 rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-purple-700 text-white shadow-2xl space-y-6">
+        <div className="p-10 sm:p-14 rounded-3xl bg-linear-to-r from-blue-600 via-indigo-600 to-teal-700 text-white shadow-2xl space-y-6">
           <h2 className="text-3xl sm:text-4xl font-black">
-            Comece a receber agendamentos online hoje mesmo
+            Comece a receber agendamentos online no seu escritório ou clínica
           </h2>
           <p className="text-sm sm:text-base text-blue-100 max-w-xl mx-auto">
-            Leva menos de 2 minutos para configurar sua página pública e compartilhar seu link com seus clientes.
+            Leva menos de 2 minutos para configurar sua página pública e compartilhar seu link com seus clientes e parceiros.
           </p>
           <Link
             href="/register"
