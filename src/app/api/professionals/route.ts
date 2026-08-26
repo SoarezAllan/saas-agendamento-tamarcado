@@ -9,8 +9,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
+    const whereClause: any = { businessId: session.businessId };
+
+    // Professional can only view their own record
+    if (session.role === 'PROFESSIONAL' && session.professionalId) {
+      whereClause.id = session.professionalId;
+    }
+
     const professionals = await db.professional.findMany({
-      where: { businessId: session.businessId },
+      where: whereClause,
       include: {
         services: {
           include: {
@@ -19,6 +26,9 @@ export async function GET(req: NextRequest) {
         },
         availabilities: {
           orderBy: { dayOfWeek: 'asc' },
+        },
+        dateOverrides: {
+          orderBy: { date: 'asc' },
         },
         user: {
           select: { id: true, email: true, role: true },

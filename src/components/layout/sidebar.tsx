@@ -18,6 +18,7 @@ import {
   LogOut,
   Sparkles,
   ShieldCheck,
+  Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -98,9 +99,19 @@ export function Sidebar({ user }: SidebarProps) {
           icon: Calendar,
         },
         {
-          label: 'Meus Horários',
+          label: 'Meus Horários & Folgas',
           href: '/dashboard/professionals',
-          icon: Users,
+          icon: Clock,
+        },
+        {
+          label: 'Meus Clientes',
+          href: '/dashboard/customers',
+          icon: UserCheck,
+        },
+        {
+          label: 'Meus Ganhos & Extrato',
+          href: '/dashboard/financial',
+          icon: TrendingUp,
         },
       ];
 

@@ -114,6 +114,9 @@ export async function calculateAvailableSlots(params: {
         availabilities: {
           where: { dayOfWeek },
         },
+        dateOverrides: {
+          where: { date: dateStr },
+        },
         services: {
           where: { serviceId },
         },
@@ -143,6 +146,9 @@ export async function calculateAvailableSlots(params: {
       include: {
         availabilities: {
           where: { dayOfWeek },
+        },
+        dateOverrides: {
+          where: { date: dateStr },
         },
       },
     });
@@ -179,6 +185,8 @@ export async function calculateAvailableSlots(params: {
 
   const businessOpenMin = timeToMinutes(businessHour.openTime || '09:00');
   const businessCloseMin = timeToMinutes(businessHour.closeTime || '18:00');
+  const businessBreakStartMin = businessHour.breakStart ? timeToMinutes(businessHour.breakStart) : null;
+  const businessBreakEndMin = businessHour.breakEnd ? timeToMinutes(businessHour.breakEnd) : null;
 
   // Check if date is today to filter past slots
   const now = new Date();
@@ -195,6 +203,16 @@ export async function calculateAvailableSlots(params: {
     slotStartMin + serviceDuration <= businessCloseMin;
     slotStartMin += slotInterval
   ) {
+    // Check if slot falls in business break
+    if (
+      businessBreakStartMin !== null &&
+      businessBreakEndMin !== null &&
+      slotStartMin < businessBreakEndMin &&
+      slotStartMin + serviceDuration > businessBreakStartMin
+    ) {
+      continue;
+    }
+
     // If today and slot has already passed, skip
     if (isToday && slotStartMin < currentMinutesToday) {
       continue;
@@ -207,19 +225,28 @@ export async function calculateAvailableSlots(params: {
     const availableProfIds: string[] = [];
 
     for (const prof of candidateProfessionals) {
-      // Check professional working hours
-      const profAvail = prof.availabilities?.[0];
+      // Check professional working hours (Date override takes precedence over recurring weekly schedule)
+      const override = prof.dateOverrides?.[0];
       let profOpenMin = businessOpenMin;
       let profCloseMin = businessCloseMin;
       let profBreakStartMin: number | null = null;
       let profBreakEndMin: number | null = null;
 
-      if (profAvail) {
-        if (!profAvail.isAvailable) continue; // Day off
-        if (profAvail.startTime) profOpenMin = timeToMinutes(profAvail.startTime);
-        if (profAvail.endTime) profCloseMin = timeToMinutes(profAvail.endTime);
-        if (profAvail.breakStart) profBreakStartMin = timeToMinutes(profAvail.breakStart);
-        if (profAvail.breakEnd) profBreakEndMin = timeToMinutes(profAvail.breakEnd);
+      if (override) {
+        if (!override.isAvailable) continue; // Explicit day off
+        if (override.startTime) profOpenMin = timeToMinutes(override.startTime);
+        if (override.endTime) profCloseMin = timeToMinutes(override.endTime);
+        if (override.breakStart) profBreakStartMin = timeToMinutes(override.breakStart);
+        if (override.breakEnd) profBreakEndMin = timeToMinutes(override.breakEnd);
+      } else {
+        const profAvail = prof.availabilities?.[0];
+        if (profAvail) {
+          if (!profAvail.isAvailable) continue; // Recurring weekly day off
+          if (profAvail.startTime) profOpenMin = timeToMinutes(profAvail.startTime);
+          if (profAvail.endTime) profCloseMin = timeToMinutes(profAvail.endTime);
+          if (profAvail.breakStart) profBreakStartMin = timeToMinutes(profAvail.breakStart);
+          if (profAvail.breakEnd) profBreakEndMin = timeToMinutes(profAvail.breakEnd);
+        }
       }
 
       // Check if slot is within professional's shift

@@ -263,19 +263,21 @@ export default function CalendarPage() {
           <span>Filtros:</span>
         </div>
 
-        {/* Professional Filter */}
-        <select
-          value={selectedProfFilter}
-          onChange={(e) => setSelectedProfFilter(e.target.value)}
-          className="text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-2.5 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none"
-        >
-          <option value="all">Todos os Profissionais</option>
-          {professionals.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
+        {/* Professional Filter (only for admin with multiple professionals) */}
+        {professionals.length > 1 && (
+          <select
+            value={selectedProfFilter}
+            onChange={(e) => setSelectedProfFilter(e.target.value)}
+            className="text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-2.5 py-1.5 text-zinc-800 dark:text-zinc-200 focus:outline-none"
+          >
+            <option value="all">Todos os Profissionais</option>
+            {professionals.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        )}
 
         {/* Status Filter */}
         <select

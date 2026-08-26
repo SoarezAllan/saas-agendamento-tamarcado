@@ -78,6 +78,7 @@ model Professional {
   business       Business                 @relation(fields: [businessId], references: [id], onDelete: Cascade)
   user           User?
   availabilities ProfessionalAvailability[]
+  dateOverrides  ProfessionalDateOverride[]
   services       ServiceProfessional[]
   appointments   Appointment[]
 }
@@ -95,6 +96,24 @@ model ProfessionalAvailability {
   professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
 
   @@unique([professionalId, dayOfWeek])
+}
+
+model ProfessionalDateOverride {
+  id             String       @id @default(cuid())
+  professionalId String
+  date           String       // Formato "YYYY-MM-DD"
+  isAvailable    Boolean      @default(false) // false = Folga / Bloqueado, true = Trabalho Extra / Horário Especial
+  startTime      String?      // "09:00"
+  endTime        String?      // "18:00"
+  breakStart     String?      // "12:00"
+  breakEnd       String?      // "13:00"
+  reason         String?      // "Folga", "Férias", "Feriado", "Plantão"
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@unique([professionalId, date])
 }
 
 model Service {
