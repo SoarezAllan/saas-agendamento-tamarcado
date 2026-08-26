@@ -104,7 +104,7 @@ export function Sidebar({ user }: SidebarProps) {
           icon: Clock,
         },
         {
-          label: 'Meus Clientes',
+          label: 'Clientes',
           href: '/dashboard/customers',
           icon: UserCheck,
         },
