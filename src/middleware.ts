@@ -24,3 +24,4 @@ export const config = {
     '/superadmin/:path*',
   ],
 };
+
