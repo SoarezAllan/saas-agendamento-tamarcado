@@ -2,6 +2,8 @@
  * Mercado Pago Integration Utility for TáMarcado SaaS Subscriptions
  */
 
+import { getSystemSetting } from '@/lib/settings';
+
 const MERCADO_PAGO_API_URL = 'https://api.mercadopago.com';
 
 export interface CreatePreferenceOptions {
@@ -21,10 +23,61 @@ export interface PreferenceResult {
   isSimulated: boolean;
 }
 
+export async function getMercadoPagoToken(): Promise<string> {
+  const dbToken = await getSystemSetting('MERCADO_PAGO_ACCESS_TOKEN');
+  if (dbToken && dbToken.trim()) return dbToken.trim();
+  return (process.env.MERCADO_PAGO_ACCESS_TOKEN || '').trim();
+}
+
+export async function testMercadoPagoConnection(customToken?: string) {
+  const token = customToken || (await getMercadoPagoToken());
+
+  if (!token || token.trim() === '' || token === 'SEU_MERCADO_PAGO_ACCESS_TOKEN_AQUI') {
+    return {
+      connected: false,
+      isSimulated: true,
+      message: 'Modo Demonstração (Nenhum Access Token configurado).',
+    };
+  }
+
+  try {
+    const response = await fetch(`${MERCADO_PAGO_API_URL}/users/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      return {
+        connected: false,
+        error: `Falha na autenticação com o Mercado Pago (Status ${response.status})`,
+      };
+    }
+
+    const data = await response.json();
+    return {
+      connected: true,
+      user: {
+        id: data.id,
+        nickname: data.nickname,
+        email: data.email,
+        siteId: data.site_id,
+      },
+      message: `Conectado com sucesso à conta Mercado Pago (${data.nickname || data.email || data.id})!`,
+    };
+  } catch (err: any) {
+    return {
+      connected: false,
+      error: err.message || 'Erro ao conectar à API do Mercado Pago',
+    };
+  }
+}
+
 export async function createMercadoPagoPreference(
   options: CreatePreferenceOptions
 ): Promise<PreferenceResult> {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const token = await getMercadoPagoToken();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   // External reference used to correlate webhook back to business and plan
@@ -99,7 +152,7 @@ export async function createMercadoPagoPreference(
 }
 
 export async function getMercadoPagoPayment(paymentId: string | number) {
-  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const token = await getMercadoPagoToken();
   if (!token) return null;
 
   const response = await fetch(`${MERCADO_PAGO_API_URL}/v1/payments/${paymentId}`, {
@@ -115,4 +168,3 @@ export async function getMercadoPagoPayment(paymentId: string | number) {
 
   return response.json();
 }
-
