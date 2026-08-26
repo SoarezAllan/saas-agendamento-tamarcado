@@ -5,7 +5,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Loader2, Menu, X, ExternalLink } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { DemoTimerModal } from '@/components/ui/demo-timer-modal';
 
 export default function DashboardLayout({
   children,
@@ -51,10 +50,7 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex text-zinc-900 dark:text-zinc-100 relative">
-      {/* 1-Minute Demo Timer Modal & Pill */}
-      <DemoTimerModal user={user} />
-
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex text-zinc-900 dark:text-zinc-100">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar user={user} />
