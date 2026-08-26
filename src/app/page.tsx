@@ -413,14 +413,16 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <Link
-                href="/login?role=owner"
+              <a
+                href="/api/auth/demo?role=owner"
+                target="_blank"
+                rel="noreferrer"
                 className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Entrar como Dono / Gestor</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              </a>
             </div>
 
             {/* Card 2: Profissional da Equipe */}
@@ -465,14 +467,16 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <Link
-                href="/login?role=professional"
+              <a
+                href="/api/auth/demo?role=professional"
+                target="_blank"
+                rel="noreferrer"
                 className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Entrar como Profissional</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              </a>
             </div>
           </div>
         </div>

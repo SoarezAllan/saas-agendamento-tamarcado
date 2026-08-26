@@ -79,31 +79,6 @@ function LoginForm() {
 
   return (
     <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6">
-      {/* Quick Test Demo Chips */}
-      <div className="space-y-2">
-        <span className="text-[11px] font-semibold text-zinc-400 block text-center">
-          ⚡ Contas de Teste Rápido (1 clique):
-        </span>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => handleQuickFill('admin@barbearia.com', 'admin123')}
-            className="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-amber-100 transition-colors cursor-pointer"
-          >
-            <Scissors className="w-3.5 h-3.5" />
-            <span>Dono Barbearia</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickFill('carlos@barbearia.com', 'pro123')}
-            className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold flex items-center justify-center gap-1.5 hover:bg-emerald-100 transition-colors cursor-pointer"
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>Profissional</span>
-          </button>
-        </div>
-      </div>
-
       {error && (
         <div className="p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs font-medium border border-rose-200">
           {error}
