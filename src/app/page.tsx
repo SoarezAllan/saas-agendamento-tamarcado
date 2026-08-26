@@ -31,12 +31,11 @@ import {
   Layers,
   Video,
   Building,
+  Eye,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export default function LandingPage() {
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState('all');
-
   const demoBusinesses = [
     {
       name: 'Albuquerque & Associados Advocacia',
@@ -46,17 +45,19 @@ export default function LandingPage() {
       image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=500&auto=format&fit=crop&q=80',
       icon: Scale,
       tag: 'Jurídico',
+      views: '1.420',
       desc: 'Consultas jurídicas, análise de contratos empresariais e assessoria tributária com advogados especialistas.',
     },
     {
-      name: 'Studio Vanguarda Arquitetura',
-      slug: 'vanguarda-arquitetura',
-      category: 'Arquitetura & Design de Interiores',
-      color: '#0f766e',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&auto=format&fit=crop&q=80',
-      icon: Compass,
-      tag: 'Arquitetura',
-      desc: 'Briefing de projetos residenciais, consultoria de interiores e visitas técnicas presenciais no imóvel.',
+      name: 'Dr. Sorriso Odontologia Integrada',
+      slug: 'dr-odonto',
+      category: 'Consultório Odontológico',
+      color: '#0284c7',
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&auto=format&fit=crop&q=80',
+      icon: Smile,
+      tag: 'Saúde',
+      views: '2.180',
+      desc: 'Consultas de avaliação, clareamento dental a laser e procedimentos odontológicos modernos.',
     },
     {
       name: 'Barbearia Vintage Club',
@@ -66,27 +67,8 @@ export default function LandingPage() {
       image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=500&auto=format&fit=crop&q=80',
       icon: Scissors,
       tag: 'Beleza',
+      views: '3.850',
       desc: 'Cortes clássicos, degradê na navalha, barboterapia e agendamento por profissional favorito.',
-    },
-    {
-      name: 'Clínica Estética Glow & Spa',
-      slug: 'clinica-estetica-glow',
-      category: 'Clínica de Estética & Spa',
-      color: '#db2777',
-      image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=500&auto=format&fit=crop&q=80',
-      icon: HeartPulse,
-      tag: 'Estética',
-      desc: 'Procedimentos faciais, limpeza de pele profunda, peelings e protocolos corporais.',
-    },
-    {
-      name: 'Dr. Sorriso Odontologia',
-      slug: 'dr-odonto',
-      category: 'Consultório Odontológico',
-      color: '#0284c7',
-      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=500&auto=format&fit=crop&q=80',
-      icon: Smile,
-      tag: 'Saúde',
-      desc: 'Consultas de avaliação, clareamento dental a laser e procedimentos odontológicos modernos.',
     },
   ];
 
@@ -146,11 +128,6 @@ export default function LandingPage() {
       color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
     },
   ];
-
-  const filteredDemos =
-    activeCategoryFilter === 'all'
-      ? demoBusinesses
-      : demoBusinesses.filter((b) => b.tag.toLowerCase() === activeCategoryFilter.toLowerCase());
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
@@ -272,32 +249,15 @@ export default function LandingPage() {
               Ambiente de Demonstração & Testes Interativos
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-zinc-100">
-              Veja a Página Pública de Cada Ramo em Funcionamento
+              Veja a Página de Demonstração de diferentes negócios em Funcionamento
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
               Clique em qualquer negócio de demonstração abaixo para testar o fluxo de agendamento em 4 passos. Sinta-se à vontade para agendar horários de teste sem custos!
             </p>
-
-            {/* Category Filter Chips */}
-            <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
-              {['all', 'Jurídico', 'Arquitetura', 'Beleza', 'Estética', 'Saúde'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategoryFilter(cat)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    activeCategoryFilter.toLowerCase() === cat.toLowerCase()
-                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs'
-                      : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 border border-zinc-200 dark:border-zinc-700'
-                  }`}
-                >
-                  {cat === 'all' ? '✨ Ver Todos os Ramos' : cat}
-                </button>
-              ))}
-            </div>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredDemos.map((biz) => {
+            {demoBusinesses.map((biz) => {
               const Icon = biz.icon;
 
               return (
@@ -327,7 +287,7 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="p-6 space-y-2">
+                    <div className="p-6 space-y-3">
                       <div className="flex items-center gap-2">
                         <div
                           className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs"
@@ -339,7 +299,21 @@ export default function LandingPage() {
                           {biz.name}
                         </h3>
                       </div>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{biz.desc}</p>
+
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
+                        {biz.desc}
+                      </p>
+
+                      {/* Views / Metrics Info Badge */}
+                      <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-[11px] text-zinc-500 dark:text-zinc-400">
+                        <span className="inline-flex items-center gap-1.5 font-medium bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md">
+                          <Eye className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <strong className="text-zinc-800 dark:text-zinc-200">{biz.views}</strong> visualizações / mês
+                        </span>
+                        <span className="text-[10px] text-emerald-600 font-semibold">
+                          ● Online
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -348,11 +322,11 @@ export default function LandingPage() {
                       href={`/b/${biz.slug}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer hover:opacity-95"
                       style={{ backgroundColor: biz.color }}
                     >
                       <PlayCircle className="w-4 h-4" />
-                      <span>Testar Agendamento neste Ramo</span>
+                      <span>Testar Agendamento</span>
                       <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                     </a>
                   </div>
