@@ -368,98 +368,44 @@ export default function LandingPage() {
           </div>
 
           {/* Cards for each user profile */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Card 1: Dono do Negócio - Advocacia */}
-            <div className="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-blue-500/50 transition-all space-y-4 shadow-sm">
-              <div className="space-y-3">
+          <div className="grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
+            {/* Card 1: Dono / Gestor do Negócio */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-amber-500/50 transition-all space-y-5 shadow-sm">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300">
-                    Dono / Admin
-                  </span>
-                  <Scale className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                    Escritório de Advocacia
-                  </h3>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                    Albuquerque & Associados
-                  </p>
-                </div>
-                <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
-                    O que este perfil visualiza:
-                  </p>
-                  <ul className="space-y-1 text-[11px]">
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Faturamento e consultas</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Equipe de advogados</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Termos jurídicos ("Consulta")</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                disabled={loggingInEmail !== null}
-                onClick={() => handleDemoLogin('admin@advocacia.com', 'admin123')}
-                className="w-full py-3 px-4 rounded-2xl text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
-              >
-                {loggingInEmail === 'admin@advocacia.com' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <PlayCircle className="w-4 h-4" />
-                    <span>Entrar como Dono (Advocacia)</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Card 2: Dono do Negócio - Barbearia */}
-            <div className="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-amber-500/50 transition-all space-y-4 shadow-sm">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
-                    Dono / Admin
+                  <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                    Dono / Gestor
                   </span>
                   <Scissors className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                    Barbearia Vintage Club
+                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                    Dono / Gestor do Estabelecimento
                   </h3>
                   <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-                    Gestão Completa do Salão
+                    Barbearia Vintage Club • Gestão Completa
                   </p>
                 </div>
-                <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
                   <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
                     O que este perfil visualiza:
                   </p>
-                  <ul className="space-y-1 text-[11px]">
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Agenda geral dos barbeiros</span>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Agenda geral de todos os colaboradores</span>
                     </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Comissões e repasses</span>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Faturamento bruto e relatório de comissões</span>
                     </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Controle de serviços e preços</span>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Controle de serviços, preços e horários</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Configurações visuais e link de agendamento</span>
                     </li>
                   </ul>
                 </div>
@@ -469,7 +415,7 @@ export default function LandingPage() {
                 type="button"
                 disabled={loggingInEmail !== null}
                 onClick={() => handleDemoLogin('admin@barbearia.com', 'admin123')}
-                className="w-full py-3 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
               >
                 {loggingInEmail === 'admin@barbearia.com' ? (
                   <>
@@ -479,45 +425,49 @@ export default function LandingPage() {
                 ) : (
                   <>
                     <PlayCircle className="w-4 h-4" />
-                    <span>Entrar como Dono (Barbearia)</span>
+                    <span>Entrar como Dono / Gestor</span>
                   </>
                 )}
               </button>
             </div>
 
-            {/* Card 3: Profissional da Equipe */}
-            <div className="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-emerald-500/50 transition-all space-y-4 shadow-sm">
-              <div className="space-y-3">
+            {/* Card 2: Profissional da Equipe */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-emerald-500/50 transition-all space-y-5 shadow-sm">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                  <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
                     Profissional / Equipe
                   </span>
                   <User className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                    Carlos Barber (Equipe)
+                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                    Profissional da Equipe
                   </h3>
                   <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                    Visão Individual & Restrita
+                    Carlos Barber • Visão Individual & Restrita
                   </p>
                 </div>
-                <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
                   <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
                     O que este perfil visualiza:
                   </p>
-                  <ul className="space-y-1 text-[11px]">
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span><strong>Apenas a sua própria agenda</strong></span>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span><strong>Apenas seus próprios agendamentos</strong></span>
                     </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Extrato pessoal de comissões</span>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Extrato pessoal de comissões e repasses</span>
                     </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Sem acesso ao financeiro geral</span>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Lista dos seus próprios clientes atendidos</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span className="text-zinc-500">Sem acesso a faturamento geral ou configurações</span>
                     </li>
                   </ul>
                 </div>
@@ -527,7 +477,7 @@ export default function LandingPage() {
                 type="button"
                 disabled={loggingInEmail !== null}
                 onClick={() => handleDemoLogin('carlos@barbearia.com', 'pro123')}
-                className="w-full py-3 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
               >
                 {loggingInEmail === 'carlos@barbearia.com' ? (
                   <>
@@ -538,64 +488,6 @@ export default function LandingPage() {
                   <>
                     <PlayCircle className="w-4 h-4" />
                     <span>Entrar como Profissional</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Card 4: Super Administrador */}
-            <div className="p-6 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-indigo-500/50 transition-all space-y-4 shadow-sm">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
-                    Super Administrador
-                  </span>
-                  <Crown className="w-5 h-5 text-indigo-600" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                    Dono do SaaS TáMarcado
-                  </h3>
-                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                    Visão Global da Plataforma
-                  </p>
-                </div>
-                <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
-                    O que este perfil visualiza:
-                  </p>
-                  <ul className="space-y-1 text-[11px]">
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Todos os negócios cadastrados</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Receita Recorrente Total (MRR)</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Métricas globais do ecossistema</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                disabled={loggingInEmail !== null}
-                onClick={() => handleDemoLogin('superadmin@saas.com', 'super123', '/superadmin')}
-                className="w-full py-3 px-4 rounded-2xl text-xs font-bold text-white bg-indigo-700 hover:bg-indigo-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
-              >
-                {loggingInEmail === 'superadmin@saas.com' ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Entrando...</span>
-                  </>
-                ) : (
-                  <>
-                    <PlayCircle className="w-4 h-4" />
-                    <span>Entrar como Super Admin</span>
                   </>
                 )}
               </button>
