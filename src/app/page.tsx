@@ -43,6 +43,33 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
 
 export default function LandingPage() {
+  const [loggingInEmail, setLoggingInEmail] = useState<string | null>(null);
+
+  const handleDemoLogin = async (demoEmail: string, demoPass: string, redirectUrl = '/dashboard') => {
+    setLoggingInEmail(demoEmail);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: demoEmail, password: demoPass }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Falha ao acessar conta de teste');
+      }
+
+      if (data.user?.role === 'SUPERADMIN' || redirectUrl === '/superadmin') {
+        window.location.href = '/superadmin';
+      } else {
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      alert('Erro ao conectar na conta de teste. Tente novamente.');
+      setLoggingInEmail(null);
+    }
+  };
+
   const demoBusinesses = [
     {
       name: 'Albuquerque & Associados Advocacia',
@@ -321,6 +348,152 @@ export default function LandingPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Account Profiles Demo Section */}
+      <section className="py-16 bg-white dark:bg-zinc-950 border-b border-zinc-100 dark:border-zinc-800 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header explaining user profile views */}
+          <div className="text-center space-y-3 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              <span>Painel Interno • Demonstração por Perfil de Usuário</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-100">
+              Acesse o painel por dentro de acordo com cada perfil
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+              A plataforma se molda ao papel de cada pessoa na empresa. Escolha um dos perfis fictícios abaixo para testar instantaneamente a visão de cada usuário com apenas 1 clique:
+            </p>
+          </div>
+
+          {/* Cards for each user profile */}
+          <div className="grid gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
+            {/* Card 1: Dono / Gestor do Negócio */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-amber-500/50 transition-all space-y-5 shadow-sm">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                    Dono / Gestor
+                  </span>
+                  <Scissors className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                    Dono / Gestor do Estabelecimento
+                  </h3>
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                    Barbearia Vintage Club • Gestão Completa
+                  </p>
+                </div>
+                <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                  <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
+                    O que este perfil visualiza:
+                  </p>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Agenda geral de todos os colaboradores</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Faturamento bruto e relatório de comissões</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Controle de serviços, preços e horários</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Configurações visuais e link de agendamento</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                disabled={loggingInEmail !== null}
+                onClick={() => handleDemoLogin('admin@barbearia.com', 'admin123')}
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {loggingInEmail === 'admin@barbearia.com' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Entrando...</span>
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="w-4 h-4" />
+                    <span>Entrar como Dono / Gestor</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Card 2: Profissional da Equipe */}
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-50 dark:bg-zinc-900/60 border-2 border-zinc-200/80 dark:border-zinc-800 flex flex-col justify-between hover:border-emerald-500/50 transition-all space-y-5 shadow-sm">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                    Profissional / Equipe
+                  </span>
+                  <User className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                    Profissional da Equipe
+                  </h3>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    Carlos Barber • Visão Individual & Restrita
+                  </p>
+                </div>
+                <div className="space-y-2 text-xs text-zinc-600 dark:text-zinc-400">
+                  <p className="font-semibold text-zinc-800 dark:text-zinc-200 text-[11px] uppercase tracking-wider">
+                    O que este perfil visualiza:
+                  </p>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span><strong>Apenas seus próprios agendamentos</strong></span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Extrato pessoal de comissões e repasses</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Lista dos seus próprios clientes atendidos</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span className="text-zinc-500">Sem acesso a faturamento geral ou configurações</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                disabled={loggingInEmail !== null}
+                onClick={() => handleDemoLogin('carlos@barbearia.com', 'pro123')}
+                className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {loggingInEmail === 'carlos@barbearia.com' ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Entrando...</span>
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="w-4 h-4" />
+                    <span>Entrar como Profissional</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </section>
