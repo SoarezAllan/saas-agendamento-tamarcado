@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+
+    // Rate limit: 3 recovery requests per 15 minutes per IP
+    const rateCheck = checkRateLimit(`forgot_pw_${clientIp}`, 3, 15 * 60 * 1000);
+    if (!rateCheck.success) {
+      const waitMinutes = Math.ceil((rateCheck.resetTime - Date.now()) / (60 * 1000));
+      return NextResponse.json(
+        { error: `Muitas solicitações de recuperação. Por favor, aguarde ${waitMinutes} minutos antes de tentar novamente.` },
+        { status: 429 }
+      );
+    }
+
     const { email } = await req.json();
 
     if (!email || typeof email !== 'string') {
@@ -55,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       message: 'Instruções para redefinição de senha enviadas com sucesso!',
-      resetUrl, // Provided in JSON response for dev convenience and preview
+      resetUrl,
     });
   } catch (error) {
     console.error('Forgot password error:', error);
@@ -65,4 +78,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

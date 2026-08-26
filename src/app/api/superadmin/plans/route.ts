@@ -66,3 +66,4 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Erro ao atualizar plano' }, { status: 500 });
   }
 }
+

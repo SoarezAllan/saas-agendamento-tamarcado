@@ -35,14 +35,24 @@ export async function GET(req: NextRequest) {
       startDate = startOfDay(subDays(now, 30));
     }
 
-    const appointments = await db.appointment.findMany({
-      where: {
-        businessId: session.businessId,
-        startTime: {
-          gte: startDate,
-          lte: endDate,
-        },
+    const whereClause: any = {
+      businessId: session.businessId,
+      startTime: {
+        gte: startDate,
+        lte: endDate,
       },
+    };
+
+    // Strict Security Isolation: Professionals can only see their own financial data
+    if (session.role === 'PROFESSIONAL') {
+      if (!session.professionalId) {
+        return NextResponse.json({ error: 'Profissional não vinculado' }, { status: 403 });
+      }
+      whereClause.professionalId = session.professionalId;
+    }
+
+    const appointments = await db.appointment.findMany({
+      where: whereClause,
       include: {
         service: true,
         professional: true,
@@ -150,4 +160,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

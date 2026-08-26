@@ -12,10 +12,20 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('q')?.toLowerCase() || '';
 
+    const whereClause: any = {
+      businessId: session.businessId,
+    };
+
+    // Strict Security Isolation: Staff members can only view their own served customers
+    if (session.role === 'PROFESSIONAL') {
+      if (!session.professionalId) {
+        return NextResponse.json({ error: 'Profissional não vinculado' }, { status: 403 });
+      }
+      whereClause.professionalId = session.professionalId;
+    }
+
     const appointments = await db.appointment.findMany({
-      where: {
-        businessId: session.businessId,
-      },
+      where: whereClause,
       include: {
         service: true,
         professional: true,
@@ -74,4 +84,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-

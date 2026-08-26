@@ -59,3 +59,4 @@ export async function getAllSystemSettings(): Promise<Record<string, string>> {
 
   return result;
 }
+

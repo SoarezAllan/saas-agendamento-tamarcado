@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { comparePassword, createAuthResponse, UserSession } from '@/lib/auth';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
+    const clientIp = getClientIp(req);
+
+    // Rate limiting: 5 login attempts per minute per IP
+    const rateCheck = checkRateLimit(`login_${clientIp}`, 5, 60 * 1000);
+    if (!rateCheck.success) {
+      const waitSeconds = Math.ceil((rateCheck.resetTime - Date.now()) / 1000);
+      return NextResponse.json(
+        { error: `Muitas tentativas de login. Por favor, aguarde ${waitSeconds} segundos antes de tentar novamente.` },
+        { status: 429 }
+      );
+    }
+
     const { email, password } = await req.json();
 
     if (!email || !password) {
@@ -76,4 +89,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

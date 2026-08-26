@@ -82,3 +82,4 @@ export async function PATCH(
     return NextResponse.json({ error: 'Erro ao atualizar empresa' }, { status: 500 });
   }
 }
+
