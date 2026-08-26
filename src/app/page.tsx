@@ -360,7 +360,7 @@ export default function LandingPage() {
               <span>Painel Interno • Demonstração por Perfil de Usuário</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-100">
-              Acesse o Painel por Dentro de Acordo com Cada Perfil
+              Acesse o painel por dentro de acordo com cada perfil
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
               A plataforma se molda ao papel de cada pessoa na empresa. Escolha um dos perfis fictícios abaixo para testar instantaneamente a visão de cada usuário com apenas 1 clique:
