@@ -108,11 +108,6 @@ export function Sidebar({ user }: SidebarProps) {
           href: '/dashboard/customers',
           icon: UserCheck,
         },
-        {
-          label: 'Meus Ganhos & Extrato',
-          href: '/dashboard/financial',
-          icon: TrendingUp,
-        },
       ];
 
   const handleCopyLink = () => {

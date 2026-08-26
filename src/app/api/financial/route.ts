@@ -7,8 +7,8 @@ import { ptBR } from 'date-fns/locale';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session || !session.businessId) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session || !session.businessId || session.role === 'PROFESSIONAL') {
+      return NextResponse.json({ error: 'Acesso restrito ao Gestor do estabelecimento' }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -42,14 +42,6 @@ export async function GET(req: NextRequest) {
         lte: endDate,
       },
     };
-
-    // Strict Security Isolation: Professionals can only see their own financial data
-    if (session.role === 'PROFESSIONAL') {
-      if (!session.professionalId) {
-        return NextResponse.json({ error: 'Profissional não vinculado' }, { status: 403 });
-      }
-      whereClause.professionalId = session.professionalId;
-    }
 
     const appointments = await db.appointment.findMany({
       where: whereClause,

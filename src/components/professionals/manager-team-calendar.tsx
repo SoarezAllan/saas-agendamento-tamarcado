@@ -721,3 +721,4 @@ export function ManagerTeamCalendar({
     </div>
   );
 }
+
