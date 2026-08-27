@@ -45,6 +45,7 @@ function BillingContent() {
   // Checkout Modal State
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<any | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'CREDIT_CARD' | 'PIX'>('CREDIT_CARD');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [payerCpf, setPayerCpf] = useState('');
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<any | null>(null);
@@ -104,6 +105,7 @@ function BillingContent() {
     setSelectedPlanForCheckout(plan);
     setCheckoutResult(null);
     setPayerCpf('');
+    setAcceptedTerms(false);
     setPaymentMethod('CREDIT_CARD');
   };
 
@@ -252,12 +254,7 @@ function BillingContent() {
                 Você está no Período de Teste Grátis de 7 Dias!
               </h3>
               <p className="text-xs text-amber-800 dark:text-amber-300/80 leading-relaxed">
-                Seu acesso completo está liberado até <strong>{trialEndsDate}</strong>.
-                {subscription?.paymentMethod === 'CREDIT_CARD' ? (
-                  <span> Ao término dos 7 dias, a cobrança do plano será efetuada automaticamente no seu cartão cadastrado, caso não haja cancelamento prévio.</span>
-                ) : (
-                  <span> Efetue o pagamento do seu Pix antes do término para manter sua página e agendamentos ativos.</span>
-                )}
+                Seu acesso completo está liberado até <strong>{trialEndsDate}</strong>. Efetue o pagamento através do pix ou cartão de crédito antes do término para manter sua página e agendamentos ativos.
               </p>
             </div>
           </div>
@@ -462,7 +459,7 @@ function BillingContent() {
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
-                  Checkout Seguro • TáMarcado
+                  Checkout • TáMarcado
                 </span>
                 <h3 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
                   Plano {selectedPlanForCheckout.name} ({billingCycle === 'MONTHLY' ? 'Mensal' : billingCycle === 'QUARTERLY' ? 'Trimestral' : 'Anual'})
@@ -608,19 +605,22 @@ function BillingContent() {
                   </div>
                 )}
 
-                {/* CPF input */}
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                    CPF do Titular (Obrigatório pelo Banco Central / Mercado Pago)
-                  </label>
+                {/* Caixinha de Concordo com os Termos */}
+                <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700">
                   <input
-                    type="text"
+                    type="checkbox"
+                    id="accept_terms_checkout"
                     required
-                    placeholder="000.000.000-00"
-                    value={payerCpf}
-                    onChange={(e) => setPayerCpf(e.target.value)}
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-zinc-300 dark:border-zinc-600 cursor-pointer shrink-0"
                   />
+                  <label
+                    htmlFor="accept_terms_checkout"
+                    className="text-xs text-zinc-700 dark:text-zinc-300 leading-snug cursor-pointer select-none"
+                  >
+                    Concordo com os termos e estou ciente de que, ao findar o período de 7 dias de teste grátis, caso não haja o cancelamento, a cobrança virá automaticamente.
+                  </label>
                 </div>
 
                 {/* Submit Action */}
@@ -635,8 +635,8 @@ function BillingContent() {
 
                   <button
                     type="submit"
-                    disabled={isProcessingCheckout}
-                    className="px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    disabled={!acceptedTerms || isProcessingCheckout}
+                    className="px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                   >
                     {isProcessingCheckout ? (
                       <>
