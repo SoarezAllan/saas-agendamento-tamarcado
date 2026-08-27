@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { sendPasswordResetEmail } from '@/lib/notifications';
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,17 +59,21 @@ export async function POST(req: NextRequest) {
     });
 
     // Origin resolution
-    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('?')[0].replace(/\/$/, '') || 'http://localhost:3000';
-    const resetUrl = `${origin}/reset-password?token=${token}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || req.headers.get('origin') || 'https://tamarcado-agendamento.com';
+    const resetUrl = `${appUrl.replace(/\/$/, '')}/reset-password?token=${token}`;
 
-    console.log(`\n========================================`);
-    console.log(`[PASSWORD RESET] E-mail: ${normalizedEmail}`);
-    console.log(`[PASSWORD RESET] Reset URL: ${resetUrl}`);
-    console.log(`========================================\n`);
+    // Dispatch real HTML password reset email
+    await sendPasswordResetEmail({
+      to: normalizedEmail,
+      userName: user.name,
+      resetUrl,
+    });
+
+    console.log(`[PASSWORD RESET] E-mail sent to: ${normalizedEmail}`);
 
     return NextResponse.json({
-      message: 'Instruções para redefinição de senha enviadas com sucesso!',
-      resetUrl,
+      success: true,
+      message: `Enviamos as instruções para o e-mail ${normalizedEmail}. Por favor, verifique sua caixa de entrada e a pasta de spam.`,
     });
   } catch (error) {
     console.error('Forgot password error:', error);

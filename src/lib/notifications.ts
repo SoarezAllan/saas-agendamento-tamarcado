@@ -396,6 +396,62 @@ export function generateCustomerConfirmationEmail(data: BookingNotificationData)
   };
 }
 
+export async function sendPasswordResetEmail({
+  to,
+  userName,
+  resetUrl,
+}: {
+  to: string;
+  userName: string;
+  resetUrl: string;
+}): Promise<boolean> {
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 28px 24px; border: 1px solid #e4e4e7; border-radius: 20px; background-color: #ffffff;">
+      <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f4f4f5;">
+        <span style="background-color: #eff6ff; color: #2563eb; padding: 6px 14px; border-radius: 9999px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase;">
+          Segurança da Conta
+        </span>
+        <h2 style="color: #09090b; margin: 16px 0 6px 0; font-size: 22px; font-weight: 800;">Recuperação de Senha</h2>
+        <p style="color: #71717a; font-size: 13px; margin: 0;">Plataforma TáMarcado</p>
+      </div>
+
+      <p style="color: #27272a; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
+        Olá, <strong>${userName || 'Cliente'}</strong>!
+      </p>
+      <p style="color: #52525b; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
+        Recebemos uma solicitação para redefinir a senha de acesso à sua conta. Clique no botão abaixo para escolher uma nova senha:
+      </p>
+
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${resetUrl}" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          Redefinir Minha Senha
+        </a>
+      </div>
+
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 24px 0; font-size: 12px; color: #64748b; line-height: 1.5;">
+        <p style="margin: 0 0 8px 0;"><strong>⚠️ Informações de Segurança:</strong></p>
+        <p style="margin: 0 0 4px 0;">• Este link é exclusivo para sua conta e expira em <strong>60 minutos</strong>.</p>
+        <p style="margin: 0 0 4px 0;">• Se você não solicitou esta alteração, ignore este e-mail. Sua senha atual permanecerá segura e inalterada.</p>
+      </div>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f4f4f5; font-size: 11px; color: #a1a1aa; word-break: break-all; line-height: 1.5;">
+        <p style="margin: 0 0 4px 0;">Se o botão acima não funcionar, copie e cole o link direto no seu navegador:</p>
+        <a href="${resetUrl}" style="color: #2563eb; text-decoration: underline;">${resetUrl}</a>
+      </div>
+
+      <p style="color: #a1a1aa; font-size: 11px; text-align: center; margin-top: 24px; margin-bottom: 0;">
+        © ${new Date().getFullYear()} TáMarcado - Todos os direitos reservados.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to,
+    subject: 'Recuperação de Senha - TáMarcado',
+    html,
+  });
+}
+
 export async function sendSimulatedNotification(type: 'email' | 'whatsapp', data: any) {
   if (type === 'email' && data.to) {
     return sendEmail({ to: data.to, subject: data.subject, html: data.html });

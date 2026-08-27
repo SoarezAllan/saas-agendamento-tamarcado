@@ -87,57 +87,42 @@ export default function ForgotPasswordPage() {
           )}
 
           {successInfo ? (
-            <div className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 space-y-2">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span className="font-bold text-xs">Solicitação Concluída!</span>
-                </div>
-                <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed">
+            <div className="space-y-6 text-center animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 className="w-7 h-7" />
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
+                  E-mail Enviado com Sucesso! ✉️
+                </h3>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
                   {successInfo.message}
                 </p>
               </div>
 
-              {/* Dev / Test Link Preview */}
-              {successInfo.resetUrl && (
-                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/70 border border-zinc-200 dark:border-zinc-700 space-y-2.5 text-left">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
-                      Link de Recuperação (Demonstração):
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="text-xs text-blue-600 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copied ? 'Copiado!' : 'Copiar Link'}</span>
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    readOnly
-                    value={successInfo.resetUrl}
-                    className="w-full text-[11px] bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 text-zinc-700 dark:text-zinc-300 font-mono select-all"
-                  />
-                  <a
-                    href={successInfo.resetUrl}
-                    className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
-                  >
-                    <span>Redefinir Minha Senha Agora</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
+              <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 dark:text-zinc-400 text-left space-y-1.5">
+                <p className="font-bold text-zinc-700 dark:text-zinc-300">Dicas:</p>
+                <p>• O link de segurança é válido por <strong>60 minutos</strong>.</p>
+                <p>• Se não encontrar na caixa de entrada, verifique a pasta de <strong>Spam / Lixo Eletrônico</strong>.</p>
+              </div>
 
-              <div className="pt-2 text-center">
+              <div className="space-y-2 pt-2">
                 <Link
                   href="/login"
-                  className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-bold inline-flex items-center gap-1.5 transition-colors"
+                  className="w-full py-3 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Voltar para o Login</span>
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Voltar para a Página de Login</span>
                 </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setSuccessInfo(null)}
+                  className="w-full py-2 text-xs font-bold text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+                >
+                  Não recebeu? Tentar com outro e-mail
+                </button>
               </div>
             </div>
           ) : (
