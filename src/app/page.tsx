@@ -584,11 +584,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo href="/" size="sm" />
           <p>© {new Date().getFullYear()} TáMarcado. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-4 font-semibold">
+          <div className="flex items-center gap-3 sm:gap-4 font-semibold">
             <a href="#faq" className="hover:text-blue-600 transition-colors">
               Dúvidas Frequentes
             </a>
-            <a href="#suporte" className="hover:text-blue-600 transition-colors">
+            <a
+              href="#suporte"
+              className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all shadow-2xs font-bold"
+            >
               Suporte
             </a>
             <Link href="/login" className="hover:underline">
