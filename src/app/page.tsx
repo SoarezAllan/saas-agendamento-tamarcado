@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
+import { FaqAndSupportSection } from '@/components/landing/faq-and-support';
 
 export default function LandingPage() {
   const [loggingInEmail, setLoggingInEmail] = useState<string | null>(null);
@@ -575,12 +576,21 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Dúvidas Frequentes (FAQ) & Suporte do TáMarcado */}
+      <FaqAndSupportSection />
+
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8 px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <Logo href="/" size="sm" />
           <p>© {new Date().getFullYear()} TáMarcado. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 font-semibold">
+            <a href="#faq" className="hover:text-blue-600 transition-colors">
+              Dúvidas Frequentes
+            </a>
+            <a href="#suporte" className="hover:text-blue-600 transition-colors">
+              Suporte
+            </a>
             <Link href="/login" className="hover:underline">
               Entrar
             </Link>
