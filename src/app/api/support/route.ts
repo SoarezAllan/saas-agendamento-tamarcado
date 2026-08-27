@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { sendEmail } from '@/lib/notifications';
 
-const SUPPORT_DESTINATION_EMAIL = 'allan.soares.melo@gmail.com';
+const SUPPORT_DESTINATION_EMAIL = 'tamarcado.agendamento@gmail.com';
 
 // Strict email regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
