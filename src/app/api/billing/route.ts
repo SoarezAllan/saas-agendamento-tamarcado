@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
         professionalsCount: business?._count.professionals || 0,
         servicesCount: business?._count.services || 0,
         appointmentsCount: business?._count.appointments || 0,
-        trialEndsAt: business?.trialEndsAt,
+        trialEndsAt: subscription?.trialEndsAt || business?.trialEndsAt,
       },
     });
   } catch (error) {
@@ -58,34 +58,50 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
     }
 
-    const { planSlug } = await req.json();
+    const {
+      planSlug,
+      billingCycle = 'MONTHLY',
+      paymentMethod = 'CREDIT_CARD',
+    } = await req.json();
 
     if (!planSlug) {
       return NextResponse.json({ error: 'Plano é obrigatório' }, { status: 400 });
     }
 
     const planUpper = planSlug.toUpperCase();
+    const cycleUpper = billingCycle.toUpperCase();
+    const methodUpper = paymentMethod.toUpperCase();
+
+    let daysToAdd = 30;
+    if (cycleUpper === 'QUARTERLY') daysToAdd = 90;
+    else if (cycleUpper === 'ANNUAL') daysToAdd = 365;
 
     const periodEnd = new Date();
-    periodEnd.setDate(periodEnd.getDate() + 30);
+    periodEnd.setDate(periodEnd.getDate() + daysToAdd);
 
     const subscription = await db.subscription.upsert({
       where: { businessId: session.businessId },
       update: {
         plan: planUpper,
         status: 'ACTIVE',
+        billingCycle: cycleUpper,
+        paymentMethod: methodUpper,
         currentPeriodEnd: periodEnd,
+        cancelAtPeriodEnd: false,
       },
       create: {
         businessId: session.businessId,
         plan: planUpper,
         status: 'ACTIVE',
+        billingCycle: cycleUpper,
+        paymentMethod: methodUpper,
         currentPeriodEnd: periodEnd,
+        cancelAtPeriodEnd: false,
       },
     });
 
     return NextResponse.json({
-      message: `Assinatura atualizada para o plano ${planUpper} com sucesso!`,
+      message: `Assinatura atualizada para o plano ${planUpper} (${cycleUpper}) com sucesso!`,
       subscription,
     });
   } catch (error) {
@@ -97,3 +113,27 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getSession(req);
+    if (!session || !session.businessId || session.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
+    }
+
+    const subscription = await db.subscription.update({
+      where: { businessId: session.businessId },
+      data: {
+        status: 'CANCELED',
+        cancelAtPeriodEnd: true,
+      },
+    });
+
+    return NextResponse.json({
+      message: 'Assinatura cancelada com sucesso. A cobrança automática foi interrompida.',
+      subscription,
+    });
+  } catch (error) {
+    console.error('Cancel subscription error:', error);
+    return NextResponse.json({ error: 'Erro ao cancelar assinatura' }, { status: 500 });
+  }
+}

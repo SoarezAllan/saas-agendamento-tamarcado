@@ -1347,10 +1347,38 @@ export default function SuperAdminPage() {
                   step="0.01"
                   value={editingPlan.priceMonthly}
                   onChange={(e) =>
-                    setEditingPlan({ ...editingPlan, priceMonthly: parseFloat(e.target.value) })
+                    setEditingPlan({ ...editingPlan, priceMonthly: parseFloat(e.target.value) || 0 })
                   }
                   className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold mb-1">Preço Trimestral (R$)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editingPlan.priceQuarterly || ''}
+                    onChange={(e) =>
+                      setEditingPlan({ ...editingPlan, priceQuarterly: parseFloat(e.target.value) || 0 })
+                    }
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold mb-1">Preço Anual (R$)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editingPlan.priceAnnual || ''}
+                    onChange={(e) =>
+                      setEditingPlan({ ...editingPlan, priceAnnual: parseFloat(e.target.value) || 0 })
+                    }
+                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
+                  />
+                </div>
               </div>
 
               <div>

@@ -32,8 +32,16 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Acesso restrito ao Super Admin' }, { status: 403 });
     }
 
-    const { id, priceMonthly, maxProfessionals, maxServices, maxAppointmentsPerMonth, features } =
-      await req.json();
+    const {
+      id,
+      priceMonthly,
+      priceQuarterly,
+      priceAnnual,
+      maxProfessionals,
+      maxServices,
+      maxAppointmentsPerMonth,
+      features,
+    } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'ID do plano é obrigatório' }, { status: 400 });
@@ -43,6 +51,8 @@ export async function PATCH(req: NextRequest) {
       where: { id },
       data: {
         ...(priceMonthly !== undefined && { priceMonthly: Number(priceMonthly) }),
+        ...(priceQuarterly !== undefined && { priceQuarterly: Number(priceQuarterly) }),
+        ...(priceAnnual !== undefined && { priceAnnual: Number(priceAnnual) }),
         ...(maxProfessionals !== undefined && { maxProfessionals: Number(maxProfessionals) }),
         ...(maxServices !== undefined && { maxServices: Number(maxServices) }),
         ...(maxAppointmentsPerMonth !== undefined && {

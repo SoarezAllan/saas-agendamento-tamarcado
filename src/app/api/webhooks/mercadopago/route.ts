@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       paymentId = bodyData.data?.id || bodyData.id || bodyData.resource;
     }
 
-    console.log('[Mercado Pago Webhook] Received notification:', {
+    console.log('[Mercado Pago Webhook] Notification received:', {
       paymentId,
       topic: searchParams.get('topic') || bodyData.type || bodyData.action,
     });
@@ -47,13 +47,13 @@ export async function POST(req: NextRequest) {
 
     // If payment is approved, activate or renew the subscription
     if (payment.status === 'approved') {
-      const externalRef = payment.external_reference; // format: "businessId:planSlug:timestamp"
+      const externalRef = payment.external_reference; // format: "businessId:planSlug:billingCycle:paymentMethod:timestamp"
       if (!externalRef) {
         console.warn(`[Mercado Pago Webhook] No external_reference found for payment ${cleanId}`);
         return NextResponse.json({ received: true });
       }
 
-      const [businessId, planSlug] = externalRef.split(':');
+      const [businessId, planSlug, cycle = 'MONTHLY', method = 'CREDIT_CARD'] = externalRef.split(':');
 
       if (!businessId || !planSlug) {
         console.warn(`[Mercado Pago Webhook] Malformed external_reference: ${externalRef}`);
@@ -61,39 +61,52 @@ export async function POST(req: NextRequest) {
       }
 
       const planUpper = planSlug.toUpperCase();
+      const cycleUpper = cycle.toUpperCase();
+      const methodUpper = method.toUpperCase();
+
+      // Calculate period duration based on cycle
+      let daysToAdd = 30;
+      if (cycleUpper === 'QUARTERLY') daysToAdd = 90;
+      else if (cycleUpper === 'ANNUAL') daysToAdd = 365;
+
       const periodEnd = new Date();
-      periodEnd.setDate(periodEnd.getDate() + 30); // 30 days renewal
+      periodEnd.setDate(periodEnd.getDate() + daysToAdd);
 
       await db.subscription.upsert({
         where: { businessId },
         update: {
           plan: planUpper,
           status: 'ACTIVE',
+          billingCycle: cycleUpper,
+          paymentMethod: methodUpper,
           currentPeriodEnd: periodEnd,
-          stripeSubscriptionId: `mp_${cleanId}`,
+          trialEndsAt: null,
+          mercadoPagoPaymentId: String(cleanId),
         },
         create: {
           businessId,
           plan: planUpper,
           status: 'ACTIVE',
+          billingCycle: cycleUpper,
+          paymentMethod: methodUpper,
           currentPeriodEnd: periodEnd,
-          stripeSubscriptionId: `mp_${cleanId}`,
+          trialEndsAt: null,
+          mercadoPagoPaymentId: String(cleanId),
         },
       });
 
-      console.log(`[Mercado Pago Webhook] Subscription ACTIVATED for business ${businessId} - Plan ${planUpper}`);
+      console.log(
+        `[Mercado Pago Webhook] Subscription ACTIVATED for business ${businessId} - Plan ${planUpper} (${cycleUpper}) via ${methodUpper}`
+      );
     }
 
     return NextResponse.json({ received: true, status: payment.status });
   } catch (error) {
     console.error('[Mercado Pago Webhook] Processing error:', error);
-    // Always return 200/202 to avoid MP hammering with retries on non-critical failures
     return NextResponse.json({ received: true, error: 'Internal processing error' }, { status: 200 });
   }
 }
 
 export async function GET(req: NextRequest) {
-  // Healthcheck for webhook endpoint
   return NextResponse.json({ status: 'Mercado Pago Webhook Endpoint Active' });
 }
-

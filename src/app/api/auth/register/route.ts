@@ -67,6 +67,8 @@ export async function POST(req: NextRequest) {
           create: {
             plan: 'STARTER',
             status: 'TRIALING',
+            billingCycle: 'MONTHLY',
+            trialEndsAt,
             currentPeriodEnd: trialEndsAt,
           },
         },

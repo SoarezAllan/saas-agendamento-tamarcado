@@ -168,17 +168,23 @@ model Appointment {
 }
 
 model Subscription {
-  id                   String    @id @default(cuid())
-  businessId           String    @unique
-  plan                 String    @default("STARTER") // STARTER, PRO, ENTERPRISE
-  status               String    @default("ACTIVE") // ACTIVE, TRIALING, PAST_DUE, CANCELED
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  currentPeriodEnd     DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  id                      String    @id @default(cuid())
+  businessId              String    @unique
+  plan                    String    @default("STARTER") // STARTER, PRO, ENTERPRISE
+  status                  String    @default("TRIALING") // ACTIVE, TRIALING, PAST_DUE, CANCELED
+  billingCycle            String    @default("MONTHLY") // MONTHLY, QUARTERLY, ANNUAL
+  paymentMethod           String?   // CREDIT_CARD, PIX
+  cardLastFour            String?
+  cardBrand               String?
+  trialEndsAt             DateTime?
+  currentPeriodEnd        DateTime?
+  cancelAtPeriodEnd       Boolean   @default(false)
+  mercadoPagoPaymentId    String?
+  mercadoPagoPreapprovalId String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
 
-  business             Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business                Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 }
 
 model Plan {
@@ -186,6 +192,8 @@ model Plan {
   name                    String
   slug                    String   @unique
   priceMonthly            Float
+  priceQuarterly          Float    @default(0.0)
+  priceAnnual             Float    @default(0.0)
   maxProfessionals        Int
   maxServices             Int
   maxAppointmentsPerMonth Int

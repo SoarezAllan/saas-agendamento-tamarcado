@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { createMercadoPagoPreference } from '@/lib/mercadopago';
+import { createMercadoPagoCheckout, BillingCycle, PaymentMethodType } from '@/lib/mercadopago';
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +10,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 403 });
     }
 
-    const { planSlug } = await req.json();
+    const body = await req.json();
+    const {
+      planSlug,
+      billingCycle = 'MONTHLY',
+      paymentMethod = 'CREDIT_CARD',
+      payerCpf,
+    } = body;
+
     if (!planSlug) {
       return NextResponse.json({ error: 'Plano é obrigatório' }, { status: 400 });
     }
@@ -27,28 +34,72 @@ export async function POST(req: NextRequest) {
     // Look up business info
     const business = await db.business.findUnique({
       where: { id: session.businessId },
+      include: { subscription: true },
     });
 
     if (!business) {
       return NextResponse.json({ error: 'Estabelecimento não encontrado' }, { status: 404 });
     }
 
-    const preference = await createMercadoPagoPreference({
+    // Determine price based on cycle
+    let price = plan.priceMonthly;
+    if (billingCycle === 'QUARTERLY') {
+      price = plan.priceQuarterly > 0 ? plan.priceQuarterly : Math.round(plan.priceMonthly * 3 * 0.9 * 100) / 100;
+    } else if (billingCycle === 'ANNUAL') {
+      price = plan.priceAnnual > 0 ? plan.priceAnnual : Math.round(plan.priceMonthly * 12 * 0.8 * 100) / 100;
+    }
+
+    const checkoutResult = await createMercadoPagoCheckout({
       businessId: business.id,
       businessName: business.name,
       userEmail: session.email,
       userName: session.name,
       planSlug: plan.slug,
       planName: plan.name,
-      price: plan.priceMonthly,
+      price,
+      billingCycle: billingCycle as BillingCycle,
+      paymentMethod: paymentMethod as PaymentMethodType,
+      payerCpf,
+    });
+
+    // Update or create subscription in trialing state with chosen payment method and cycle
+    const trialEndsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await db.subscription.upsert({
+      where: { businessId: business.id },
+      update: {
+        plan: plan.slug.toUpperCase(),
+        billingCycle: billingCycle as BillingCycle,
+        paymentMethod: paymentMethod as PaymentMethodType,
+        trialEndsAt: trialEndsDate,
+        ...(checkoutResult.id ? { mercadoPagoPaymentId: checkoutResult.id } : {}),
+      },
+      create: {
+        businessId: business.id,
+        plan: plan.slug.toUpperCase(),
+        status: 'TRIALING',
+        billingCycle: billingCycle as BillingCycle,
+        paymentMethod: paymentMethod as PaymentMethodType,
+        trialEndsAt: trialEndsDate,
+        ...(checkoutResult.id ? { mercadoPagoPaymentId: checkoutResult.id } : {}),
+      },
     });
 
     return NextResponse.json({
-      checkoutUrl: preference.initPoint,
-      preferenceId: preference.id,
-      isSimulated: preference.isSimulated,
+      success: true,
+      checkoutUrl: checkoutResult.initPoint,
+      preferenceId: checkoutResult.id,
+      isSimulated: checkoutResult.isSimulated,
       planName: plan.name,
-      price: plan.priceMonthly,
+      price,
+      billingCycle,
+      paymentMethod,
+      trialDays: 7,
+      trialEndsAt: checkoutResult.trialEndsAt,
+      firstChargeDate: checkoutResult.firstChargeDate,
+      pixQrCodeBase64: checkoutResult.pixQrCodeBase64,
+      pixQrCodeText: checkoutResult.pixQrCodeText,
+      pixExpiration: checkoutResult.pixExpiration,
     });
   } catch (error: any) {
     console.error('Create checkout error:', error);
@@ -58,4 +109,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
