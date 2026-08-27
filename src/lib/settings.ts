@@ -37,6 +37,11 @@ export async function getAllSystemSettings(): Promise<Record<string, string>> {
     'TRIAL_DAYS',
     'SUPPORT_WHATSAPP',
     'SUPPORT_EMAIL',
+    'SMTP_HOST',
+    'SMTP_PORT',
+    'SMTP_USER',
+    'SMTP_PASS',
+    'SMTP_FROM',
   ];
 
   const result: Record<string, string> = {};

@@ -40,13 +40,15 @@ import {
   Compass,
   ArrowUpRight,
   Trash2,
+  Mail,
+  Send,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function SuperAdminPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'mercadopago' | 'businesses' | 'plans' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'mercadopago' | 'email' | 'businesses' | 'plans' | 'settings'>('overview');
 
   const [data, setData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,11 +63,20 @@ export default function SuperAdminPage() {
     TRIAL_DAYS: '7',
     SUPPORT_WHATSAPP: '',
     SUPPORT_EMAIL: '',
+    SMTP_HOST: 'smtp.gmail.com',
+    SMTP_PORT: '465',
+    SMTP_USER: 'tamarcado.agendamento@gmail.com',
+    SMTP_PASS: 'dzzlbkoraagfnowr',
+    SMTP_FROM: 'TáMarcado <tamarcado.agendamento@gmail.com>',
   });
 
   const [showAccessToken, setShowAccessToken] = useState(false);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [isTestingMp, setIsTestingMp] = useState(false);
+  const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [testEmailTo, setTestEmailTo] = useState('tamarcado.agendamento@gmail.com');
+  const [emailTestFeedback, setEmailTestFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [settingsFeedback, setSettingsFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [mpTestResult, setMpTestResult] = useState<any | null>(null);
   const [copiedWebhook, setCopiedWebhook] = useState(false);
@@ -104,6 +115,11 @@ export default function SuperAdminPage() {
           TRIAL_DAYS: result.settings.TRIAL_DAYS || '7',
           SUPPORT_WHATSAPP: result.settings.SUPPORT_WHATSAPP || '',
           SUPPORT_EMAIL: result.settings.SUPPORT_EMAIL || '',
+          SMTP_HOST: result.settings.SMTP_HOST || 'smtp.gmail.com',
+          SMTP_PORT: result.settings.SMTP_PORT || '465',
+          SMTP_USER: result.settings.SMTP_USER || 'tamarcado.agendamento@gmail.com',
+          SMTP_PASS: result.settings.SMTP_PASS || 'dzzlbkoraagfnowr',
+          SMTP_FROM: result.settings.SMTP_FROM || 'TáMarcado <tamarcado.agendamento@gmail.com>',
         });
       }
 
@@ -179,6 +195,38 @@ export default function SuperAdminPage() {
     navigator.clipboard.writeText(webhookUrl);
     setCopiedWebhook(true);
     setTimeout(() => setCopiedWebhook(false), 2000);
+  };
+
+  const handleTestEmail = async () => {
+    setIsTestingEmail(true);
+    setEmailTestFeedback(null);
+    try {
+      const res = await fetch('/api/superadmin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'TEST_EMAIL',
+          to: testEmailTo.trim() || settingsForm.SMTP_USER,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Falha ao enviar e-mail de teste.');
+      }
+
+      setEmailTestFeedback({
+        type: 'success',
+        message: data.message || `E-mail de teste enviado com sucesso para ${testEmailTo || settingsForm.SMTP_USER}! Verifique sua caixa de entrada.`,
+      });
+    } catch (err: any) {
+      setEmailTestFeedback({
+        type: 'error',
+        message: err.message || 'Erro ao tentar enviar e-mail de teste.',
+      });
+    } finally {
+      setIsTestingEmail(false);
+    }
   };
 
   const handleOpenBusinessModal = (business: any) => {
@@ -396,6 +444,18 @@ export default function SuperAdminPage() {
             {mpTestResult?.connected && (
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('email')}
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+              activeTab === 'email'
+                ? 'bg-rose-600 text-white shadow-md shadow-rose-500/20'
+                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Mail className="w-4 h-4" />
+            <span>Servidor de E-mail / SMTP</span>
           </button>
 
           <button
@@ -988,6 +1048,211 @@ export default function SuperAdminPage() {
 
               <div className="bg-white dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-sky-700 dark:text-sky-400 select-all">
                 {typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/mercadopago` : '/api/webhooks/mercadopago'}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 3.5: SERVIDOR DE E-MAIL / SMTP (NOVO)
+            ======================================================== */}
+        {activeTab === 'email' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Status / Overview Card */}
+            <div className="p-6 rounded-3xl bg-linear-to-br from-rose-900 via-zinc-900 to-black text-white shadow-xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-wider">
+                    <Mail className="w-3.5 h-3.5" /> Servidor Transacional Gmail SMTP
+                  </span>
+                  <h2 className="text-xl sm:text-2xl font-black">
+                    Disparo de E-mails do Sistema
+                  </h2>
+                  <p className="text-xs text-rose-200/80 max-w-xl">
+                    Utilizado para enviar recuperação de senhas aos usuários, notificações de novos agendamentos, remarcações, cancelamentos aos gestores e profissionais, e mensagens de suporte.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-center sm:text-right shrink-0">
+                  <span className="text-[10px] uppercase tracking-wider text-rose-300 font-bold block">
+                    Remetente Ativo
+                  </span>
+                  <strong className="text-sm text-white font-mono block mt-0.5">
+                    {settingsForm.SMTP_USER || 'tamarcado.agendamento@gmail.com'}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Email Test Feedback */}
+            {emailTestFeedback && (
+              <div
+                className={`p-4 rounded-2xl border text-xs font-semibold flex items-center gap-3 animate-in fade-in ${
+                  emailTestFeedback.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800'
+                    : 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800'
+                }`}
+              >
+                {emailTestFeedback.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+                )}
+                <span>{emailTestFeedback.message}</span>
+              </div>
+            )}
+
+            {/* Settings Form */}
+            <div className="bg-white dark:bg-zinc-900 p-6 sm:p-8 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-6">
+              <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <div>
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                    Credenciais do Servidor SMTP
+                  </h3>
+                  <p className="text-xs text-zinc-500">
+                    Configurações salvas diretamente no banco de dados e sincronizadas com a nuvem.
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveSettings} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      E-mail do Gmail (Remetente) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="tamarcado.agendamento@gmail.com"
+                      value={settingsForm.SMTP_USER}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, SMTP_USER: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Senha de App do Google (16 Letras) <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showSmtpPass ? 'text' : 'password'}
+                        required
+                        placeholder="dzzlbkoraagfnowr"
+                        value={settingsForm.SMTP_PASS}
+                        onChange={(e) =>
+                          setSettingsForm({ ...settingsForm, SMTP_PASS: e.target.value })
+                        }
+                        className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl pl-4 pr-12 py-3 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-rose-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSmtpPass(!showSmtpPass)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                      >
+                        {showSmtpPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Nome de Exibição do Remetente
+                    </label>
+                    <input
+                      type="text"
+                      placeholder='TáMarcado <tamarcado.agendamento@gmail.com>'
+                      value={settingsForm.SMTP_FROM}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, SMTP_FROM: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Host SMTP
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.SMTP_HOST}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, SMTP_HOST: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Porta SMTP
+                    </label>
+                    <input
+                      type="text"
+                      value={settingsForm.SMTP_PORT}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, SMTP_PORT: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSavingSettings}
+                    className="px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSavingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                    <span>Salvar Configurações de E-mail</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Test Email Card */}
+            <div className="p-6 rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <Send className="w-4 h-4 text-rose-600" />
+                    <span>Testar Disparo de E-mail em Tempo Real</span>
+                  </h4>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    Envie um e-mail de teste agora mesmo para validar a entrega na sua caixa de entrada.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <input
+                  type="email"
+                  placeholder="Seu e-mail para receber o teste..."
+                  value={testEmailTo}
+                  onChange={(e) => setTestEmailTo(e.target.value)}
+                  className="w-full sm:w-80 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleTestEmail}
+                  disabled={isTestingEmail}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-md shadow-rose-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isTestingEmail ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                  <span>{isTestingEmail ? 'Enviando...' : 'Disparar E-mail de Teste'}</span>
+                </button>
               </div>
             </div>
           </div>

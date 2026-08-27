@@ -59,21 +59,27 @@ export function generateWhatsAppBookingUrl(data: BookingNotificationData): strin
   return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
 }
 
+import { getSystemSetting } from './settings';
+
 // ---------------------------------------------------------------------------
 // 2. Email Transporter (SMTP / Resend / Fallback)
 // ---------------------------------------------------------------------------
 
-function getMailTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT) || 465;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+export async function getMailTransporter() {
+  const host = (await getSystemSetting('SMTP_HOST', process.env.SMTP_HOST || 'smtp.gmail.com')).trim();
+  const port = Number(await getSystemSetting('SMTP_PORT', process.env.SMTP_PORT || '465')) || 465;
+  const user = (await getSystemSetting('SMTP_USER', process.env.SMTP_USER || 'tamarcado.agendamento@gmail.com')).trim();
+  const rawPass = await getSystemSetting('SMTP_PASS', process.env.SMTP_PASS || 'dzzlbkoraagfnowr');
+  const pass = rawPass.replace(/\s+/g, ''); // Remove spaces from Google App Password
 
   if (user && pass) {
     if (!host || host.includes('gmail')) {
       return nodemailer.createTransport({
         service: 'gmail',
         auth: { user, pass },
+        tls: {
+          rejectUnauthorized: false,
+        },
       });
     }
 
@@ -82,6 +88,9 @@ function getMailTransporter() {
       port,
       secure: port === 465,
       auth: { user, pass },
+      tls: {
+        rejectUnauthorized: false,
+      },
     });
   }
 
@@ -98,24 +107,26 @@ export async function sendEmail({
   html: string;
 }): Promise<boolean> {
   try {
-    const transporter = getMailTransporter();
-    const fromAddress = process.env.SMTP_FROM || '"TáMarcado Agendamentos" <notificacoes@tamarcado.com.br>';
+    const transporter = await getMailTransporter();
+    const customFrom = await getSystemSetting('SMTP_FROM', process.env.SMTP_FROM || '');
+    const user = (await getSystemSetting('SMTP_USER', process.env.SMTP_USER || 'tamarcado.agendamento@gmail.com')).trim();
+    const fromAddress = customFrom || `"TáMarcado" <${user}>`;
 
     if (transporter) {
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from: fromAddress,
         to,
         subject,
         html,
       });
-      console.log(`[Email Service] E-mail sent successfully to ${to} (Subject: ${subject})`);
+      console.log(`[Email Service] E-mail sent successfully to ${to} (Subject: ${subject}, ID: ${info.messageId})`);
       return true;
     } else {
-      console.log(`[Email Service - Simulated] To: ${to} | Subject: ${subject}`);
-      return true;
+      console.warn(`[Email Service - Warning] No transporter configured for ${to} | Subject: ${subject}`);
+      return false;
     }
-  } catch (error) {
-    console.error(`[Email Service Error] Failed to send email to ${to}:`, error);
+  } catch (error: any) {
+    console.error(`[Email Service Error] Failed to send email to ${to}:`, error.message);
     return false;
   }
 }
