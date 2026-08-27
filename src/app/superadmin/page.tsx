@@ -30,13 +30,23 @@ import {
   Briefcase,
   Clock,
   X,
+  Activity,
+  BarChart3,
+  Globe,
+  Smartphone,
+  Laptop,
+  Tablet,
+  MousePointer,
+  Compass,
+  ArrowUpRight,
+  Trash2,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function SuperAdminPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'mercadopago' | 'businesses' | 'plans' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'mercadopago' | 'businesses' | 'plans' | 'settings'>('overview');
 
   const [data, setData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,6 +78,7 @@ export default function SuperAdminPage() {
   const [isUpdatingBusiness, setIsUpdatingBusiness] = useState(false);
   const [businessSearch, setBusinessSearch] = useState('');
   const [planFilter, setPlanFilter] = useState('ALL');
+  const [deletingBusinessId, setDeletingBusinessId] = useState<string | null>(null);
 
   // Plan editing state
   const [editingPlan, setEditingPlan] = useState<any | null>(null);
@@ -124,73 +135,73 @@ export default function SuperAdminPage() {
       });
 
       const resData = await res.json();
-      if (!res.ok) throw new Error(resData.error || 'Falha ao salvar configurações');
+      if (!res.ok) throw new Error(resData.error || 'Erro ao salvar configurações');
 
-      setSettingsFeedback({ type: 'success', message: resData.message });
-      if (resData.mercadoPagoStatus) {
-        setMpTestResult(resData.mercadoPagoStatus);
-      }
+      setSettingsFeedback({ type: 'success', message: 'Configurações salvas com sucesso!' });
       await fetchSuperAdminData();
     } catch (err: any) {
-      setSettingsFeedback({ type: 'error', message: err.message || 'Erro ao salvar' });
+      setSettingsFeedback({ type: 'error', message: err.message || 'Erro ao salvar configurações' });
     } finally {
       setIsSavingSettings(false);
     }
   };
 
-  const handleTestMpConnection = async () => {
+  const handleTestMercadoPago = async () => {
     setIsTestingMp(true);
-    setMpTestResult(null);
-
     try {
       const res = await fetch('/api/superadmin/settings', {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: settingsForm.MERCADO_PAGO_ACCESS_TOKEN }),
+        body: JSON.stringify({
+          ...settingsForm,
+          testOnly: true,
+        }),
       });
 
       const resData = await res.json();
-      setMpTestResult(resData);
-    } catch (err: any) {
-      setMpTestResult({ connected: false, error: err.message || 'Erro ao testar conexão' });
+      setMpTestResult(resData.mercadoPagoStatus);
+
+      if (resData.mercadoPagoStatus?.connected) {
+        alert('✅ Conexão com Mercado Pago efetuada com sucesso!');
+      } else {
+        alert(`❌ Falha ao conectar: ${resData.mercadoPagoStatus?.message || 'Verifique o Token'}`);
+      }
+    } catch (err) {
+      alert('Erro ao testar conexão.');
     } finally {
       setIsTestingMp(false);
     }
   };
 
   const handleCopyWebhook = () => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://seudominio.com';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://tamarcado.com.br';
     const webhookUrl = `${origin}/api/webhooks/mercadopago`;
     navigator.clipboard.writeText(webhookUrl);
     setCopiedWebhook(true);
     setTimeout(() => setCopiedWebhook(false), 2000);
   };
 
-  const handleOpenBusinessModal = (biz: any) => {
-    setSelectedBusiness(biz);
-    setManagePlan(biz.subscription?.plan || 'STARTER');
-    setManageStatus(biz.subscription?.status || 'ACTIVE');
+  const handleOpenBusinessModal = (business: any) => {
+    setSelectedBusiness(business);
+    setManagePlan(business.subscription?.plan || 'STARTER');
+    setManageStatus(business.subscription?.status || 'ACTIVE');
     setExtendDays('30');
   };
 
-  const handleUpdateBusiness = async (withExtend = false) => {
+  const handleUpdateBusiness = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedBusiness) return;
     setIsUpdatingBusiness(true);
 
     try {
-      const payload: any = {
-        plan: managePlan,
-        status: manageStatus,
-      };
-
-      if (withExtend && Number(extendDays) > 0) {
-        payload.extendDays = Number(extendDays);
-      }
-
       const res = await fetch(`/api/superadmin/businesses/${selectedBusiness.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          plan: managePlan,
+          status: manageStatus,
+          extendDays: Number(extendDays),
+        }),
       });
 
       const resData = await res.json();
@@ -203,6 +214,32 @@ export default function SuperAdminPage() {
       alert(err.message || 'Erro ao atualizar');
     } finally {
       setIsUpdatingBusiness(false);
+    }
+  };
+
+  const handleDeleteBusiness = async (businessId: string, businessName: string) => {
+    const confirmDelete = window.confirm(
+      `Tem certeza que deseja EXCLUIR PERMANENTEMENTE o estabelecimento "${businessName}"?\n\nTodos os agendamentos, serviços, profissionais e usuários deste estabelecimento serão excluídos.`
+    );
+    if (!confirmDelete) return;
+
+    setDeletingBusinessId(businessId);
+    try {
+      const res = await fetch(`/api/superadmin/businesses/${businessId}`, {
+        method: 'DELETE',
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'Erro ao excluir');
+
+      alert(resData.message || 'Empresa excluída com sucesso!');
+      if (selectedBusiness?.id === businessId) {
+        setSelectedBusiness(null);
+      }
+      await fetchSuperAdminData();
+    } catch (err: any) {
+      alert(err.message || 'Erro ao excluir estabelecimento');
+    } finally {
+      setDeletingBusinessId(null);
     }
   };
 
@@ -258,6 +295,7 @@ export default function SuperAdminPage() {
   }
 
   const stats = data?.stats || {};
+  const analytics = data?.analytics || {};
   const businesses = data?.businesses || [];
   const plans = data?.plans || [];
 
@@ -267,7 +305,7 @@ export default function SuperAdminPage() {
       b.name.toLowerCase().includes(businessSearch.toLowerCase()) ||
       b.slug.toLowerCase().includes(businessSearch.toLowerCase()) ||
       b.users?.[0]?.email?.toLowerCase().includes(businessSearch.toLowerCase()) ||
-      b.category.toLowerCase().includes(businessSearch.toLowerCase());
+      b.category?.toLowerCase().includes(businessSearch.toLowerCase());
 
     const matchesPlan =
       planFilter === 'ALL' || (b.subscription?.plan || 'STARTER') === planFilter;
@@ -283,15 +321,15 @@ export default function SuperAdminPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300">
-                👑 Super Admin • Dono do SaaS
+                👑 Super Admin • Dono da Plataforma
               </span>
-              <span className="text-xs text-zinc-400 font-mono">TáMarcado v2.0</span>
+              <span className="text-xs text-zinc-400 font-mono">TáMarcado Produção</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black mt-1">
-              Painel de Controle do SaaS
+              Painel de Controle Geral
             </h1>
             <p className="text-xs text-zinc-500 mt-0.5">
-              Gestão financeira, tokens de pagamento, clientes e planos da plataforma
+              Indicadores reais de acesso, telemetria de tráfego, gestão de empresas e pagamentos
             </p>
           </div>
 
@@ -306,11 +344,12 @@ export default function SuperAdminPage() {
             </button>
 
             <Link
-              href="/dashboard"
+              href="/"
+              target="_blank"
               className="px-4 py-2.5 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Painel de Negócio</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Ver Site Principal</span>
             </Link>
           </div>
         </div>
@@ -319,19 +358,34 @@ export default function SuperAdminPage() {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-zinc-200 dark:border-zinc-800">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeTab === 'overview'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
-            <span>Visão Geral & Métricas</span>
+            <span>Visão Geral & Negócio</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+              activeTab === 'analytics'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <Activity className="w-4 h-4" />
+            <span>Indicadores & Tráfego</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-indigo-500/20 text-indigo-200 border border-indigo-400/30">
+              NOVO
+            </span>
           </button>
 
           <button
             onClick={() => setActiveTab('mercadopago')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeTab === 'mercadopago'
                 ? 'bg-sky-600 text-white shadow-md shadow-sky-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -346,7 +400,7 @@ export default function SuperAdminPage() {
 
           <button
             onClick={() => setActiveTab('businesses')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeTab === 'businesses'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -358,7 +412,7 @@ export default function SuperAdminPage() {
 
           <button
             onClick={() => setActiveTab('plans')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeTab === 'plans'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -370,7 +424,7 @@ export default function SuperAdminPage() {
 
           <button
             onClick={() => setActiveTab('settings')}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
               activeTab === 'settings'
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -381,22 +435,26 @@ export default function SuperAdminPage() {
           </button>
         </div>
 
-        {/* TAB 1: VISÃO GERAL */}
+        {/* ========================================================
+            TAB 1: VISÃO GERAL & NEGÓCIO (DADOS 100% REAIS)
+            ======================================================== */}
         {activeTab === 'overview' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Macro KPIs */}
+            {/* Real Macro KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-6 rounded-3xl bg-linear-to-tr from-amber-600 to-amber-700 text-white shadow-lg space-y-2">
-                <span className="text-xs font-semibold text-amber-100 uppercase tracking-wider block">
-                  MRR do SaaS (Projeção)
+              <div className="p-6 rounded-3xl bg-linear-to-tr from-blue-600 to-indigo-700 text-white shadow-lg space-y-2">
+                <span className="text-xs font-semibold text-blue-100 uppercase tracking-wider block">
+                  MRR do SaaS (Receita Real)
                 </span>
                 <p className="text-3xl font-black">{formatCurrency(stats.estimatedMRR || 0)}</p>
-                <span className="text-[11px] text-amber-100 block">Receita Recorrente Mensal</span>
+                <span className="text-[11px] text-blue-100 block">
+                  {stats.activeSubscriptions || 0} assinaturas ativas
+                </span>
               </div>
 
               <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block">
-                  Empresas Cadastradas
+                  Empresas Reais Cadastradas
                 </span>
                 <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
                   {stats.totalBusinesses || 0}
@@ -410,24 +468,26 @@ export default function SuperAdminPage() {
 
               <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block">
-                  Agendamentos Totais
+                  Agendamentos Criados
                 </span>
                 <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
                   {stats.totalAppointments || 0}
                 </p>
                 <span className="text-[11px] text-emerald-600 font-medium block">
-                  Processados em toda a plataforma
+                  Em toda a plataforma
                 </span>
               </div>
 
               <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
                 <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider block">
-                  Profissionais Ativos
+                  Total de Visualizações do Site
                 </span>
                 <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
-                  {stats.totalProfessionals || 0}
+                  {analytics.totalPageViews || 0}
                 </p>
-                <span className="text-[11px] text-zinc-400 block">Usuários com agenda vinculada</span>
+                <span className="text-[11px] text-indigo-600 font-bold block">
+                  {analytics.uniqueVisitorsCount || 0} visitantes únicos
+                </span>
               </div>
             </div>
 
@@ -437,11 +497,11 @@ export default function SuperAdminPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-bold flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-sky-600" />
-                    <span>Status do Mercado Pago</span>
+                    <span>Status do Gateway de Pagamento</span>
                   </h3>
                   <button
                     onClick={() => setActiveTab('mercadopago')}
-                    className="text-xs text-blue-600 font-bold hover:underline"
+                    className="text-xs text-blue-600 font-bold hover:underline cursor-pointer"
                   >
                     Gerenciar Chaves →
                   </button>
@@ -461,10 +521,10 @@ export default function SuperAdminPage() {
                   <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 space-y-1">
                     <div className="flex items-center gap-2 font-bold text-xs">
                       <Sparkles className="w-4 h-4 text-amber-600" />
-                      <span>Modo Demonstração / Simulador</span>
+                      <span>Mercado Pago em Configuração</span>
                     </div>
                     <p className="text-xs text-amber-800 dark:text-amber-300">
-                      Insira seu Access Token na aba <strong>Gateway Mercado Pago</strong> para receber pagamentos reais.
+                      Adicione seu Access Token na aba <strong>Gateway Mercado Pago</strong> para processar Pix e Cartão reais.
                     </p>
                   </div>
                 )}
@@ -478,34 +538,319 @@ export default function SuperAdminPage() {
                   </h3>
                   <button
                     onClick={() => setActiveTab('businesses')}
-                    className="text-xs text-blue-600 font-bold hover:underline"
+                    className="text-xs text-blue-600 font-bold hover:underline cursor-pointer"
                   >
                     Ver Todas ({businesses.length}) →
                   </button>
                 </div>
 
-                <div className="space-y-2">
-                  {businesses.slice(0, 3).map((b: any) => (
-                    <div
-                      key={b.id}
-                      className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
-                    >
-                      <div>
-                        <strong className="block text-zinc-900 dark:text-zinc-100">{b.name}</strong>
-                        <span className="text-zinc-400 text-[10px]">{b.category}</span>
+                {businesses.length === 0 ? (
+                  <div className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 text-center space-y-2">
+                    <p className="text-xs text-zinc-500 font-medium">
+                      Nenhum estabelecimento cadastrado no momento.
+                    </p>
+                    <span className="text-[11px] text-zinc-400 block">
+                      Assim que novos usuários criarem suas contas na página pública ou pelo formulário de cadastro, elas aparecerão aqui em tempo real.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {businesses.slice(0, 3).map((b: any) => (
+                      <div
+                        key={b.id}
+                        className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <div>
+                          <strong className="block text-zinc-900 dark:text-zinc-100">{b.name}</strong>
+                          <span className="text-zinc-400 text-[10px]">{b.category}</span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">
+                          {b.subscription?.plan || 'STARTER'}
+                        </span>
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">
-                        {b.subscription?.plan || 'STARTER'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: GATEWAY MERCADO PAGO */}
+        {/* ========================================================
+            TAB 2: INDICADORES & TELEMETRIA DO SITE (NOVO)
+            ======================================================== */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Real Web Indicators KPIs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+                  <span>Acessos Hoje</span>
+                  <Eye className="w-4 h-4 text-blue-600" />
+                </div>
+                <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
+                  {analytics.pageViewsToday || 0}
+                </p>
+                <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                  <span>{analytics.uniqueVisitorsToday || 0} visitantes únicos hoje</span>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+                  <span>Acessos nos Últimos 7 Dias</span>
+                  <Calendar className="w-4 h-4 text-indigo-600" />
+                </div>
+                <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
+                  {analytics.pageViews7d || 0}
+                </p>
+                <span className="text-[11px] text-indigo-600 font-bold block">
+                  {analytics.pageViews30d || 0} visualizações em 30 dias
+                </span>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+                  <span>Tempo Médio na Página</span>
+                  <Clock className="w-4 h-4 text-emerald-600" />
+                </div>
+                <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
+                  {analytics.avgDurationFormatted || '0m 45s'}
+                </p>
+                <span className="text-[11px] text-emerald-600 font-semibold block">
+                  Engajamento ativo dos visitantes
+                </span>
+              </div>
+
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">
+                <div className="flex items-center justify-between text-zinc-500 text-xs font-semibold uppercase tracking-wider">
+                  <span>Taxa de Conversão</span>
+                  <ArrowUpRight className="w-4 h-4 text-amber-600" />
+                </div>
+                <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">
+                  {analytics.conversionRate || 0}%
+                </p>
+                <span className="text-[11px] text-zinc-500 block">
+                  Visitas → Ações concretas na plataforma
+                </span>
+              </div>
+            </div>
+
+            {/* Daily Activity Chart & Device Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Daily Chart (8 cols) */}
+              <div className="lg:col-span-8 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <h3 className="text-base font-bold flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-indigo-600" />
+                    <span>Acessos Diários nos Últimos 7 Dias</span>
+                  </h3>
+                  <span className="text-xs text-zinc-400 font-semibold">Total: {analytics.pageViews7d || 0}</span>
+                </div>
+
+                <div className="h-44 flex items-end justify-between gap-3 pt-6 px-2">
+                  {(analytics.dailyChart || []).map((item: any, idx: number) => {
+                    const maxVal = Math.max(...(analytics.dailyChart || []).map((i: any) => i.views), 1);
+                    const heightPercent = Math.max(Math.round((item.views / maxVal) * 100), 8);
+
+                    return (
+                      <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
+                        <div className="relative w-full flex flex-col items-center">
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-zinc-800 dark:text-zinc-200 mb-1">
+                            {item.views}
+                          </span>
+                          <div
+                            style={{ height: `${heightPercent}%` }}
+                            className="w-full max-w-[42px] rounded-t-xl bg-linear-to-t from-blue-600 to-indigo-500 group-hover:from-blue-500 group-hover:to-indigo-400 transition-all min-h-[12px]"
+                          />
+                        </div>
+                        <span className="text-[10px] font-bold text-zinc-400 font-mono">
+                          {item.date}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Devices Breakdown (4 cols) */}
+              <div className="lg:col-span-4 p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <h3 className="text-base font-bold flex items-center gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <Smartphone className="w-5 h-5 text-blue-600" />
+                  <span>Dispositivos dos Usuários</span>
+                </h3>
+
+                <div className="space-y-4 pt-2">
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                      <span className="flex items-center gap-1.5">
+                        <Smartphone className="w-4 h-4 text-blue-600" />
+                        <span>Celular (Mobile)</span>
+                      </span>
+                      <span>{analytics.devicePercentages?.mobile || 0}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                      <div
+                        style={{ width: `${analytics.devicePercentages?.mobile || 0}%` }}
+                        className="h-full bg-blue-600 rounded-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                      <span className="flex items-center gap-1.5">
+                        <Laptop className="w-4 h-4 text-emerald-600" />
+                        <span>Computador (Desktop)</span>
+                      </span>
+                      <span>{analytics.devicePercentages?.desktop || 0}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                      <div
+                        style={{ width: `${analytics.devicePercentages?.desktop || 0}%` }}
+                        className="h-full bg-emerald-600 rounded-full"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+                      <span className="flex items-center gap-1.5">
+                        <Tablet className="w-4 h-4 text-purple-600" />
+                        <span>Tablet</span>
+                      </span>
+                      <span>{analytics.devicePercentages?.tablet || 0}%</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                      <div
+                        style={{ width: `${analytics.devicePercentages?.tablet || 0}%` }}
+                        className="h-full bg-purple-600 rounded-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Pages & Traffic Sources */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top Pages */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <h3 className="text-base font-bold flex items-center gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <Globe className="w-5 h-5 text-indigo-600" />
+                  <span>Páginas Mais Acessadas</span>
+                </h3>
+
+                {(analytics.topPages || []).length === 0 ? (
+                  <p className="text-xs text-zinc-500 py-4 text-center">Nenhum dado coletado ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {(analytics.topPages || []).map((page: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <div className="flex items-center gap-2.5 truncate pr-2">
+                          <span className="w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-[10px] font-bold flex items-center justify-center shrink-0">
+                            {idx + 1}
+                          </span>
+                          <span className="font-mono font-semibold text-zinc-800 dark:text-zinc-200 truncate">
+                            {page.path}
+                          </span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 shrink-0">
+                          {page.count} visualizações
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Traffic Sources */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <h3 className="text-base font-bold flex items-center gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <Compass className="w-5 h-5 text-emerald-600" />
+                  <span>Origem do Tráfego (Fontes & Redes)</span>
+                </h3>
+
+                {(analytics.topTrafficSources || []).length === 0 ? (
+                  <p className="text-xs text-zinc-500 py-4 text-center">Nenhum dado coletado ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {(analytics.topTrafficSources || []).map((source: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <strong className="text-zinc-800 dark:text-zinc-200">{source.source}</strong>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                          {source.count} visitas
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Real-time Recent Activity Stream */}
+            <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                <h3 className="text-base font-bold flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-blue-600" />
+                  <span>Registro de Acessos Recentes em Tempo Real</span>
+                </h3>
+                <span className="text-xs text-zinc-400">Últimos eventos gravados</span>
+              </div>
+
+              {(analytics.recentViews || []).length === 0 ? (
+                <p className="text-xs text-zinc-500 py-4 text-center">Navegue pelas páginas do site para ver o registro em tempo real.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-zinc-50 dark:bg-zinc-800/60 text-zinc-500 uppercase font-semibold">
+                      <tr>
+                        <th className="py-2.5 px-3">Data e Hora</th>
+                        <th className="py-2.5 px-3">Página Acessada</th>
+                        <th className="py-2.5 px-3">Dispositivo</th>
+                        <th className="py-2.5 px-3">Origem</th>
+                        <th className="py-2.5 px-3 text-right">Tempo</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                      {(analytics.recentViews || []).map((view: any) => (
+                        <tr key={view.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40">
+                          <td className="py-2.5 px-3 text-zinc-400 font-mono text-[11px]">
+                            {format(new Date(view.createdAt), 'dd/MM HH:mm:ss', { locale: ptBR })}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                            {view.path}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="capitalize px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">
+                              {view.deviceType}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-zinc-500">
+                            {view.referrer || 'Direto'}
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono text-zinc-500">
+                            {view.durationSeconds > 0 ? `${view.durationSeconds}s` : '< 5s'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================
+            TAB 3: GATEWAY MERCADO PAGO
+            ======================================================== */}
         {activeTab === 'mercadopago' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             {/* Status Banner */}
@@ -539,129 +884,92 @@ export default function SuperAdminPage() {
                   )}
                 </div>
               </div>
-
-              {mpTestResult && (
-                <div
-                  className={`p-4 rounded-2xl text-xs border ${
-                    mpTestResult.connected
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-900 dark:text-emerald-200'
-                      : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 text-rose-900 dark:text-rose-200'
-                  }`}
-                >
-                  <p className="font-semibold">{mpTestResult.message || mpTestResult.error}</p>
-                </div>
-              )}
             </div>
 
-            {/* Token Form */}
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs p-6 sm:p-8 space-y-6">
-              {settingsFeedback && (
-                <div
-                  className={`p-4 rounded-2xl text-xs font-medium border ${
-                    settingsFeedback.type === 'success'
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                      : 'bg-rose-50 text-rose-800 border-rose-200'
-                  }`}
-                >
-                  {settingsFeedback.message}
-                </div>
-              )}
-
+            {/* Form */}
+            <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-6">
               <form onSubmit={handleSaveSettings} className="space-y-5">
                 <div>
                   <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                    Mercado Pago Access Token <span className="text-rose-500">*</span>
+                    Mercado Pago Access Token (Chave Secreta de Produção)
                   </label>
                   <div className="relative">
                     <input
                       type={showAccessToken ? 'text' : 'password'}
-                      placeholder="APP_USR-xxxxxx-xxxxxx-xxxxxx ou TEST-xxxxxx"
+                      placeholder="APP_USR-xxxxxx-xxxxxx-xxxxxx..."
                       value={settingsForm.MERCADO_PAGO_ACCESS_TOKEN}
                       onChange={(e) =>
                         setSettingsForm({ ...settingsForm, MERCADO_PAGO_ACCESS_TOKEN: e.target.value })
                       }
-                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-4 pr-10 py-3 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl pl-4 pr-12 py-3 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                     <button
                       type="button"
                       onClick={() => setShowAccessToken(!showAccessToken)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 p-1"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
                     >
                       {showAccessToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  <p className="text-[11px] text-zinc-500 mt-1">
-                    Pegue no portal do desenvolvedor do Mercado Pago (em Credenciais de Produção ou Teste).
-                  </p>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                    Mercado Pago Public Key (Chave Pública)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="APP_USR-xxxxxx ou TEST-xxxxxx"
-                    value={settingsForm.MERCADO_PAGO_PUBLIC_KEY}
-                    onChange={(e) =>
-                      setSettingsForm({ ...settingsForm, MERCADO_PAGO_PUBLIC_KEY: e.target.value })
-                    }
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 text-xs font-mono text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Mercado Pago Public Key
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="APP_USR-xxxxxx..."
+                      value={settingsForm.MERCADO_PAGO_PUBLIC_KEY}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, MERCADO_PAGO_PUBLIC_KEY: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs text-zinc-900 dark:text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
+                      Ambiente
+                    </label>
+                    <select
+                      value={settingsForm.MERCADO_PAGO_ENVIRONMENT}
+                      onChange={(e) =>
+                        setSettingsForm({ ...settingsForm, MERCADO_PAGO_ENVIRONMENT: e.target.value })
+                      }
+                      className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-xs font-semibold text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="production">Produção (Pagamentos Reais)</option>
+                      <option value="sandbox">Sandbox (Testes)</option>
+                    </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                    Ambiente do Gateway
-                  </label>
-                  <select
-                    value={settingsForm.MERCADO_PAGO_ENVIRONMENT}
-                    onChange={(e) =>
-                      setSettingsForm({ ...settingsForm, MERCADO_PAGO_ENVIRONMENT: e.target.value })
-                    }
-                    className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  >
-                    <option value="production">🚀 Produção (Cobranças Reais)</option>
-                    <option value="sandbox">🧪 Sandbox (Ambiente de Testes)</option>
-                  </select>
-                </div>
-
-                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
                     disabled={isSavingSettings}
-                    className="w-full sm:w-auto py-3 px-6 rounded-xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 shadow-md shadow-sky-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    {isSavingSettings ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Salvar Credenciais no Sistema</span>
-                      </>
-                    )}
+                    {isSavingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                    <span>Salvar Configurações</span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={handleTestMpConnection}
-                    disabled={isTestingMp || !settingsForm.MERCADO_PAGO_ACCESS_TOKEN}
-                    className="w-full sm:w-auto py-3 px-5 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    onClick={handleTestMercadoPago}
+                    disabled={isTestingMp}
+                    className="px-5 py-3 rounded-xl text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                   >
-                    {isTestingMp ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <RefreshCw className="w-4 h-4" />
-                        <span>Testar Conexão em Tempo Real</span>
-                      </>
-                    )}
+                    {isTestingMp ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                    <span>Testar Conexão</span>
                   </button>
                 </div>
               </form>
             </div>
 
-            {/* Webhook Info Card */}
+            {/* Webhook Card */}
             <div className="p-6 rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 space-y-3 text-xs">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-2">
@@ -681,24 +989,22 @@ export default function SuperAdminPage() {
               <div className="bg-white dark:bg-zinc-950 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 font-mono text-sky-700 dark:text-sky-400 select-all">
                 {typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/mercadopago` : '/api/webhooks/mercadopago'}
               </div>
-
-              <p className="text-zinc-500 text-[11px]">
-                Cadastre esta URL nas configurações de Webhook do Mercado Pago para receber confirmação automática de Pix e Cartão de Crédito.
-              </p>
             </div>
           </div>
         )}
 
-        {/* TAB 3: GESTÃO DE EMPRESAS */}
+        {/* ========================================================
+            TAB 4: GESTÃO DE EMPRESAS & ASSINATURAS
+            ======================================================== */}
         {activeTab === 'businesses' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Search & Filter Bar */}
+            {/* Search Bar */}
             <div className="bg-white dark:bg-zinc-900 p-4 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="relative w-full sm:w-96">
                 <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Buscar por nome, slug, e-mail ou nicho..."
+                  placeholder="Buscar por nome, slug ou e-mail..."
                   value={businessSearch}
                   onChange={(e) => setBusinessSearch(e.target.value)}
                   className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -728,94 +1034,120 @@ export default function SuperAdminPage() {
                 </h2>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/80 dark:border-zinc-800 text-zinc-500 uppercase tracking-wider font-semibold">
-                    <tr>
-                      <th className="py-3 px-4">Empresa</th>
-                      <th className="py-3 px-4">Categoria</th>
-                      <th className="py-3 px-4">Admin Responsável</th>
-                      <th className="py-3 px-4">Plano</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4 text-center">Profissionais</th>
-                      <th className="py-3 px-4 text-center">Agendamentos</th>
-                      <th className="py-3 px-4 text-right">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                    {filteredBusinesses.map((b: any) => {
-                      const owner = b.users?.[0];
-                      const isTrial = b.subscription?.status === 'TRIALING' || !b.subscription;
+              {filteredBusinesses.length === 0 ? (
+                <div className="text-center py-12 space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 flex items-center justify-center mx-auto">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs text-zinc-500 font-semibold">Nenhuma empresa encontrada.</p>
+                  <p className="text-[11px] text-zinc-400 max-w-sm mx-auto">
+                    Todos os novos cadastros feitos por clientes reais aparecerão listados aqui automaticamente.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/80 dark:border-zinc-800 text-zinc-500 uppercase tracking-wider font-semibold">
+                      <tr>
+                        <th className="py-3 px-4">Empresa</th>
+                        <th className="py-3 px-4">Categoria</th>
+                        <th className="py-3 px-4">Admin Responsável</th>
+                        <th className="py-3 px-4">Plano</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4 text-center">Profissionais</th>
+                        <th className="py-3 px-4 text-center">Agendamentos</th>
+                        <th className="py-3 px-4 text-right">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                      {filteredBusinesses.map((b: any) => {
+                        const owner = b.users?.[0];
+                        const isTrial = b.subscription?.status === 'TRIALING' || !b.subscription;
 
-                      return (
-                        <tr key={b.id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors">
-                          <td className="py-3.5 px-4">
-                            <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
-                              {b.name}
-                            </div>
-                            <span className="text-zinc-400 font-mono text-[10px]">/b/{b.slug}</span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] font-medium">
-                              {b.category}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <div className="font-semibold text-zinc-800 dark:text-zinc-200">
-                              {owner?.name || 'Admin'}
-                            </div>
-                            <span className="text-zinc-400 text-[11px]">{owner?.email}</span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                              {b.subscription?.plan || 'STARTER'}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4">
-                            <span
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                                isTrial
-                                  ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200'
-                                  : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200'
-                              }`}
-                            >
-                              {isTrial ? 'Período Teste' : 'Assinatura Ativa'}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-4 text-center font-bold">
-                            {b._count?.professionals || 0}
-                          </td>
-                          <td className="py-3.5 px-4 text-center font-bold">
-                            {b._count?.appointments || 0}
-                          </td>
-                          <td className="py-3.5 px-4 text-right space-x-2">
-                            <button
-                              onClick={() => handleOpenBusinessModal(b)}
-                              className="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 transition-colors cursor-pointer"
-                            >
-                              Gerenciar
-                            </button>
-                            <a
-                              href={`/b/${b.slug}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
-                              title="Ver Página Pública"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                        return (
+                          <tr key={b.id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors">
+                            <td className="py-3.5 px-4">
+                              <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
+                                {b.name}
+                              </div>
+                              <span className="text-zinc-400 font-mono text-[10px]">/b/{b.slug}</span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] font-medium">
+                                {b.category}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <div className="font-semibold text-zinc-800 dark:text-zinc-200">
+                                {owner?.name || 'Admin'}
+                              </div>
+                              <span className="text-zinc-400 text-[11px]">{owner?.email}</span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                                {b.subscription?.plan || 'STARTER'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  isTrial
+                                    ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200'
+                                    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200'
+                                }`}
+                              >
+                                {isTrial ? 'Período Teste' : 'Assinatura Ativa'}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center font-bold">
+                              {b._count?.professionals || 0}
+                            </td>
+                            <td className="py-3.5 px-4 text-center font-bold">
+                              {b._count?.appointments || 0}
+                            </td>
+                            <td className="py-3.5 px-4 text-right space-x-1.5">
+                              <button
+                                onClick={() => handleOpenBusinessModal(b)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 transition-colors cursor-pointer"
+                              >
+                                Gerenciar
+                              </button>
+                              <button
+                                onClick={() => handleDeleteBusiness(b.id, b.name)}
+                                disabled={deletingBusinessId === b.id}
+                                className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                title="Excluir Estabelecimento"
+                              >
+                                {deletingBusinessId === b.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                              <a
+                                href={`/b/${b.slug}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+                                title="Ver Página Pública"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* TAB 4: PLANOS & PREÇOS */}
+        {/* ========================================================
+            TAB 5: PLANOS & PREÇOS
+            ======================================================== */}
         {activeTab === 'plans' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -833,31 +1165,28 @@ export default function SuperAdminPage() {
                     </div>
 
                     <div>
-                      <span className="text-3xl font-black text-blue-600 dark:text-blue-400">
-                        {formatCurrency(plan.priceMonthly)}
-                      </span>
-                      <span className="text-xs text-zinc-500 ml-1">/mês</span>
+                      <span className="text-3xl font-black">{formatCurrency(plan.priceMonthly)}</span>
+                      <span className="text-xs text-zinc-400"> /mês</span>
                     </div>
 
-                    <div className="space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                      <p>
-                        👥 Máx. Profissionais: <strong>{plan.maxProfessionals}</strong>
-                      </p>
-                      <p>
-                        ✂️ Máx. Serviços: <strong>{plan.maxServices}</strong>
-                      </p>
-                      <p>
-                        📅 Máx. Agendamentos/Mês: <strong>{plan.maxAppointmentsPerMonth}</strong>
-                      </p>
+                    <div className="text-xs text-zinc-500 space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <div>
+                        <strong>Profissionais:</strong> {plan.maxProfessionals === 999 ? 'Ilimitados' : plan.maxProfessionals}
+                      </div>
+                      <div>
+                        <strong>Serviços:</strong> {plan.maxServices === 999 ? 'Ilimitados' : plan.maxServices}
+                      </div>
+                      <div>
+                        <strong>Agendamentos:</strong> {plan.maxAppointmentsPerMonth === 9999 ? 'Ilimitados' : `${plan.maxAppointmentsPerMonth}/mês`}
+                      </div>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => setEditingPlan({ ...plan })}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    onClick={() => setEditingPlan(plan)}
+                    className="w-full py-2.5 rounded-xl text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 transition-colors cursor-pointer"
                   >
-                    <Sliders className="w-3.5 h-3.5" />
-                    <span>Editar Preço e Limites</span>
+                    Editar Preço & Limites
                   </button>
                 </div>
               ))}
@@ -865,15 +1194,14 @@ export default function SuperAdminPage() {
           </div>
         )}
 
-        {/* TAB 5: CONFIGURAÇÕES GERAIS */}
+        {/* ========================================================
+            TAB 6: CONFIGURAÇÕES GERAIS DO SAAS
+            ======================================================== */}
         {activeTab === 'settings' && (
-          <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
-            <div>
-              <h2 className="text-lg font-black">Configurações Globais da Plataforma</h2>
-              <p className="text-xs text-zinc-500">
-                Personalize os parâmetros operacionais do SaaS
-              </p>
-            </div>
+          <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-6 animate-in fade-in duration-200">
+            <h2 className="text-lg font-black pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              Configurações Globais da Plataforma
+            </h2>
 
             <form onSubmit={handleSaveSettings} className="space-y-4 max-w-xl">
               <div>
@@ -884,87 +1212,55 @@ export default function SuperAdminPage() {
                   type="text"
                   value={settingsForm.PLATFORM_NAME}
                   onChange={(e) => setSettingsForm({ ...settingsForm, PLATFORM_NAME: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs font-bold text-zinc-900 dark:text-zinc-100"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs font-semibold"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                  Período de Teste Grátis Padrão (em dias)
+                  Dias de Teste Grátis no Cadastro (Trial)
                 </label>
                 <input
                   type="number"
-                  min={1}
-                  max={60}
                   value={settingsForm.TRIAL_DAYS}
                   onChange={(e) => setSettingsForm({ ...settingsForm, TRIAL_DAYS: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                  WhatsApp de Suporte do SaaS
-                </label>
-                <input
-                  type="text"
-                  placeholder="(11) 99999-9999"
-                  value={settingsForm.SUPPORT_WHATSAPP}
-                  onChange={(e) => setSettingsForm({ ...settingsForm, SUPPORT_WHATSAPP: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">
-                  E-mail de Suporte do SaaS
-                </label>
-                <input
-                  type="email"
-                  placeholder="suporte@tamarcado.com"
-                  value={settingsForm.SUPPORT_EMAIL}
-                  onChange={(e) => setSettingsForm({ ...settingsForm, SUPPORT_EMAIL: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-xs font-semibold"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSavingSettings}
-                className="py-3 px-6 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="px-6 py-3 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                {isSavingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                <span>Salvar Configurações Gerais</span>
+                {isSavingSettings ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                <span>Salvar Alterações</span>
               </button>
             </form>
           </div>
         )}
       </div>
 
-      {/* MODAL: GERENCIAR EMPRESA */}
+      {/* Modal: Gerenciar Empresa */}
       {selectedBusiness && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-3xl max-w-md w-full p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 max-w-lg w-full p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div>
-                <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">
-                  Gerenciar {selectedBusiness.name}
-                </h3>
-                <span className="text-[11px] text-zinc-400 font-mono">ID: {selectedBusiness.id}</span>
+                <h3 className="text-base font-bold">{selectedBusiness.name}</h3>
+                <span className="text-xs text-zinc-400 font-mono">ID: {selectedBusiness.id}</span>
               </div>
               <button
                 onClick={() => setSelectedBusiness(null)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600"
+                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4 text-xs">
+            <form onSubmit={handleUpdateBusiness} className="space-y-4">
               <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Plano da Empresa
-                </label>
+                <label className="block text-xs font-bold mb-1">Alterar Plano</label>
                 <select
                   value={managePlan}
                   onChange={(e) => setManagePlan(e.target.value)}
@@ -977,151 +1273,124 @@ export default function SuperAdminPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Status da Assinatura
-                </label>
+                <label className="block text-xs font-bold mb-1">Status da Assinatura</label>
                 <select
                   value={manageStatus}
                   onChange={(e) => setManageStatus(e.target.value)}
                   className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
                 >
-                  <option value="ACTIVE">Ativa</option>
-                  <option value="TRIALING">Período de Teste</option>
-                  <option value="SUSPENDED">Suspensa / Bloqueada</option>
+                  <option value="ACTIVE">Ativa (Pago)</option>
+                  <option value="TRIALING">Período Teste</option>
+                  <option value="PAST_DUE">Inadimplente</option>
                   <option value="CANCELED">Cancelada</option>
                 </select>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 space-y-2">
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300">
-                  🎁 Conceder Extensão de Dias Grátis:
-                </label>
+              <div>
+                <label className="block text-xs font-bold mb-1">Estender Validade (Dias de Cortesia)</label>
+                <input
+                  type="number"
+                  value={extendDays}
+                  onChange={(e) => setExtendDays(e.target.value)}
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => handleDeleteBusiness(selectedBusiness.id, selectedBusiness.name)}
+                  className="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Excluir Empresa</span>
+                </button>
+
                 <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min={1}
-                    max={365}
-                    value={extendDays}
-                    onChange={(e) => setExtendDays(e.target.value)}
-                    className="w-24 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-1.5 text-xs font-bold"
-                  />
-                  <span className="text-zinc-500 text-xs">dias adicionais</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBusiness(null)}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdatingBusiness}
+                    className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md"
+                  >
+                    {isUpdatingBusiness ? 'Salvando...' : 'Salvar Alterações'}
+                  </button>
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setSelectedBusiness(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={isUpdatingBusiness}
-                onClick={() => handleUpdateBusiness(true)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-1.5"
-              >
-                {isUpdatingBusiness ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                <span>Salvar Alterações</span>
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* MODAL: EDITAR PLANO */}
+      {/* Modal: Editar Plano */}
       {editingPlan && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-3xl max-w-md w-full p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 max-w-md w-full p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-              <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">
-                Editar Plano {editingPlan.name}
-              </h3>
-              <button
-                onClick={() => setEditingPlan(null)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600"
-              >
+              <h3 className="text-base font-bold">Editar Plano {editingPlan.name}</h3>
+              <button onClick={() => setEditingPlan(null)} className="p-1 text-zinc-400">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSavePlan} className="space-y-4 text-xs">
+            <form onSubmit={handleSavePlan} className="space-y-4">
               <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Preço Mensal (R$)
-                </label>
+                <label className="block text-xs font-bold mb-1">Preço Mensal (R$)</label>
                 <input
                   type="number"
                   step="0.01"
-                  required
                   value={editingPlan.priceMonthly}
-                  onChange={(e) => setEditingPlan({ ...editingPlan, priceMonthly: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-bold"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Máximo de Profissionais
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  required
-                  value={editingPlan.maxProfessionals}
-                  onChange={(e) => setEditingPlan({ ...editingPlan, maxProfessionals: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Máximo de Serviços
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  required
-                  value={editingPlan.maxServices}
-                  onChange={(e) => setEditingPlan({ ...editingPlan, maxServices: e.target.value })}
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Máximo de Agendamentos / Mês
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  required
-                  value={editingPlan.maxAppointmentsPerMonth}
                   onChange={(e) =>
-                    setEditingPlan({ ...editingPlan, maxAppointmentsPerMonth: e.target.value })
+                    setEditingPlan({ ...editingPlan, priceMonthly: parseFloat(e.target.value) })
                   }
-                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs"
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div>
+                <label className="block text-xs font-bold mb-1">Máximo de Profissionais</label>
+                <input
+                  type="number"
+                  value={editingPlan.maxProfessionals}
+                  onChange={(e) =>
+                    setEditingPlan({ ...editingPlan, maxProfessionals: parseInt(e.target.value) })
+                  }
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1">Máximo de Serviços</label>
+                <input
+                  type="number"
+                  value={editingPlan.maxServices}
+                  onChange={(e) =>
+                    setEditingPlan({ ...editingPlan, maxServices: parseInt(e.target.value) })
+                  }
+                  className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs font-semibold"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setEditingPlan(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-500"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={isSavingPlan}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md"
                 >
-                  {isSavingPlan ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                  <span>Salvar Plano</span>
+                  {isSavingPlan ? 'Salvando...' : 'Salvar Plano'}
                 </button>
               </div>
             </form>

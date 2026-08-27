@@ -252,3 +252,4 @@ export function SupportModal({ isOpen, onClose }: SupportModalProps) {
     </Modal>
   );
 }
+

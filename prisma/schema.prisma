@@ -208,3 +208,19 @@ model SystemSetting {
   updatedAt DateTime @updatedAt
 }
 
+model PageView {
+  id              String   @id @default(cuid())
+  path            String
+  ipHash          String?
+  userAgent       String?
+  deviceType      String   @default("desktop") // desktop, mobile, tablet
+  referrer        String?
+  durationSeconds Int      @default(0)
+  sessionId       String?
+  createdAt       DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path])
+}
+
+

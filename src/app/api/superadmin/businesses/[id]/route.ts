@@ -83,3 +83,38 @@ export async function PATCH(
   }
 }
 
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getSession(req);
+    if (!session || session.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Acesso restrito ao Super Admin' }, { status: 403 });
+    }
+
+    const { id: businessId } = await params;
+
+    const business = await db.business.findUnique({
+      where: { id: businessId },
+    });
+
+    if (!business) {
+      return NextResponse.json({ error: 'Empresa não encontrada' }, { status: 404 });
+    }
+
+    // Cascade delete business (deletes appointments, services, professionals, customers, subscription, etc.)
+    await db.business.delete({
+      where: { id: businessId },
+    });
+
+    return NextResponse.json({
+      message: `Empresa "${business.name}" excluída permanentemente com sucesso!`,
+    });
+  } catch (error: any) {
+    console.error('Superadmin delete business error:', error);
+    return NextResponse.json({ error: 'Erro ao excluir empresa' }, { status: 500 });
+  }
+}
+
+
