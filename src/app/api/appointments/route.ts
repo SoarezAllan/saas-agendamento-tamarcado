@@ -8,6 +8,7 @@ import {
   generateGoogleCalendarUrl,
   generateWhatsAppBookingUrl,
   sendSimulatedNotification,
+  dispatchAppointmentNotification,
 } from '@/lib/notifications';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -218,9 +219,14 @@ export async function POST(req: NextRequest) {
       endIso: endTime.toISOString(),
     });
 
-    await sendSimulatedNotification('whatsapp', notificationPayload);
+    // 6. Dispatch Notifications to Owner, Professional, and Customer
+    await dispatchAppointmentNotification('CREATED', appointment.id);
+
     if (appointment.customerEmail) {
-      await sendSimulatedNotification('email', generateCustomerConfirmationEmail(notificationPayload));
+      await sendSimulatedNotification('email', {
+        to: appointment.customerEmail,
+        ...generateCustomerConfirmationEmail(notificationPayload),
+      });
     }
 
     return NextResponse.json(
@@ -288,6 +294,10 @@ export async function PUT(req: NextRequest) {
       },
     });
 
+    // Determine event type and notify stakeholders (Owner & Professional)
+    const eventType = status === 'CANCELLED' ? 'CANCELLED' : status ? 'STATUS_CHANGED' : 'RESCHEDULED';
+    await dispatchAppointmentNotification(eventType, updated.id);
+
     return NextResponse.json({ message: 'Agendamento atualizado com sucesso', appointment: updated });
   } catch (error) {
     console.error('Update appointment error:', error);
@@ -297,4 +307,6 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
+
+export const PATCH = PUT;
 

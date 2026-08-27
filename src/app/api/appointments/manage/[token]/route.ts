@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { calculateAvailableSlots } from '@/lib/slots';
+import { dispatchAppointmentNotification } from '@/lib/notifications';
 
 export async function GET(
   req: NextRequest,
@@ -75,6 +76,10 @@ export async function PUT(
         where: { manageToken: token },
         data: { status: 'CANCELLED' },
       });
+
+      // Notify Owner and Professional of Cancellation
+      await dispatchAppointmentNotification('CANCELLED', updated.id);
+
       return NextResponse.json({
         message: 'Agendamento cancelado com sucesso',
         appointment: updated,
@@ -129,6 +134,9 @@ export async function PUT(
           business: true,
         },
       });
+
+      // Notify Owner and Professional of Rescheduling
+      await dispatchAppointmentNotification('RESCHEDULED', updated.id);
 
       return NextResponse.json({
         message: 'Agendamento remarcado com sucesso!',
