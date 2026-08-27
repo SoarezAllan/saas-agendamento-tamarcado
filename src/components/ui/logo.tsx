@@ -16,20 +16,20 @@ export function Logo({
 }: LogoProps) {
   const sizeMap = {
     sm: {
-      box: 'h-6 sm:h-7 w-auto',
-      imgClass: 'h-6 sm:h-7 w-auto object-contain',
+      box: 'h-8 sm:h-9 w-auto',
+      imgClass: 'h-8 sm:h-9 w-auto object-contain',
     },
     md: {
-      box: 'h-7 sm:h-8 w-auto',
-      imgClass: 'h-7 sm:h-8 w-auto object-contain',
+      box: 'h-9 sm:h-10 w-auto',
+      imgClass: 'h-9 sm:h-10 w-auto object-contain',
     },
     lg: {
-      box: 'h-10 sm:h-11 w-auto',
-      imgClass: 'h-10 sm:h-11 w-auto object-contain',
+      box: 'h-12 sm:h-14 w-auto',
+      imgClass: 'h-12 sm:h-14 w-auto object-contain',
     },
     xl: {
-      box: 'h-14 sm:h-16 w-auto',
-      imgClass: 'h-14 sm:h-16 w-auto object-contain',
+      box: 'h-16 sm:h-20 w-auto',
+      imgClass: 'h-16 sm:h-20 w-auto object-contain',
     },
   };
 
