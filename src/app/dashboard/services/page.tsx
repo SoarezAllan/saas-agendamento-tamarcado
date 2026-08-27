@@ -217,17 +217,45 @@ export default function ServicesPage() {
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800">
-          <Scissors className="w-8 h-8 text-zinc-300 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-            Nenhum serviço cadastrado
-          </p>
-          <button
-            onClick={handleOpenCreate}
-            className="mt-3 text-xs text-blue-600 font-bold hover:underline"
-          >
-            + Cadastrar primeiro serviço
-          </button>
+        <div className="p-8 sm:p-12 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-dashed border-zinc-200 dark:border-zinc-800 space-y-6">
+          <div className="w-16 h-16 rounded-3xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
+            <Scissors className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h3 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
+              Cadastre seu Primeiro Atendimento ou Serviço
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+              Adicione os serviços que você ou sua equipe oferecem. Seus clientes poderão escolher o serviço, ver o preço e duração, e agendar direto pela sua página pública.
+            </p>
+          </div>
+
+          {/* Ideas by Segment */}
+          <div className="grid gap-3 sm:grid-cols-3 max-w-2xl mx-auto text-left text-xs">
+            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-1">
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 block">💈 Beleza & Estilo</span>
+              <p className="text-[11px] text-zinc-500">Corte de Cabelo, Barboterapia, Manicure, Escova, Limpeza de Pele...</p>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-1">
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 block">⚖️ Escritórios & Consultoria</span>
+              <p className="text-[11px] text-zinc-500">Consulta Inicial, Análise Contratual, Briefing de Projeto, Mentoria...</p>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800 space-y-1">
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 block">🩺 Saúde & Treinos</span>
+              <p className="text-[11px] text-zinc-500">Consulta Médica, Avaliação Nutricional, Fisioterapia, Personal Trainer...</p>
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={handleOpenCreate}
+              className="px-6 py-3.5 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all inline-flex items-center gap-2 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Cadastrar Meu Primeiro Serviço</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

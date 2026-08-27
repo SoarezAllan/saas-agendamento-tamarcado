@@ -134,6 +134,208 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
+      {/* Interactive Onboarding Guide (Primeiros Passos) */}
+      {(() => {
+        const hasServices = (business?._count?.services || 0) > 0;
+        const hasHours = Boolean(business?.businessHours && business.businessHours.length > 0);
+        const hasCustomized = Boolean(business?.logoUrl || (business?.description && business.description.length > 5));
+        const hasShared = copied;
+
+        const completedCount = [hasServices, hasHours, hasCustomized, hasShared].filter(Boolean).length;
+        const percent = Math.round((completedCount / 4) * 100);
+
+        return (
+          <div className="p-6 rounded-3xl bg-linear-to-br from-blue-50/70 via-indigo-50/40 to-white dark:from-zinc-900 dark:via-zinc-900/80 dark:to-zinc-950 border border-blue-200/80 dark:border-zinc-800 shadow-sm space-y-5 animate-in fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/80 px-2.5 py-0.5 rounded-full">
+                  Guia de Boas-Vindas
+                </span>
+                <h2 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-zinc-100 mt-1.5 flex items-center gap-2">
+                  <span>👋 Primeiros Passos para Ativar seu Negócio</span>
+                </h2>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                  Siga os 4 passos abaixo para deixar sua página de agendamentos 100% pronta para receber clientes.
+                </p>
+              </div>
+
+              {/* Progress */}
+              <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
+                <div className="text-right">
+                  <span className="text-xs font-black text-zinc-900 dark:text-zinc-100 block">
+                    {completedCount} de 4 tarefas ({percent}%)
+                  </span>
+                  <span className="text-[10px] text-zinc-400">Progresso de configuração</span>
+                </div>
+                <div className="w-16 h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Steps Grid */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 pt-1">
+              {/* Step 1 */}
+              <div
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
+                  hasServices
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-white dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700 shadow-xs'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">✂️</span>
+                    {hasServices ? (
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Concluído
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-full">
+                        Pendente
+                      </span>
+                    )}
+                  </div>
+                  <strong className="block text-xs text-zinc-900 dark:text-zinc-100">
+                    1. Cadastre seus Serviços
+                  </strong>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    Adicione os atendimentos ou consultas que você oferece, com duração e valor.
+                  </p>
+                </div>
+
+                <Link
+                  href="/dashboard/services"
+                  className={`w-full py-2 px-3 rounded-xl text-xs font-bold text-center transition-all block ${
+                    hasServices
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'
+                  }`}
+                >
+                  {hasServices ? 'Gerenciar Serviços' : 'Adicionar Serviços'}
+                </Link>
+              </div>
+
+              {/* Step 2 */}
+              <div
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
+                  hasHours
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-white dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700 shadow-xs'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">⏰</span>
+                    {hasHours ? (
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Configurado
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-full">
+                        Pendente
+                      </span>
+                    )}
+                  </div>
+                  <strong className="block text-xs text-zinc-900 dark:text-zinc-100">
+                    2. Horários & Folgas
+                  </strong>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    Defina dias da semana de atendimento, intervalo de almoço e bloqueios.
+                  </p>
+                </div>
+
+                <Link
+                  href="/dashboard/settings"
+                  className="w-full py-2 px-3 rounded-xl text-xs font-bold text-center bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 transition-all block"
+                >
+                  Revisar Horários
+                </Link>
+              </div>
+
+              {/* Step 3 */}
+              <div
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
+                  hasCustomized
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-white dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700 shadow-xs'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">🎨</span>
+                    {hasCustomized ? (
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Personalizado
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                        Opcional
+                      </span>
+                    )}
+                  </div>
+                  <strong className="block text-xs text-zinc-900 dark:text-zinc-100">
+                    3. Marca & Cores
+                  </strong>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    Adicione a logo do seu negócio, descrição e a cor preferida da sua página.
+                  </p>
+                </div>
+
+                <Link
+                  href="/dashboard/settings"
+                  className="w-full py-2 px-3 rounded-xl text-xs font-bold text-center bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 text-zinc-800 dark:text-zinc-200 transition-all block"
+                >
+                  Personalizar Página
+                </Link>
+              </div>
+
+              {/* Step 4 */}
+              <div
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
+                  hasShared
+                    ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-white dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700 shadow-xs'
+                }`}
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">🔗</span>
+                    {hasShared ? (
+                      <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Copiado!
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full">
+                        Compartilhar
+                      </span>
+                    )}
+                  </div>
+                  <strong className="block text-xs text-zinc-900 dark:text-zinc-100">
+                    4. Divulgue seu Link
+                  </strong>
+                  <p className="text-[11px] text-zinc-500 leading-relaxed">
+                    Envie para seus clientes pelo WhatsApp, Instagram e Google Meu Negócio.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="w-full py-2 px-3 rounded-xl text-xs font-bold text-center bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Link Copiado!' : 'Copiar Link Público'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Public Page Share Card */}
       {business?.slug && (
         <div className="p-5 rounded-3xl bg-linear-to-r from-blue-900 to-indigo-900 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">

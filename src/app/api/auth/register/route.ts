@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
         name: ownerName,
         email: cleanEmail,
         phone: phone || '',
-        bio: 'Profissional e responsável pelo atendimento.',
+        bio: '',
         active: true,
       },
     });
@@ -117,27 +117,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 4. Create Default Service
-    const defaultService = await db.service.create({
-      data: {
-        businessId: business.id,
-        name: 'Atendimento Padrão',
-        description: 'Serviço inicial cadastrado.',
-        durationMinutes: 30,
-        price: 50.0,
-        category: 'Geral',
-        active: true,
-      },
-    });
-
-    await db.serviceProfessional.create({
-      data: {
-        serviceId: defaultService.id,
-        professionalId: professional.id,
-      },
-    });
-
-    // 5. Create Owner User Account
+    // 4. Create Owner User Account
     const user = await db.user.create({
       data: {
         name: ownerName,
