@@ -41,10 +41,12 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
-import { FaqAndSupportSection } from '@/components/landing/faq-and-support';
+import { FaqSection } from '@/components/landing/faq-and-support';
+import { SupportModal } from '@/components/landing/support-modal';
 
 export default function LandingPage() {
   const [loggingInEmail, setLoggingInEmail] = useState<string | null>(null);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const handleDemoLogin = async (demoEmail: string, demoPass: string, redirectUrl = '/dashboard') => {
     setLoggingInEmail(demoEmail);
@@ -576,8 +578,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Dúvidas Frequentes (FAQ) & Suporte do TáMarcado */}
-      <FaqAndSupportSection />
+      {/* Dúvidas Frequentes (FAQ) */}
+      <FaqSection onOpenSupport={() => setIsSupportModalOpen(true)} />
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8 px-4 sm:px-6 lg:px-8 text-center text-xs text-zinc-500">
@@ -588,12 +590,13 @@ export default function LandingPage() {
             <a href="#faq" className="hover:text-blue-600 transition-colors">
               Dúvidas Frequentes
             </a>
-            <a
-              href="#suporte"
-              className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all shadow-2xs font-bold"
+            <button
+              type="button"
+              onClick={() => setIsSupportModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all shadow-2xs font-bold cursor-pointer"
             >
               Suporte
-            </a>
+            </button>
             <Link href="/login" className="hover:underline">
               Entrar
             </Link>
@@ -603,6 +606,12 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Support Modal Form */}
+      <SupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+      />
     </div>
   );
 }
