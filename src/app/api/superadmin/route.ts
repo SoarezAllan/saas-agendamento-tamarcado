@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
       allPageViewsList,
     ] = await Promise.all([
       db.business.findMany({
+        where: { isDemo: false },
         include: {
           subscription: true,
           users: {
@@ -55,7 +56,7 @@ export async function GET(req: NextRequest) {
         orderBy: { priceMonthly: 'asc' },
       }),
       getAllSystemSettings(),
-      db.user.count(),
+      db.user.count({ where: { isDemo: false, role: { not: 'SUPERADMIN' } } }),
       db.pageView.count(),
       db.pageView.count({ where: { createdAt: { gte: todayStart } } }),
       db.pageView.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
