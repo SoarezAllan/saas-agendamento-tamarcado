@@ -242,7 +242,23 @@ function BillingContent() {
         </div>
       )}
 
-      {/* Active Trial Notice Banner */}
+      {/* Missing Token Info for Admin */}
+      {data?.hasMercadoPagoToken === false && (
+        <div className="p-4 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 text-sky-900 dark:text-sky-200 text-xs flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <Info className="w-4 h-4 text-sky-600 shrink-0" />
+            <span>
+              <strong>Modo de Demonstração Ativo:</strong> Insira seu Access Token do Mercado Pago no painel Super Admin (ou variáveis de ambiente) para processar transações reais instantâneas.
+            </span>
+          </div>
+          <a
+            href="/superadmin"
+            className="px-3 py-1.5 rounded-xl bg-sky-600 text-white font-bold hover:bg-sky-700 transition-colors shrink-0 text-[11px]"
+          >
+            Configurar Token
+          </a>
+        </div>
+      )}
       {isTrial && (
         <div className="p-5 rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">

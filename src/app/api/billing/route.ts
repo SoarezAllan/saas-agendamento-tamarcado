@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { getMercadoPagoToken } from '@/lib/mercadopago';
 
 export async function GET(req: NextRequest) {
   try {
@@ -35,9 +36,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    const mpToken = await getMercadoPagoToken();
+    const hasMercadoPagoToken = Boolean(mpToken && mpToken.trim() !== '' && mpToken !== 'SEU_MERCADO_PAGO_ACCESS_TOKEN_AQUI');
+
     return NextResponse.json({
       plans: parsedPlans,
       subscription,
+      hasMercadoPagoToken,
       usage: {
         professionalsCount: business?._count.professionals || 0,
         servicesCount: business?._count.services || 0,
