@@ -16,20 +16,20 @@ export function Logo({
 }: LogoProps) {
   const sizeMap = {
     sm: {
+      box: 'h-6 sm:h-7 w-auto',
+      imgClass: 'h-6 sm:h-7 w-auto object-contain',
+    },
+    md: {
       box: 'h-8 sm:h-9 w-auto',
       imgClass: 'h-8 sm:h-9 w-auto object-contain',
     },
-    md: {
-      box: 'h-9 sm:h-10 w-auto',
-      imgClass: 'h-9 sm:h-10 w-auto object-contain',
-    },
     lg: {
-      box: 'h-12 sm:h-14 w-auto',
-      imgClass: 'h-12 sm:h-14 w-auto object-contain',
+      box: 'h-10 sm:h-12 w-auto',
+      imgClass: 'h-10 sm:h-12 w-auto object-contain',
     },
     xl: {
-      box: 'h-16 sm:h-20 w-auto',
-      imgClass: 'h-16 sm:h-20 w-auto object-contain',
+      box: 'h-14 sm:h-16 w-auto',
+      imgClass: 'h-14 sm:h-16 w-auto object-contain',
     },
   };
 
@@ -42,7 +42,7 @@ export function Logo({
         <img
           src="/logo.png"
           alt="Tá Marcado"
-          className={`${currentSize.imgClass} dark:bg-white/95 dark:rounded-xl dark:px-2.5 dark:py-1 transition-all`}
+          className={`${currentSize.imgClass} dark:bg-white dark:rounded-lg dark:px-2 dark:py-0.5 transition-all`}
         />
       </div>
     </div>
