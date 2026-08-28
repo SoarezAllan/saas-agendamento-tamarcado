@@ -571,6 +571,57 @@ export async function sendPasswordResetEmail({
   });
 }
 
+export async function sendVerificationCodeEmail({
+  to,
+  userName,
+  code,
+}: {
+  to: string;
+  userName: string;
+  code: string;
+}): Promise<boolean> {
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 28px 24px; border: 1px solid #e4e4e7; border-radius: 20px; background-color: #ffffff;">
+      <div style="text-align: center; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #f4f4f5;">
+        <span style="background-color: #eff6ff; color: #2563eb; padding: 6px 14px; border-radius: 9999px; font-size: 12px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase;">
+          Verificação de Cadastro
+        </span>
+        <h2 style="color: #09090b; margin: 16px 0 6px 0; font-size: 22px; font-weight: 800;">Confirme seu E-mail</h2>
+        <p style="color: #71717a; font-size: 13px; margin: 0;">Plataforma TáMarcado</p>
+      </div>
+
+      <p style="color: #27272a; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
+        Olá, <strong>${userName || 'Gestor'}</strong>!
+      </p>
+      <p style="color: #52525b; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
+        Para ativar sua conta de gestor e começar a usar o TáMarcado, utilize o código de verificação abaixo:
+      </p>
+
+      <div style="text-align: center; margin: 28px 0; padding: 20px; background-color: #f8fafc; border-radius: 16px; border: 1px dashed #cbd5e1;">
+        <span style="font-family: monospace; font-size: 36px; font-weight: 900; letter-spacing: 8px; color: #2563eb; display: inline-block;">
+          ${code}
+        </span>
+        <p style="margin: 8px 0 0 0; color: #64748b; font-size: 12px;">Código válido por 15 minutos</p>
+      </div>
+
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 24px 0; font-size: 12px; color: #64748b; line-height: 1.5;">
+        <p style="margin: 0 0 6px 0;"><strong>💡 Dica de Segurança:</strong></p>
+        <p style="margin: 0;">Nunca compartilhe este código com ninguém. Nossa equipe nunca solicitará seu código por mensagem ou telefone.</p>
+      </div>
+
+      <p style="color: #a1a1aa; font-size: 11px; text-align: center; margin-top: 24px; border-top: 1px solid #f4f4f5; padding-top: 16px; margin-bottom: 0;">
+        © ${new Date().getFullYear()} TáMarcado - Todos os direitos reservados.
+      </p>
+    </div>
+  `;
+
+  return sendEmail({
+    to,
+    subject: `Seu Código de Verificação: ${code} - TáMarcado`,
+    html,
+  });
+}
+
 export async function sendSimulatedNotification(type: 'email' | 'whatsapp', data: any) {
   if (type === 'email' && data.to) {
     return sendEmail({ to: data.to, subject: data.subject, html: data.html });

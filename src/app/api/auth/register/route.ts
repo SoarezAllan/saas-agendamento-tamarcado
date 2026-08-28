@@ -5,12 +5,19 @@ import { slugify } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   try {
-    const { businessName, category, customSlug, ownerName, email, password, phone, address } =
+    const { businessName, category, customSlug, ownerName, email, password, phone, address, code } =
       await req.json();
 
     if (!businessName || !ownerName || !email || !password) {
       return NextResponse.json(
         { error: 'Preencha todos os campos obrigatórios' },
+        { status: 400 }
+      );
+    }
+
+    if (!code || code.trim().length < 6) {
+      return NextResponse.json(
+        { error: 'Informe o código de verificação de 6 dígitos enviado para seu e-mail.' },
         { status: 400 }
       );
     }
@@ -24,6 +31,27 @@ export async function POST(req: NextRequest) {
 
     const cleanEmail = email.toLowerCase().trim();
 
+    // Validate 6-digit verification code
+    const verification = await db.emailVerificationCode.findFirst({
+      where: {
+        email: cleanEmail,
+        code: code.trim(),
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!verification) {
+      return NextResponse.json(
+        { error: 'Código de verificação inválido ou expirado. Verifique os números ou solicite um novo código.' },
+        { status: 400 }
+      );
+    }
+
+    // Delete used code
+    await db.emailVerificationCode.deleteMany({
+      where: { email: cleanEmail },
+    });
+
     // Check if user email already exists
     const existingUser = await db.user.findUnique({
       where: { email: cleanEmail },
@@ -31,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Este e-mail já está cadastrado' },
+        { error: 'Este e-mail já está cadastrado. Faça login para acessar seu painel.' },
         { status: 400 }
       );
     }

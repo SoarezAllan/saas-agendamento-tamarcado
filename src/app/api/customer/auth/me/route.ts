@@ -31,3 +31,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Erro ao obter dados do cliente' }, { status: 500 });
   }
 }
+
