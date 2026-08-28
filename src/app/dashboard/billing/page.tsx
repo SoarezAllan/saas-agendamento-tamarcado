@@ -415,12 +415,73 @@ function BillingContent() {
         </div>
       )}
 
+      {/* Periodicity Toggle Selector Buttons (Without Title Phrase) */}
+      <div className="flex justify-center pt-2">
+        <div className="inline-flex items-center p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setBillingCycle('MONTHLY')}
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              billingCycle === 'MONTHLY'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+            }`}
+          >
+            Mensal
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setBillingCycle('QUARTERLY')}
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              billingCycle === 'QUARTERLY'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+            }`}
+          >
+            <span>Trimestral</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+              10% OFF
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setBillingCycle('ANNUAL')}
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              billingCycle === 'ANNUAL'
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+            }`}
+          >
+            <span>Anual</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              20% OFF
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* Plans Pricing Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {plans.map((plan: any) => {
           const isCurrentActive = subscription?.status === 'ACTIVE' && subscription.plan?.toLowerCase() === plan.slug.toLowerCase();
           const isPopular = plan.slug === 'pro';
-          const displayPrice = plan.priceMonthly;
+          
+          let displayPrice = plan.priceMonthly;
+          let fullCyclePrice = plan.priceMonthly;
+          let economyNote = null;
+
+          if (billingCycle === 'QUARTERLY') {
+            fullCyclePrice = plan.priceQuarterly > 0 ? plan.priceQuarterly : plan.priceMonthly * 3 * 0.9;
+            displayPrice = fullCyclePrice / 3;
+            economyNote = 'Economia de 10%';
+          } else if (billingCycle === 'ANNUAL') {
+            fullCyclePrice = plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly * 12 * 0.8;
+            displayPrice = fullCyclePrice / 12;
+            economyNote = 'Economia de 20%';
+          }
+
           const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features || [];
 
           return (
@@ -463,6 +524,18 @@ function BillingContent() {
                     </span>
                     <span className="text-xs font-semibold text-zinc-400">/mês</span>
                   </div>
+
+                  {billingCycle !== 'MONTHLY' && (
+                    <div className="text-[11px] text-zinc-500 font-medium">
+                      Cobrado {formatCurrency(fullCyclePrice)} {billingCycle === 'QUARTERLY' ? 'trimestralmente' : 'anualmente'}
+                    </div>
+                  )}
+
+                  {economyNote && (
+                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                      {economyNote}
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 text-xs space-y-1.5 border border-zinc-100 dark:border-zinc-800">
