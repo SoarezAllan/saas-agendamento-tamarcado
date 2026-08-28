@@ -274,16 +274,97 @@ export async function getMercadoPagoPayment(paymentId: string | number) {
   const token = await getMercadoPagoToken();
   if (!token) return null;
 
-  const response = await fetch(`${MERCADO_PAGO_API_URL}/v1/payments/${paymentId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const response = await fetch(`${MERCADO_PAGO_API_URL}/v1/payments/${paymentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    console.error(`[Mercado Pago] Failed to fetch payment ${paymentId}`);
+    if (!response.ok) {
+      console.error(`[Mercado Pago] Failed to fetch payment ${paymentId}: ${response.status}`);
+      return null;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(`[Mercado Pago] Error fetching payment ${paymentId}:`, err);
     return null;
   }
+}
 
-  return response.json();
+export async function getMercadoPagoMerchantOrder(orderId: string | number) {
+  const token = await getMercadoPagoToken();
+  if (!token) return null;
+
+  try {
+    const response = await fetch(`${MERCADO_PAGO_API_URL}/merchant_orders/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`[Mercado Pago] Failed to fetch merchant order ${orderId}: ${response.status}`);
+      return null;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(`[Mercado Pago] Error fetching merchant order ${orderId}:`, err);
+    return null;
+  }
+}
+
+export async function getMercadoPagoPreference(preferenceId: string) {
+  const token = await getMercadoPagoToken();
+  if (!token) return null;
+
+  try {
+    const response = await fetch(`${MERCADO_PAGO_API_URL}/checkout/preferences/${preferenceId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`[Mercado Pago] Failed to fetch preference ${preferenceId}: ${response.status}`);
+      return null;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(`[Mercado Pago] Error fetching preference ${preferenceId}:`, err);
+    return null;
+  }
+}
+
+export async function searchMercadoPagoPayments(query: { external_reference?: string; limit?: number }) {
+  const token = await getMercadoPagoToken();
+  if (!token) return [];
+
+  try {
+    const params = new URLSearchParams();
+    if (query.external_reference) params.set('external_reference', query.external_reference);
+    params.set('sort', 'date_created');
+    params.set('criteria', 'desc');
+    params.set('limit', String(query.limit || 10));
+
+    const response = await fetch(`${MERCADO_PAGO_API_URL}/v1/payments/search?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`[Mercado Pago] Failed to search payments: ${response.status}`);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.results || [];
+  } catch (err) {
+    console.error('[Mercado Pago] Error searching payments:', err);
+    return [];
+  }
 }

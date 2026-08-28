@@ -35,12 +35,19 @@ function BillingContent() {
   const simulatedPlan = searchParams.get('plan');
   const cycleParam = searchParams.get('cycle');
   const methodParam = searchParams.get('method');
+  const paymentIdParam = searchParams.get('payment_id') || searchParams.get('collection_id') || searchParams.get('data.id');
+  const collectionStatusParam = searchParams.get('collection_status') || searchParams.get('status');
+  const merchantOrderIdParam = searchParams.get('merchant_order_id');
+  const preferenceIdParam = searchParams.get('preference_id');
+  const externalRefParam = searchParams.get('external_reference');
 
   const [data, setData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'QUARTERLY' | 'ANNUAL'>('MONTHLY');
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [verificationResult, setVerificationResult] = useState<any | null>(null);
 
   // Checkout Modal State
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<any | null>(null);
@@ -70,13 +77,47 @@ function BillingContent() {
     }
   };
 
+  const handleVerifyPayment = async (customId?: string) => {
+    setIsVerifyingPayment(true);
+    try {
+      const res = await fetch('/api/billing/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentId: customId || paymentIdParam,
+          collectionId: searchParams.get('collection_id'),
+          collectionStatus: collectionStatusParam,
+          merchantOrderId: merchantOrderIdParam,
+          preferenceId: preferenceIdParam,
+          externalReference: externalRefParam,
+          planSlug: simulatedPlan || selectedPlanForCheckout?.slug,
+          billingCycle: cycleParam,
+          paymentMethod: methodParam,
+        }),
+      });
+
+      const resData = await res.json();
+      if (resData.success) {
+        setVerificationResult(resData);
+        setSuccessMessage(resData.message);
+        await fetchBilling();
+      } else if (resData.status === 'pending' || resData.status === 'in_process') {
+        setSuccessMessage('Seu pagamento está em análise pelo Mercado Pago e será confirmado automaticamente em instantes.');
+      }
+    } catch (err) {
+      console.error('Error confirming payment:', err);
+    } finally {
+      setIsVerifyingPayment(false);
+    }
+  };
+
   useEffect(() => {
     fetchBilling();
   }, []);
 
   // Handle return from Mercado Pago
   useEffect(() => {
-    if (paymentStatus === 'success') {
+    if (paymentStatus === 'success' || collectionStatusParam === 'approved' || paymentIdParam) {
       if (isSimulated && simulatedPlan) {
         fetch('/api/billing', {
           method: 'POST',
@@ -93,13 +134,12 @@ function BillingContent() {
           fetchBilling();
         });
       } else {
-        setSuccessMessage('Pagamento processado com sucesso via Mercado Pago! Sua assinatura está ativa.');
-        fetchBilling();
+        handleVerifyPayment();
       }
     } else if (paymentStatus === 'pending') {
       setSuccessMessage('Seu pagamento está sendo processado pelo Mercado Pago e será liberado em instantes.');
     }
-  }, [paymentStatus, isSimulated, simulatedPlan, cycleParam, methodParam]);
+  }, [paymentStatus, collectionStatusParam, paymentIdParam, isSimulated, simulatedPlan, cycleParam, methodParam]);
 
   const handleOpenCheckoutModal = (plan: any) => {
     setSelectedPlanForCheckout(plan);
@@ -259,6 +299,78 @@ function BillingContent() {
           </a>
         </div>
       )}
+      {/* Active Subscription Banner with Period End & Countdown */}
+      {subscription?.status === 'ACTIVE' && (
+        <div className="p-6 rounded-3xl bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-300 dark:border-emerald-800/60 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-xs">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-2xs">
+                  Assinatura Ativa
+                </span>
+                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                  Plano {subscription.plan} ({subscription.billingCycle === 'QUARTERLY' ? 'Trimestral' : subscription.billingCycle === 'ANNUAL' ? 'Anual' : 'Mensal'})
+                </span>
+                {subscription.paymentMethod && (
+                  <span className="px-2 py-0.2 rounded-md text-[10px] font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    {subscription.paymentMethod === 'PIX' ? 'Pix' : 'Cartão de Crédito'}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-1 text-xs text-zinc-600 dark:text-zinc-300">
+                <p className="flex items-center gap-1.5 font-medium">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>
+                    Válido até <strong>{periodEndDate || 'Data de renovação'}</strong>
+                    {subscription.currentPeriodEnd && (
+                      <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
+                        {Math.max(0, Math.ceil((new Date(subscription.currentPeriodEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} dias restantes
+                      </span>
+                    )}
+                  </span>
+                </p>
+                {subscription.mercadoPagoPaymentId && (
+                  <p className="text-[11px] text-zinc-400 font-mono">
+                    ID Transação Mercado Pago: #{subscription.mercadoPagoPaymentId}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
+            <button
+              type="button"
+              onClick={() => handleVerifyPayment()}
+              disabled={isVerifyingPayment}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Consultar e sincronizar status no Mercado Pago"
+            >
+              {isVerifyingPayment ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5 text-emerald-600" />
+              )}
+              <span>Sincronizar</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCancelSubscription}
+              disabled={isCanceling}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 transition-all cursor-pointer"
+            >
+              {isCanceling ? 'Cancelando...' : 'Cancelar'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Trialing Banner */}
       {isTrial && (
         <div className="p-5 rounded-3xl bg-linear-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -275,14 +387,31 @@ function BillingContent() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleCancelSubscription}
-            disabled={isCanceling}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 transition-all shrink-0 cursor-pointer self-start sm:self-center"
-          >
-            {isCanceling ? 'Cancelando...' : 'Cancelar Assinatura'}
-          </button>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+            <button
+              type="button"
+              onClick={() => handleVerifyPayment()}
+              disabled={isVerifyingPayment}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Consultar e sincronizar pagamento no Mercado Pago"
+            >
+              {isVerifyingPayment ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-600" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5 text-amber-600" />
+              )}
+              <span>Verificar Pagamento</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCancelSubscription}
+              disabled={isCanceling}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 transition-all cursor-pointer"
+            >
+              {isCanceling ? 'Cancelando...' : 'Cancelar Assinatura'}
+            </button>
+          </div>
         </div>
       )}
 
