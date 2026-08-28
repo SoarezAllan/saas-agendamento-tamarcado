@@ -166,8 +166,8 @@ export async function sendWhatsAppMessage({
   if (!cleanPhone) return false;
 
   const phoneWithCountry = cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`;
-  const apiUrl = process.env.WHATSAPP_API_URL;
-  const apiToken = process.env.WHATSAPP_API_TOKEN;
+  const apiUrl = (await getSystemSetting('WHATSAPP_API_URL', process.env.WHATSAPP_API_URL || '')).trim();
+  const apiToken = (await getSystemSetting('WHATSAPP_API_TOKEN', process.env.WHATSAPP_API_TOKEN || '')).trim();
 
   if (apiUrl) {
     try {
@@ -175,11 +175,12 @@ export async function sendWhatsAppMessage({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiToken ? { Authorization: `Bearer ${apiToken}` } : {}),
+          ...(apiToken ? { Authorization: `Bearer ${apiToken}`, apikey: apiToken, 'Client-Token': apiToken } : {}),
         },
         body: JSON.stringify({
           phone: phoneWithCountry,
           number: phoneWithCountry,
+          to: phoneWithCountry,
           message: message,
           text: message,
         }),

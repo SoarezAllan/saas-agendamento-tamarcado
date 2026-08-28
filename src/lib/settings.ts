@@ -42,6 +42,8 @@ export async function getAllSystemSettings(): Promise<Record<string, string>> {
     'SMTP_USER',
     'SMTP_PASS',
     'SMTP_FROM',
+    'WHATSAPP_API_URL',
+    'WHATSAPP_API_TOKEN',
   ];
 
   const result: Record<string, string> = {};
