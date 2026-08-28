@@ -225,7 +225,7 @@ export async function createMercadoPagoCheckout(
       email: options.userEmail,
     },
     back_urls: {
-      success: `${appUrl}/dashboard/billing?status=success&cycle=${options.billingCycle}&method=${options.paymentMethod}`,
+      success: `${appUrl}/dashboard/billing/sucesso?status=success&cycle=${options.billingCycle}&method=${options.paymentMethod}`,
       pending: `${appUrl}/dashboard/billing?status=pending&cycle=${options.billingCycle}&method=${options.paymentMethod}`,
       failure: `${appUrl}/dashboard/billing?status=failure`,
     },
