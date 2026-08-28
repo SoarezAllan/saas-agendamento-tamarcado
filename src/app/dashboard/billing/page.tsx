@@ -331,7 +331,7 @@ function BillingContent() {
           >
             <span>Anual</span>
             <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              20% OFF • 2 Meses Grátis
+              20% OFF
             </span>
           </button>
         </div>
@@ -358,7 +358,7 @@ function BillingContent() {
             fullCyclePrice = plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly * 12 * 0.8;
             displayPrice = fullCyclePrice / 12;
             periodText = '/mês (cobrado R$ ' + fullCyclePrice.toFixed(2) + '/ano)';
-            economyNote = 'Economia de 20% (2 meses grátis)';
+            economyNote = 'Economia de 20%';
           }
 
           const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features || [];

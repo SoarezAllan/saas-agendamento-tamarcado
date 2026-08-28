@@ -25,7 +25,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<'FORM' | 'VERIFY'>('FORM');
   const [businessName, setBusinessName] = useState('');
-  const [category, setCategory] = useState('Barbearia');
+  const [category, setCategory] = useState('');
   const [customSlug, setCustomSlug] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
@@ -63,8 +63,8 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
-    if (!businessName || !ownerName || !email || !password) {
-      setError('Preencha os campos obrigatórios');
+    if (!businessName || !category || !ownerName || !email || !password) {
+      setError('Preencha todos os campos obrigatórios e selecione o segmento do seu negócio');
       return;
     }
 
@@ -242,16 +242,24 @@ export default function RegisterPage() {
                       Segmento / Categoria <span className="text-rose-500">*</span>
                     </label>
                     <select
+                      required
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
+                      <option value="" disabled>
+                        Selecione um segmento...
+                      </option>
                       <option value="Barbearia">Barbearia</option>
                       <option value="Salão de Beleza">Salão de Beleza</option>
-                      <option value="Clínica / Estética">Clínica / Estética</option>
-                      <option value="Consultoria / Advocacia">Consultoria / Advocacia</option>
-                      <option value="Odontologia">Odontologia</option>
-                      <option value="Personal / Saúde">Personal / Saúde</option>
+                      <option value="Clínica / Estética">Clínica / Estética & Spa</option>
+                      <option value="Consultoria / Advocacia">Consultoria / Advocacia / Escritório</option>
+                      <option value="Odontologia">Odontologia & Saúde</option>
+                      <option value="Personal / Saúde">Personal Trainer & Fitness</option>
+                      <option value="Pet Shop">Pet Shop & Banho e Tosa</option>
+                      <option value="Fotografia">Fotografia & Estúdio</option>
+                      <option value="Aulas Particulares">Aulas Particulares & Mentoria</option>
+                      <option value="Tatuagem">Estúdio de Tatuagem</option>
                       <option value="Geral">Outros Serviços</option>
                     </select>
                   </div>
