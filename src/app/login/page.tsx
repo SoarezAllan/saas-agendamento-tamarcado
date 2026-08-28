@@ -239,11 +239,22 @@ function LoginForm() {
         </Link>
       </div>
 
-      <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
-        Ainda não tem conta para o seu negócio?{' '}
-        <Link href="/register" className="text-blue-600 font-bold hover:underline">
-          Cadastre seu negócio (7 dias grátis)
-        </Link>
+      <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center space-y-2.5 text-xs text-zinc-500 dark:text-zinc-400">
+        <p>
+          Ainda não tem conta para o seu negócio?{' '}
+          <Link href="/register" className="text-blue-600 font-bold hover:underline">
+            Cadastre seu negócio (7 dias grátis)
+          </Link>
+        </p>
+        <div>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1 px-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar ao início</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -256,10 +267,10 @@ export default function LoginPage() {
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1.5 px-2.5 rounded-xl hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1.5 px-2.5 rounded-xl bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 shadow-xs hover:bg-zinc-100 dark:hover:bg-zinc-800"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span className="hidden xs:inline sm:inline">Voltar ao início</span>
+          <ArrowLeft className="w-3.5 h-3.5 text-blue-600" />
+          <span>Voltar ao início</span>
         </Link>
       </div>
 
