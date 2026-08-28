@@ -14,8 +14,63 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tamarcado-agendamento.com'),
   title: "TáMarcado - Agendamento Online para Negócios & Especialistas",
-  description: "A plataforma completa de agendamento online inteligente para escritórios de advocacia, arquitetura, clínicas, salões, consultorias e personal trainers.",
+  description: "A plataforma completa de agendamento online inteligente para escritórios de advocacia, clínicas, salões, barbearias, consultorias e profissionais autônomos no Brasil.",
+  keywords: [
+    "agendamento online",
+    "sistema de agendamento",
+    "marcar horario online",
+    "agenda online barbearia",
+    "agenda online clinica",
+    "agenda online salao",
+    "agenda online consultorio",
+    "software de agendamento brasil",
+    "agendamento de clientes",
+    "tamarcado",
+  ],
+  authors: [{ name: "TáMarcado" }],
+  creator: "TáMarcado",
+  publisher: "TáMarcado",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: "https://tamarcado-agendamento.com",
+    languages: {
+      "pt-BR": "https://tamarcado-agendamento.com",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "https://tamarcado-agendamento.com",
+    siteName: "TáMarcado",
+    title: "TáMarcado - Agendamento Online Inteligente para Negócios no Brasil",
+    description: "Automatize seus agendamentos, envie lembretes por e-mail e tenha sua página personalizada pronta em 2 minutos.",
+    images: [
+      {
+        url: "/icon.png",
+        width: 512,
+        height: 512,
+        alt: "TáMarcado - Sistema de Agendamento Online",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TáMarcado - Agendamento Online para Negócios",
+    description: "Plataforma completa de agendamento online inteligente para negócios e especialistas no Brasil.",
+    images: ["/icon.png"],
+  },
   icons: {
     icon: [
       { url: '/icon.png', type: 'image/png' },
@@ -25,6 +80,13 @@ export const metadata: Metadata = {
   },
   verification: {
     google: 'google6b3ef84142767305',
+  },
+  other: {
+    'geo.region': 'BR',
+    'geo.placename': 'Brasil',
+    'geo.position': '-14.2350;-51.9253',
+    'ICBM': '-14.2350, -51.9253',
+    'DC.Language': 'pt-BR',
   },
 };
 

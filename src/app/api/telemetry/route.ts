@@ -147,6 +147,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, ignored: true });
     }
 
+    const userAgent = req.headers.get('user-agent') || '';
+    // 4. Ignore automated search engine crawlers and deployment bots from human analytics
+    const isBot = /bot|googlebot|adsbot|mediapartners|bingbot|crawler|spider|robot|crawling|headless|vercel|lighthouse|inspect|probe/i.test(userAgent);
+    if (isBot) {
+      return NextResponse.json({ success: true, ignored: true });
+    }
+
     const clientIp = getClientIp(req);
     const dateSalt = new Date().toISOString().slice(0, 10);
     const ipHash = crypto
@@ -155,7 +162,6 @@ export async function POST(req: NextRequest) {
       .digest('hex')
       .slice(0, 16);
 
-    const userAgent = req.headers.get('user-agent') || '';
     const { deviceType, os, browser } = parseUserAgent(userAgent);
     const cleanReferrer = normalizeReferrer(referrer);
 
