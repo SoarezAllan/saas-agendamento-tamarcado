@@ -68,6 +68,30 @@ export default function DashboardOverviewPage() {
 
   useEffect(() => {
     fetchDashboardData();
+
+    // Check if user just registered a business
+    if (typeof window !== 'undefined') {
+      const justRegistered = sessionStorage.getItem('just_registered_business');
+      const urlParams = new URLSearchParams(window.location.search);
+      const isWelcome = urlParams.get('welcome') === 'true';
+
+      if (justRegistered || isWelcome) {
+        sessionStorage.removeItem('just_registered_business');
+        if ((window as any).gtag) {
+          (window as any).gtag('event', 'conversion', {
+            send_to: 'AW-18409831535',
+            event_category: 'registration',
+            event_label: 'Novo Negocio Cadastrado',
+            value: 1.0,
+            currency: 'BRL',
+          });
+          (window as any).gtag('event', 'sign_up', {
+            method: 'Email',
+            event_label: 'Novo Negocio Cadastrado',
+          });
+        }
+      }
+    }
   }, []);
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {

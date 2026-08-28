@@ -165,7 +165,29 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Erro ao verificar código');
       }
 
-      router.push('/dashboard');
+      // Mark Google Ads conversion: New Business Registered
+      if (typeof window !== 'undefined') {
+        try {
+          sessionStorage.setItem('just_registered_business', 'true');
+          if ((window as any).gtag) {
+            (window as any).gtag('event', 'conversion', {
+              send_to: 'AW-18409831535',
+              event_category: 'registration',
+              event_label: 'Novo Negocio Cadastrado',
+              value: 1.0,
+              currency: 'BRL',
+            });
+            (window as any).gtag('event', 'sign_up', {
+              method: 'Email',
+              event_label: 'Novo Negocio Cadastrado',
+            });
+          }
+        } catch (e) {
+          console.error('gtag conversion error:', e);
+        }
+      }
+
+      router.push('/dashboard?welcome=true');
       router.refresh();
     } catch (err: any) {
       setError(err.message || 'Erro ao cadastrar');
