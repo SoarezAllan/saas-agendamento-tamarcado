@@ -490,8 +490,55 @@ function BillingContent() {
               </button>
             </div>
 
-            {/* If Pix was generated, show Pix screen */}
-            {checkoutResult?.paymentMethod === 'PIX' && checkoutResult?.pixQrCodeText ? (
+            {/* If Demo Mode, show safety disclaimer instead of real Pix / Card payment */}
+            {data?.isDemo ? (
+              <div className="text-center space-y-6 py-2 animate-in fade-in">
+                <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-md">
+                  <ShieldCheck className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-2">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
+                    <Sparkles className="w-3 h-3" /> Ambiente de Demonstração
+                  </span>
+                  <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-100">
+                    Pagamento Desativado nesta Conta de Teste
+                  </h4>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
+                    Você está navegando na conta de demonstração pública do <strong>{data?.business?.name || 'TáMarcado'}</strong>.
+                    Para sua segurança e para <strong>evitar cobranças acidentais</strong>, a emissão de código Pix e a inserção de cartão de crédito estão desativadas nesta conta demonstrativa.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-left space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-900 dark:text-blue-200">
+                    <Zap className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span>Deseja usar o TáMarcado no seu próprio negócio?</span>
+                  </div>
+                  <p className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+                    Crie sua conta oficial agora mesmo! Você ganha <strong>7 dias de teste grátis</strong>, página de agendamentos personalizada e acesso a todas as funcionalidades.
+                  </p>
+                </div>
+
+                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={() => router.push('/register')}
+                    className="flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Criar Minha Conta Grátis</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPlanForCheckout(null)}
+                    className="py-3.5 px-4 rounded-2xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                  >
+                    Continuar na Demo
+                  </button>
+                </div>
+              </div>
+            ) : checkoutResult?.paymentMethod === 'PIX' && checkoutResult?.pixQrCodeText ? (
               <div className="text-center space-y-5 py-2">
                 <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-left space-y-1.5">
                   <div className="flex items-center gap-2 font-bold text-xs text-emerald-800 dark:text-emerald-300">

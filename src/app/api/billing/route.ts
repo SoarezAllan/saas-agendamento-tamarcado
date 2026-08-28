@@ -43,6 +43,7 @@ export async function GET(req: NextRequest) {
       plans: parsedPlans,
       subscription,
       hasMercadoPagoToken,
+      isDemo: Boolean(business?.isDemo || business?.slug === 'barbearia-vintage' || session.email === 'admin@barbearia.com'),
       usage: {
         professionalsCount: business?._count.professionals || 0,
         servicesCount: business?._count.services || 0,

@@ -49,6 +49,20 @@ export async function POST(req: NextRequest) {
       price = plan.priceAnnual > 0 ? plan.priceAnnual : Math.round(plan.priceMonthly * 12 * 0.8 * 100) / 100;
     }
 
+    // If this is a demo account, do not generate real money charges or Mercado Pago PIX/cards
+    if (business.isDemo || business.slug === 'barbearia-vintage' || session.email === 'admin@barbearia.com') {
+      return NextResponse.json({
+        success: true,
+        isDemo: true,
+        message: 'Esta é uma conta de demonstração interativa. O processamento de pagamentos reais fica bloqueado nesta visualização para evitar cobranças acidentais.',
+        planName: plan.name,
+        price,
+        billingCycle,
+        paymentMethod,
+        trialDays: 7,
+      });
+    }
+
     const checkoutResult = await createMercadoPagoCheckout({
       businessId: business.id,
       businessName: business.name,
