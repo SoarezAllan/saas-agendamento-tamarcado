@@ -767,23 +767,28 @@ export default function SuperAdminPage() {
                   <span className="text-xs text-zinc-400 font-semibold">Total: {analytics.pageViews7d || 0}</span>
                 </div>
 
-                <div className="h-44 flex items-end justify-between gap-3 pt-6 px-2">
+                <div className="h-48 flex items-end justify-between gap-2 sm:gap-3 pt-6 px-1 sm:px-2">
                   {(analytics.dailyChart || []).map((item: any, idx: number) => {
                     const maxVal = Math.max(...(analytics.dailyChart || []).map((i: any) => i.views), 1);
-                    const heightPercent = Math.max(Math.round((item.views / maxVal) * 100), 8);
+                    const isPositive = item.views > 0;
+                    const heightPercent = isPositive ? Math.max(Math.round((item.views / maxVal) * 100), 16) : 6;
 
                     return (
                       <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                        <div className="relative w-full flex flex-col items-center">
-                          <span className="opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-zinc-800 dark:text-zinc-200 mb-1">
+                        <div className="relative w-full flex flex-col items-center justify-end h-32">
+                          <span className={`text-[11px] font-bold mb-1 transition-all ${isPositive ? 'text-blue-600 dark:text-blue-400 opacity-100' : 'text-zinc-400 dark:text-zinc-600 opacity-60 group-hover:opacity-100'}`}>
                             {item.views}
                           </span>
                           <div
                             style={{ height: `${heightPercent}%` }}
-                            className="w-full max-w-[42px] rounded-t-xl bg-linear-to-t from-blue-600 to-indigo-500 group-hover:from-blue-500 group-hover:to-indigo-400 transition-all min-h-[12px]"
+                            className={`w-full max-w-[44px] rounded-t-xl transition-all ${
+                              isPositive
+                                ? 'bg-linear-to-t from-blue-600 to-indigo-500 shadow-xs shadow-blue-500/20 group-hover:from-blue-500 group-hover:to-indigo-400'
+                                : 'bg-zinc-200/80 dark:bg-zinc-800/80 min-h-[6px]'
+                            }`}
                           />
                         </div>
-                        <span className="text-[10px] font-bold text-zinc-400 font-mono">
+                        <span className="text-[10px] sm:text-[11px] font-bold text-zinc-500 dark:text-zinc-400 font-mono">
                           {item.date}
                         </span>
                       </div>

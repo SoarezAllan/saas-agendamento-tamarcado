@@ -59,26 +59,25 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
-      {/* Top Floating Theme Toggle */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
+      {/* Top Header Bar with Logo and ThemeToggle cleanly separated */}
+      <div className="w-full max-w-md mx-auto px-4 flex items-center justify-between">
+        <Logo href="/" size="md" />
         <ThemeToggle />
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Logo href="/" size="lg" className="justify-center" />
-        <div className="mt-4 inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-2 shadow-xs">
-          <KeyRound className="w-6 h-6" />
+      <div className="my-auto sm:mx-auto sm:w-full sm:max-w-md px-4 py-4 space-y-6">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 mb-2 shadow-xs">
+            <KeyRound className="w-6 h-6" />
+          </div>
+          <h2 className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+            Recuperação de Senha
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">
+            Informe o e-mail cadastrado da sua conta para receber o link de redefinição
+          </p>
         </div>
-        <h2 className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
-          Recuperação de Senha
-        </h2>
-        <p className="mt-1 text-xs text-zinc-500 max-w-sm mx-auto">
-          Informe o e-mail cadastrado da sua conta para receber o link de redefinição
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6">
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs font-medium border border-rose-200 animate-in fade-in">

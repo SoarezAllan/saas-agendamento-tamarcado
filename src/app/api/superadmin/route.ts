@@ -206,23 +206,28 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.count - a.count)
       .slice(0, 6);
 
-    // Daily views last 7 days
-    const dailyViewsMap: Record<string, number> = {};
+    // Daily views last 7 days (calculated using precise day boundaries)
+    const dailyChart: { date: string; fullDate: string; views: number }[] = [];
     for (let i = 6; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-      const dateKey = d.toISOString().slice(5, 10); // MM-DD
-      dailyViewsMap[dateKey] = 0;
+      const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
+      const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+
+      const day = String(targetDate.getDate()).padStart(2, '0');
+      const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const dateLabel = `${day}/${month}`;
+
+      const dayViews = allPageViewsList.filter((p) => {
+        const pDate = new Date(p.createdAt);
+        return pDate >= dayStart && pDate <= dayEnd;
+      }).length;
+
+      dailyChart.push({
+        date: dateLabel,
+        fullDate: `${day}/${month}/${targetDate.getFullYear()}`,
+        views: dayViews,
+      });
     }
-    allPageViewsList.forEach((p) => {
-      const dateKey = new Date(p.createdAt).toISOString().slice(5, 10);
-      if (dailyViewsMap[dateKey] !== undefined) {
-        dailyViewsMap[dateKey] += 1;
-      }
-    });
-    const dailyChart = Object.entries(dailyViewsMap).map(([date, views]) => ({
-      date,
-      views,
-    }));
 
     // Conversion Rate: Landing page views to businesses registered
     const landingViews = pageCounts['/'] || totalPageViews || 0;

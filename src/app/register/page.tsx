@@ -89,23 +89,22 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
-      {/* Top Floating Theme Toggle */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
+      {/* Top Header Bar with Logo and ThemeToggle cleanly separated */}
+      <div className="w-full max-w-xl mx-auto px-4 flex items-center justify-between">
+        <Logo href="/" size="md" />
         <ThemeToggle />
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-xl text-center">
-        <Logo href="/" size="lg" className="justify-center" />
-        <h2 className="mt-4 text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-100">
-          Cadastre seu Negócio Gratuitamente
-        </h2>
-        <p className="mt-1 text-xs text-zinc-500 max-w-md mx-auto">
-          Crie sua conta em 1 minuto e ganhe 7 dias de teste grátis com página pública e agendamentos ilimitados!
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl px-4">
+      <div className="my-auto sm:mx-auto sm:w-full sm:max-w-xl px-4 py-4 space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-zinc-100">
+            Cadastre seu Negócio Gratuitamente
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500 max-w-md mx-auto">
+            Crie sua conta em 1 minuto e ganhe 7 dias de teste grátis com página pública e agendamentos ilimitados!
+          </p>
+        </div>
         <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800">
           {error && (
             <div className="p-3.5 rounded-xl bg-rose-50 text-rose-800 text-xs font-medium border border-rose-200 mb-6">

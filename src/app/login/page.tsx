@@ -153,23 +153,23 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative">
-      {/* Top Floating Theme Toggle */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
+      {/* Top Header Bar with Logo and ThemeToggle cleanly separated */}
+      <div className="w-full max-w-md mx-auto px-4 flex items-center justify-between">
+        <Logo href="/" size="md" />
         <ThemeToggle />
       </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Logo href="/" size="lg" className="justify-center" />
-        <h2 className="mt-4 text-2xl font-black text-zinc-900 dark:text-zinc-100">
-          Acesse seu Painel
-        </h2>
-        <p className="mt-1 text-xs text-zinc-500">
-          Entre com sua conta de administrador ou profissional
-        </p>
-      </div>
+      <div className="my-auto sm:mx-auto sm:w-full sm:max-w-md px-4 py-4 space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+            Acesse seu Painel
+          </h2>
+          <p className="mt-1 text-xs text-zinc-500">
+            Entre com sua conta de administrador ou profissional
+          </p>
+        </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
         <Suspense
           fallback={
             <div className="bg-white dark:bg-zinc-900 py-12 px-6 rounded-3xl text-center">
@@ -179,6 +179,10 @@ export default function LoginPage() {
         >
           <LoginForm />
         </Suspense>
+      </div>
+
+      <div className="w-full max-w-md mx-auto text-center py-2 text-[11px] text-zinc-400">
+        TáMarcado © {new Date().getFullYear()} - Todos os direitos reservados
       </div>
     </div>
   );

@@ -83,28 +83,31 @@ export default function DashboardLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile Header Bar */}
-        <header className="lg:hidden h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-4 flex items-center justify-between sticky top-0 z-30">
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="p-2 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 rounded-lg"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-1.5 min-w-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain shrink-0" />
-            <span className="font-bold text-sm truncate max-w-[180px]">
-              {user.business?.name || 'TáMarcado'}
-            </span>
+        <header className="lg:hidden h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-3 sm:px-4 flex items-center justify-between gap-2 sticky top-0 z-30">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg shrink-0 cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Logo" className="w-5 h-5 object-contain shrink-0" />
+              <span className="font-bold text-xs sm:text-sm truncate max-w-[130px] sm:max-w-[200px]">
+                {user.business?.name || 'TáMarcado'}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-1.5 shrink-0">
             <ThemeToggle />
             {user.business?.slug && (
               <a
                 href={`/b/${user.business.slug}`}
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg"
+                className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg shrink-0"
                 title="Abrir página pública"
               >
                 <ExternalLink className="w-4 h-4" />
