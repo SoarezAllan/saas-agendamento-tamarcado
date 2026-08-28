@@ -105,8 +105,6 @@ export default function DashboardLayout({
             {user.business?.slug && (
               <a
                 href={`/b/${user.business.slug}`}
-                target="_blank"
-                rel="noreferrer"
                 className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg shrink-0"
                 title="Abrir página pública"
               >

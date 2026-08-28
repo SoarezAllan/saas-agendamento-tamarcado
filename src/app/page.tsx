@@ -351,14 +351,12 @@ export default function LandingPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <a
                       href={`/b/${biz.slug}`}
-                      target="_blank"
-                      rel="noreferrer"
                       className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer hover:opacity-95"
                       style={{ backgroundColor: biz.color }}
                     >
                       <PlayCircle className="w-4 h-4" />
                       <span>Testar Agendamento</span>
-                      <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                      <ArrowRight className="w-3.5 h-3.5 opacity-70" />
                     </a>
                   </div>
                 </div>
@@ -431,13 +429,11 @@ export default function LandingPage() {
 
               <a
                 href="/api/auth/demo?role=owner"
-                target="_blank"
-                rel="noreferrer"
                 className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-amber-700 hover:bg-amber-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Entrar como Dono / Gestor</span>
-                <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                <ArrowRight className="w-3.5 h-3.5 opacity-80" />
               </a>
             </div>
 
@@ -485,13 +481,11 @@ export default function LandingPage() {
 
               <a
                 href="/api/auth/demo?role=professional"
-                target="_blank"
-                rel="noreferrer"
                 className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <PlayCircle className="w-4 h-4" />
                 <span>Entrar como Profissional</span>
-                <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                <ArrowRight className="w-3.5 h-3.5 opacity-80" />
               </a>
             </div>
           </div>

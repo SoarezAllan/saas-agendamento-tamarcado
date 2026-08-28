@@ -391,8 +391,6 @@ export default function DashboardOverviewPage() {
             </button>
             <a
               href={`/b/${business.slug}`}
-              target="_blank"
-              rel="noreferrer"
               className="p-2.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs flex items-center gap-1.5 shrink-0 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />

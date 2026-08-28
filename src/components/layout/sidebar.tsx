@@ -190,8 +190,6 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
               </span>
               <a
                 href={`/b/${business.slug}`}
-                target="_blank"
-                rel="noreferrer"
                 className="text-blue-600 hover:text-blue-700 flex items-center gap-0.5 hover:underline"
               >
                 Abrir <ExternalLink className="w-3 h-3" />
