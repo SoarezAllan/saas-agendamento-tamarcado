@@ -101,10 +101,12 @@ export async function sendEmail({
   to,
   subject,
   html,
+  text,
 }: {
   to: string;
   subject: string;
   html: string;
+  text?: string;
 }): Promise<boolean> {
   try {
     const transporter = await getMailTransporter();
@@ -112,12 +114,30 @@ export async function sendEmail({
     const user = (await getSystemSetting('SMTP_USER', process.env.SMTP_USER || 'tamarcado.agendamento@gmail.com')).trim();
     const fromAddress = customFrom || `"TáMarcado" <${user}>`;
 
+    // Generate fallback plain text if not provided
+    const plainText =
+      text ||
+      html
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<br\s*[\/]?>/gi, '\n')
+        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
+        .replace(/<[^>]+>/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
     if (transporter) {
       const info = await transporter.sendMail({
         from: fromAddress,
         to,
         subject,
+        text: plainText,
         html,
+        replyTo: user,
+        headers: {
+          'X-Mailer': 'TaMarcado Notifier',
+          'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        },
       });
       console.log(`[Email Service] E-mail sent successfully to ${to} (Subject: ${subject}, ID: ${info.messageId})`);
       return true;
