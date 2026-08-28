@@ -257,42 +257,6 @@ export default function CustomerLoginPage() {
           </p>
         </div>
 
-        {/* Profile Selector Cards */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              Tipo de Acesso
-            </span>
-            <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Modo Cliente Ativo
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5 p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-200 dark:border-zinc-700/80 shadow-inner">
-            {/* Inactive Card: Dono / Gestor */}
-            <Link
-              href="/login"
-              className="p-3 rounded-xl bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-600 shadow-xs flex flex-col items-center justify-center text-center gap-1 transition-all group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/60 group-hover:text-blue-600 flex items-center justify-center transition-colors">
-                <Shield className="w-4 h-4 text-zinc-500 dark:text-zinc-400 group-hover:text-blue-600" />
-              </div>
-              <span className="text-xs font-bold leading-tight group-hover:text-blue-600">Dono / Gestor</span>
-              <span className="text-[10px] text-zinc-400 group-hover:text-blue-500 font-medium leading-none">Painel do Negócio</span>
-            </Link>
-
-            {/* Active Card: Área do Cliente */}
-            <div className="relative p-3 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/30 flex flex-col items-center justify-center text-center gap-1 cursor-default ring-2 ring-blue-600 ring-offset-2 dark:ring-offset-zinc-900">
-              <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xs font-black leading-tight">Área do Cliente</span>
-              <span className="text-[10px] text-blue-100 font-medium leading-none">Meus Agendamentos</span>
-            </div>
-          </div>
-        </div>
-
         <Suspense
           fallback={
             <div className="bg-white dark:bg-zinc-900 py-12 px-6 rounded-3xl text-center">

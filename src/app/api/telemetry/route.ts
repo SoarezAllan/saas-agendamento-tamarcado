@@ -155,6 +155,21 @@ export async function POST(req: NextRequest) {
     }
 
     const clientIp = getClientIp(req);
+    // 5. Ignore Google Ads automated review bots and datacenter probes (66.102.*, 66.249.*, etc.)
+    const isDatacenterBot =
+      clientIp.startsWith('66.102.') ||
+      clientIp.startsWith('66.249.') ||
+      clientIp.startsWith('72.14.') ||
+      clientIp.startsWith('74.125.') ||
+      clientIp.startsWith('209.85.') ||
+      clientIp.startsWith('216.239.') ||
+      clientIp.startsWith('34.') ||
+      clientIp.startsWith('35.');
+
+    if (isDatacenterBot) {
+      return NextResponse.json({ success: true, ignored: true });
+    }
+
     const dateSalt = new Date().toISOString().slice(0, 10);
     const ipHash = crypto
       .createHash('sha256')
