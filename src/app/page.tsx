@@ -174,6 +174,14 @@ export default function LandingPage() {
             <ThemeToggle />
 
             <Link
+              href="/cliente"
+              className="hidden md:inline-flex px-3 py-2 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors shrink-0 items-center gap-1.5"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Área do Cliente</span>
+            </Link>
+
+            <Link
               href="/login"
               className="px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
             >
@@ -598,6 +606,9 @@ export default function LandingPage() {
             >
               Suporte
             </button>
+            <Link href="/cliente" className="hover:text-blue-600 font-bold transition-colors">
+              Área do Cliente
+            </Link>
             <Link href="/login" className="hover:underline">
               Entrar
             </Link>

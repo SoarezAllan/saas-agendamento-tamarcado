@@ -9,9 +9,11 @@ export interface UserSession {
   userId: string;
   email: string;
   name: string;
-  role: 'SUPERADMIN' | 'ADMIN' | 'PROFESSIONAL';
+  role: 'SUPERADMIN' | 'ADMIN' | 'PROFESSIONAL' | 'CUSTOMER';
   businessId?: string | null;
   professionalId?: string | null;
+  customerId?: string | null;
+  phone?: string | null;
 }
 
 export async function hashPassword(password: string): Promise<string> {

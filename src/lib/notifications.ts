@@ -434,6 +434,87 @@ export function generateCustomerConfirmationEmail(data: BookingNotificationData)
   };
 }
 
+export function generateReminder24hEmail(data: BookingNotificationData): {
+  subject: string;
+  html: string;
+} {
+  const priceDisplay = data.servicePrice > 0 ? formatCurrency(data.servicePrice) : 'A combinar';
+
+  return {
+    subject: `🔔 Lembrete: Seu agendamento em ${data.businessName} é amanhã!`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <span style="background-color: #2563eb; color: #ffffff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+            Lembrete 24 Horas Antes
+          </span>
+          <h2 style="color: #111827; margin: 16px 0 6px 0; font-size: 22px;">Seu agendamento é amanhã! ⏰</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Olá, <strong>${data.customerName}</strong>! Lembramos que seu horário está confirmado em <strong>${data.businessName}</strong>.</p>
+        </div>
+
+        <div style="background-color: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 18px; margin: 20px 0; font-size: 14px; color: #374151;">
+          <p style="margin: 6px 0;"><strong>✂️ Serviço:</strong> ${data.serviceName}</p>
+          <p style="margin: 6px 0;"><strong>👤 Profissional:</strong> ${data.professionalName}</p>
+          <p style="margin: 6px 0;"><strong>📅 Data:</strong> ${data.dateFormatted}</p>
+          <p style="margin: 6px 0;"><strong>⏰ Horário:</strong> ${data.timeFormatted}</p>
+          <p style="margin: 6px 0;"><strong>💰 Valor:</strong> ${priceDisplay}</p>
+          ${data.businessAddress ? `<p style="margin: 6px 0;"><strong>📍 Endereço:</strong> ${data.businessAddress}</p>` : ''}
+        </div>
+
+        <div style="text-align: center; margin: 28px 0 10px 0;">
+          <a href="${data.manageUrl}" style="background-color: #2563eb; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block;">
+            Visualizar ou Remarcar
+          </a>
+        </div>
+
+        <p style="color: #9ca3af; font-size: 11px; text-align: center; margin-top: 24px; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+          Caso precise reagendar ou cancelar com antecedência, use o botão acima. Te esperamos lá!
+        </p>
+      </div>
+    `,
+  };
+}
+
+export function generateReminder2hEmail(data: BookingNotificationData): {
+  subject: string;
+  html: string;
+} {
+  const priceDisplay = data.servicePrice > 0 ? formatCurrency(data.servicePrice) : 'A combinar';
+
+  return {
+    subject: `⚡ Atenção: Seu horário em ${data.businessName} é daqui a 2 horas!`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <span style="background-color: #059669; color: #ffffff; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+            Lembrete 2 Horas Antes
+          </span>
+          <h2 style="color: #111827; margin: 16px 0 6px 0; font-size: 22px;">Seu atendimento é hoje! 🚀</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Olá, <strong>${data.customerName}</strong>! Seu horário é <strong>daqui a pouco às ${data.timeFormatted.split(' às ')[0]}</strong>.</p>
+        </div>
+
+        <div style="background-color: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 18px; margin: 20px 0; font-size: 14px; color: #374151;">
+          <p style="margin: 6px 0;"><strong>✂️ Serviço:</strong> ${data.serviceName}</p>
+          <p style="margin: 6px 0;"><strong>👤 Profissional:</strong> ${data.professionalName}</p>
+          <p style="margin: 6px 0;"><strong>⏰ Horário:</strong> ${data.timeFormatted}</p>
+          <p style="margin: 6px 0;"><strong>💰 Valor:</strong> ${priceDisplay}</p>
+          ${data.businessAddress ? `<p style="margin: 6px 0;"><strong>📍 Local / Endereço:</strong> ${data.businessAddress}</p>` : ''}
+        </div>
+
+        <div style="text-align: center; margin: 28px 0 10px 0;">
+          <a href="${data.manageUrl}" style="background-color: #059669; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block;">
+            Abrir Detalhes do Agendamento
+          </a>
+        </div>
+
+        <p style="color: #9ca3af; font-size: 11px; text-align: center; margin-top: 24px; border-top: 1px solid #f3f4f6; padding-top: 16px;">
+          Por favor, procure chegar com alguns minutos de antecedência. Bom atendimento! ✨
+        </p>
+      </div>
+    `,
+  };
+}
+
 export async function sendPasswordResetEmail({
   to,
   userName,

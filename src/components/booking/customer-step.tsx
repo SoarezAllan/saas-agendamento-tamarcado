@@ -46,6 +46,20 @@ export function CustomerStep({
   const dateObj = new Date(year, month - 1, day);
   const dateFormatted = format(dateObj, "EEEE, dd 'de' MMMM", { locale: ptBR });
 
+  React.useEffect(() => {
+    // Check if customer is already logged in
+    fetch('/api/customer/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.customer) {
+          if (data.customer.name) setName(data.customer.name);
+          if (data.customer.phone) setPhone(formatPhoneMask(data.customer.phone));
+          if (data.customer.email) setEmail(data.customer.email);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const formatPhoneMask = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 10) {

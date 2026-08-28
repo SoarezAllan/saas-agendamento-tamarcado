@@ -163,17 +163,111 @@ export async function POST(req: NextRequest) {
     const startTime = new Date(year, month - 1, day, hours, minutes, 0);
     const endTime = new Date(startTime.getTime() + service.durationMinutes * 60 * 1000);
 
+    const cleanPhone = customerPhone.replace(/\D/g, '');
+    const cleanEmail = customerEmail ? customerEmail.trim().toLowerCase() : null;
+
+    // 4. ANTI-DUPLICITY & CONFLICT PREVENTION VALIDATIONS
+    // A) Check for Time Overlap Conflict: Same customer cannot have conflicting overlapping appointments
+    const activeConflict = await db.appointment.findFirst({
+      where: {
+        OR: [
+          { customerPhone: cleanPhone },
+          ...(cleanEmail ? [{ customerEmail: cleanEmail }] : []),
+        ],
+        status: { notIn: ['CANCELLED', 'NO_SHOW'] },
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+      include: {
+        service: true,
+        business: true,
+      },
+    });
+
+    if (activeConflict) {
+      const conflictStart = format(new Date(activeConflict.startTime), 'HH:mm');
+      const conflictEnd = format(new Date(activeConflict.endTime), 'HH:mm');
+      return NextResponse.json(
+        {
+          error: `Você já possui um agendamento marcado neste mesmo horário (${conflictStart} às ${conflictEnd} - ${activeConflict.service.name}). Por favor, selecione outro horário para evitar conflito.`,
+        },
+        { status: 409 }
+      );
+    }
+
+    // B) Check for Duplicate Service on the Same Day: Same customer cannot book duplicate of the same service on the same date
+    const dayStart = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const dayEnd = new Date(year, month - 1, day, 23, 59, 59, 999);
+
+    const duplicateSameService = await db.appointment.findFirst({
+      where: {
+        businessId,
+        serviceId,
+        OR: [
+          { customerPhone: cleanPhone },
+          ...(cleanEmail ? [{ customerEmail: cleanEmail }] : []),
+        ],
+        status: { notIn: ['CANCELLED', 'NO_SHOW'] },
+        startTime: {
+          gte: dayStart,
+          lte: dayEnd,
+        },
+      },
+      include: {
+        service: true,
+      },
+    });
+
+    if (duplicateSameService) {
+      const dupTime = format(new Date(duplicateSameService.startTime), 'HH:mm');
+      return NextResponse.json(
+        {
+          error: `Você já possui um agendamento para "${duplicateSameService.service.name}" nesta data (às ${dupTime}). Caso queira mudar o horário, use o link de gerenciamento ou acesse seu painel.`,
+        },
+        { status: 409 }
+      );
+    }
+
+    // 5. Customer Linkage / Auto-Creation
+    let linkedCustomerId: string | null = null;
+    const session = await getSession(req);
+    if (session && session.role === 'CUSTOMER') {
+      linkedCustomerId = session.userId;
+    } else {
+      const existingCustomer = await db.customer.findFirst({
+        where: {
+          OR: [
+            ...(cleanEmail ? [{ email: cleanEmail }] : []),
+            { phone: cleanPhone },
+          ],
+        },
+      });
+      if (existingCustomer) {
+        linkedCustomerId = existingCustomer.id;
+      } else {
+        const newCustomer = await db.customer.create({
+          data: {
+            name: customerName.trim(),
+            phone: cleanPhone,
+            email: cleanEmail,
+          },
+        });
+        linkedCustomerId = newCustomer.id;
+      }
+    }
+
     const manageToken = crypto.randomUUID();
 
-    // 4. Create Appointment
+    // 6. Create Appointment
     const appointment = await db.appointment.create({
       data: {
         businessId,
         serviceId,
         professionalId: finalProfessionalId,
+        customerId: linkedCustomerId,
         customerName: customerName.trim(),
-        customerPhone: customerPhone.trim(),
-        customerEmail: customerEmail ? customerEmail.trim().toLowerCase() : null,
+        customerPhone: cleanPhone,
+        customerEmail: cleanEmail,
         notes: notes ? notes.trim() : null,
         startTime,
         endTime,
@@ -188,7 +282,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 5. Generate URLs and Notification
+    // 7. Generate URLs and Notification
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const manageUrl = `${baseUrl}/b/${business.slug}/manage/${manageToken}`;
     const dateFormatted = format(startTime, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
