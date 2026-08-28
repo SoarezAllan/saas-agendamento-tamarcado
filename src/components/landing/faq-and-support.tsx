@@ -24,7 +24,7 @@ const FAQ_ITEMS = [
   {
     question: 'Como meus clientes fazem para agendar?',
     answer:
-      'Você recebe um link exclusivo do seu estabelecimento (ex: tamarcado.com.br/b/sua-empresa). Basta colocar na sua bio do Instagram, WhatsApp ou site. O cliente escolhe o serviço, profissional, dia e horário em 4 passos simples, sem precisar baixar app nem criar senha.',
+      'Você recebe um link exclusivo do seu estabelecimento (ex: tamarcado.com.br/b/sua-empresa). Basta colocar na sua bio do Instagram, redes sociais ou site. O cliente escolhe o serviço, profissional, dia e horário em 4 passos simples, sem precisar baixar app nem criar senha.',
   },
   {
     question: 'Posso cadastrar múltiplos colaboradores e profissionais?',
@@ -34,7 +34,7 @@ const FAQ_ITEMS = [
   {
     question: 'Como eu e minha equipe somos avisados dos agendamentos?',
     answer:
-      'O sistema envia notificações automáticas no WhatsApp e por E-mail tanto para o proprietário quanto para o profissional designado sempre que um horário for marcado, remarcado ou cancelado.',
+      'O sistema envia notificações e lembretes automáticos por E-mail tanto para o proprietário quanto para o profissional designado sempre que um horário for marcado, remarcado ou cancelado.',
   },
   {
     question: 'Consigo bloquear folgas, plantões e férias da equipe?',

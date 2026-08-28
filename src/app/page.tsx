@@ -550,9 +550,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center">
               <MessageCircle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold">WhatsApp & Google Calendar</h3>
+            <h3 className="text-base font-bold">Lembretes & Google Calendar</h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Confirmações instantâneas, link direto para sincronizar na agenda do Google e link seguro para o próprio cliente remarcar ou cancelar com antecedência.
+              Confirmações por e-mail, link direto para sincronizar na agenda do Google e portal seguro para o próprio cliente remarcar ou cancelar com antecedência.
             </p>
           </div>
 

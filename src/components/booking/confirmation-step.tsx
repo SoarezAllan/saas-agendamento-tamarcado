@@ -174,7 +174,7 @@ export function ConfirmationStep({
           className="w-full py-3 px-4 rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
         >
           <MessageCircle className="w-4 h-4" />
-          <span>Confirmar via WhatsApp</span>
+          <span>Falar com o Estabelecimento</span>
           <ExternalLink className="w-3.5 h-3.5 opacity-70" />
         </a>
       </div>

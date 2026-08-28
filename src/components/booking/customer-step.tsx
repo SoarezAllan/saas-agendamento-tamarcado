@@ -207,7 +207,7 @@ export function CustomerStep({
             />
           </div>
           <p className="text-[11px] text-zinc-500 mt-1">
-            Enviaremos a confirmação e lembretes para este WhatsApp
+            Enviaremos a confirmação e lembretes do seu agendamento
           </p>
         </div>
 
