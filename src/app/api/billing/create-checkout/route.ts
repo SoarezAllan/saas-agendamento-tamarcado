@@ -76,28 +76,35 @@ export async function POST(req: NextRequest) {
       payerCpf,
     });
 
-    // Update or create subscription in trialing state with chosen payment method and cycle
-    const trialEndsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-    await db.subscription.upsert({
+    // Do not change the business's active plan or subscription status until payment is confirmed.
+    // Only record the pending checkout payment ID for verification.
+    const existingSub = await db.subscription.findUnique({
       where: { businessId: business.id },
-      update: {
-        plan: plan.slug.toUpperCase(),
-        billingCycle: billingCycle as BillingCycle,
-        paymentMethod: paymentMethod as PaymentMethodType,
-        trialEndsAt: trialEndsDate,
-        ...(checkoutResult.id ? { mercadoPagoPaymentId: checkoutResult.id } : {}),
-      },
-      create: {
-        businessId: business.id,
-        plan: plan.slug.toUpperCase(),
-        status: 'TRIALING',
-        billingCycle: billingCycle as BillingCycle,
-        paymentMethod: paymentMethod as PaymentMethodType,
-        trialEndsAt: trialEndsDate,
-        ...(checkoutResult.id ? { mercadoPagoPaymentId: checkoutResult.id } : {}),
-      },
     });
+
+    if (existingSub) {
+      if (checkoutResult.id) {
+        await db.subscription.update({
+          where: { businessId: business.id },
+          data: {
+            mercadoPagoPaymentId: checkoutResult.id,
+          },
+        });
+      }
+    } else {
+      const trialEndsDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      await db.subscription.create({
+        data: {
+          businessId: business.id,
+          plan: 'STARTER',
+          status: 'TRIALING',
+          billingCycle: (billingCycle as BillingCycle) || 'MONTHLY',
+          paymentMethod: (paymentMethod as PaymentMethodType) || 'CREDIT_CARD',
+          trialEndsAt: trialEndsDate,
+          mercadoPagoPaymentId: checkoutResult.id || null,
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,

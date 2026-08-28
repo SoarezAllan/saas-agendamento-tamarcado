@@ -106,15 +106,34 @@ export async function GET(req: NextRequest) {
       (b: any) => !b.subscription || b.subscription.status === 'TRIALING'
     ).length;
 
-    const planPriceMap: Record<string, number> = {};
+    const planPriceMonthlyMap: Record<string, { monthly: number; quarterly: number; annual: number }> = {};
     plans.forEach((p) => {
-      planPriceMap[p.slug.toUpperCase()] = p.priceMonthly;
+      const q = p.priceQuarterly > 0 ? p.priceQuarterly : p.priceMonthly * 3;
+      const a = p.priceAnnual > 0 ? p.priceAnnual : p.priceMonthly * 12;
+      planPriceMonthlyMap[p.slug.toUpperCase()] = {
+        monthly: p.priceMonthly,
+        quarterly: q / 3,
+        annual: a / 12,
+      };
     });
 
     let estimatedMRR = 0;
     for (const b of businesses as any[]) {
+      // MRR is strictly calculated ONLY for verified, active paid subscriptions
       if (b.subscription && b.subscription.status === 'ACTIVE') {
-        estimatedMRR += planPriceMap[b.subscription.plan] || 49.9;
+        const planPrices = planPriceMonthlyMap[b.subscription.plan] || {
+          monthly: 49.9,
+          quarterly: 46.63,
+          annual: 46.57,
+        };
+        const cycle = b.subscription.billingCycle?.toUpperCase();
+        if (cycle === 'QUARTERLY') {
+          estimatedMRR += planPrices.quarterly;
+        } else if (cycle === 'ANNUAL') {
+          estimatedMRR += planPrices.annual;
+        } else {
+          estimatedMRR += planPrices.monthly;
+        }
       }
     }
 

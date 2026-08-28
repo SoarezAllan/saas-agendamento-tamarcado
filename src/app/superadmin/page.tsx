@@ -1548,9 +1548,23 @@ export default function SuperAdminPage() {
                               <span className="text-zinc-400 text-[11px]">{owner?.email}</span>
                             </td>
                             <td className="py-3.5 px-4">
-                              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                                {b.subscription?.plan || 'STARTER'}
-                              </span>
+                              {isTrial ? (
+                                <div className="space-y-0.5">
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                    {b.subscription?.plan || 'STARTER'} (Em Teste)
+                                  </span>
+                                  <div className="text-[10px] text-zinc-400">R$ 0,00/mês</div>
+                                </div>
+                              ) : (
+                                <div className="space-y-0.5">
+                                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                    {b.subscription?.plan || 'STARTER'} ({b.subscription?.billingCycle === 'QUARTERLY' ? 'Trimestral' : b.subscription?.billingCycle === 'ANNUAL' ? 'Anual' : 'Mensal'})
+                                  </span>
+                                  {b.subscription?.paymentMethod && (
+                                    <div className="text-[10px] text-emerald-600 font-medium">Pago via {b.subscription.paymentMethod}</div>
+                                  )}
+                                </div>
+                              )}
                             </td>
                             <td className="py-3.5 px-4">
                               <span
@@ -1560,8 +1574,18 @@ export default function SuperAdminPage() {
                                     : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200'
                                 }`}
                               >
-                                {isTrial ? 'Período Teste' : 'Assinatura Ativa'}
+                                {isTrial ? 'Período Teste (7d)' : 'Assinatura Ativa (Paga)'}
                               </span>
+                              {b.subscription?.currentPeriodEnd && !isTrial && (
+                                <div className="text-[10px] text-zinc-400 mt-0.5">
+                                  Vence: {new Date(b.subscription.currentPeriodEnd).toLocaleDateString('pt-BR')}
+                                </div>
+                              )}
+                              {b.subscription?.trialEndsAt && isTrial && (
+                                <div className="text-[10px] text-zinc-400 mt-0.5">
+                                  Expira: {new Date(b.subscription.trialEndsAt).toLocaleDateString('pt-BR')}
+                                </div>
+                              )}
                             </td>
                             <td className="py-3.5 px-4 text-center font-bold">
                               {b._count?.professionals || 0}
