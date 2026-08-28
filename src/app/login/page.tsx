@@ -34,9 +34,6 @@ function LoginForm() {
     } else if (roleParam === 'professional' || emailParam === 'carlos@barbearia.com') {
       setEmail('carlos@barbearia.com');
       setPassword('pro123');
-    } else if (roleParam === 'superadmin' || emailParam === 'superadmin@saas.com') {
-      setEmail('superadmin@saas.com');
-      setPassword('super123');
     }
   }, [searchParams]);
 

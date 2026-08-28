@@ -68,16 +68,26 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
       }),
       db.pageView.findMany({
-        take: 20,
+        take: 50,
         orderBy: { createdAt: 'desc' },
       }),
       db.pageView.findMany({
         where: { createdAt: { gte: thirtyDaysAgo } },
         select: {
           path: true,
-          deviceType: true,
-          referrer: true,
+          ip: true,
           ipHash: true,
+          city: true,
+          region: true,
+          country: true,
+          countryCode: true,
+          browser: true,
+          os: true,
+          deviceType: true,
+          screenResolution: true,
+          language: true,
+          referrer: true,
+          durationSeconds: true,
           createdAt: true,
         },
       }),
@@ -109,11 +119,11 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. Calculate Real Web Telemetry & Indicators
-    const uniqueIpsTotal = new Set(allPageViewsList.map((p) => p.ipHash).filter(Boolean)).size;
+    const uniqueIpsTotal = new Set(allPageViewsList.map((p) => p.ip || p.ipHash).filter(Boolean)).size;
     const uniqueIpsToday = new Set(
       allPageViewsList
         .filter((p) => new Date(p.createdAt) >= todayStart)
-        .map((p) => p.ipHash)
+        .map((p) => p.ip || p.ipHash)
         .filter(Boolean)
     ).size;
 
@@ -122,7 +132,7 @@ export async function GET(req: NextRequest) {
     const avgDurationSeconds =
       pageViewsWithDuration.length > 0
         ? Math.round(totalDurationSeconds / pageViewsWithDuration.length)
-        : 45; // Default realistic baseline if fresh
+        : 45;
 
     // Top Pages
     const pageCounts: Record<string, number> = {};
@@ -133,6 +143,41 @@ export async function GET(req: NextRequest) {
       .map(([path, count]) => ({ path, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
+
+    // Top Locations (Cities / Regions)
+    const cityCounts: Record<string, number> = {};
+    allPageViewsList.forEach((p) => {
+      const loc = p.city
+        ? `${p.city}${p.region ? ` - ${p.region}` : ''}`
+        : p.country || 'Brasil';
+      cityCounts[loc] = (cityCounts[loc] || 0) + 1;
+    });
+    const topCities = Object.entries(cityCounts)
+      .map(([location, count]) => ({ location, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+
+    // Top Operating Systems
+    const osCounts: Record<string, number> = {};
+    allPageViewsList.forEach((p) => {
+      const os = p.os || (p.deviceType === 'mobile' ? 'Mobile' : 'Desktop');
+      osCounts[os] = (osCounts[os] || 0) + 1;
+    });
+    const topOS = Object.entries(osCounts)
+      .map(([os, count]) => ({ os, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+
+    // Top Browsers
+    const browserCounts: Record<string, number> = {};
+    allPageViewsList.forEach((p) => {
+      const browser = p.browser || 'Navegador';
+      browserCounts[browser] = (browserCounts[browser] || 0) + 1;
+    });
+    const topBrowsers = Object.entries(browserCounts)
+      .map(([browser, count]) => ({ browser, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
 
     // Devices Breakdown
     const deviceCounts: Record<string, number> = { desktop: 0, mobile: 0, tablet: 0 };
@@ -211,6 +256,9 @@ export async function GET(req: NextRequest) {
         avgDurationFormatted: `${Math.floor(avgDurationSeconds / 60)}m ${avgDurationSeconds % 60}s`,
         conversionRate,
         topPages,
+        topCities,
+        topBrowsers,
+        topOS,
         devicePercentages,
         deviceCounts,
         topTrafficSources,

@@ -17,8 +17,11 @@ export function TelemetryTracker() {
     startTimeRef.current = Date.now();
     const currentSessionId = sessionIdRef.current;
 
-    // Send initial page view
+    // Send initial page view with rich client diagnostics
     try {
+      const screenResolution = typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : undefined;
+      const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
+
       fetch('/api/telemetry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,6 +29,8 @@ export function TelemetryTracker() {
           path: pathname,
           referrer: document.referrer || '',
           sessionId: currentSessionId,
+          screenResolution,
+          language,
           durationSeconds: 0,
           isHeartbeat: false,
         }),

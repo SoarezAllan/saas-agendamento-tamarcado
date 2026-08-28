@@ -42,6 +42,10 @@ import {
   Trash2,
   Mail,
   Send,
+  MapPin,
+  Monitor,
+  Wifi,
+  Radio,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -637,7 +641,7 @@ export default function SuperAdminPage() {
         )}
 
         {/* ========================================================
-            TAB 2: INDICADORES & TELEMETRIA DO SITE (NOVO)
+            TAB 2: INDICADORES & TELEMETRIA DO SITE (TELEMETRIA AVANÇADA)
             ======================================================== */}
         {activeTab === 'analytics' && (
           <div className="space-y-6 animate-in fade-in duration-200">
@@ -691,7 +695,7 @@ export default function SuperAdminPage() {
                   {analytics.conversionRate || 0}%
                 </p>
                 <span className="text-[11px] text-zinc-500 block">
-                  Visitas → Ações concretas na plataforma
+                  Visitas → Ações concretas no SaaS
                 </span>
               </div>
             </div>
@@ -792,6 +796,92 @@ export default function SuperAdminPage() {
               </div>
             </div>
 
+            {/* Geolocation & Browsers / OS Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Geolocation / Top Cities */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <h3 className="text-base font-bold flex items-center gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <MapPin className="w-5 h-5 text-rose-600" />
+                  <span>Localização Geográfica dos Visitantes (Cidades & Estados)</span>
+                </h3>
+
+                {(analytics.topCities || []).length === 0 ? (
+                  <p className="text-xs text-zinc-500 py-4 text-center">Nenhuma localização registrada ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {(analytics.topCities || []).map((loc: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 text-[10px] font-bold flex items-center justify-center shrink-0">
+                            {idx + 1}
+                          </span>
+                          <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                            📍 {loc.location}
+                          </span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 dark:bg-rose-950/80 dark:text-rose-300 shrink-0">
+                          {loc.count} acessos
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Operating Systems & Browsers */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
+                <h3 className="text-base font-bold flex items-center gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                  <Monitor className="w-5 h-5 text-teal-600" />
+                  <span>Sistemas Operacionais & Navegadores Mais Usados</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Top OS */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block">
+                      Sistemas Operacionais
+                    </span>
+                    {(analytics.topOS || []).map((item: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate pr-1">
+                          💻 {item.os}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300 shrink-0">
+                          {item.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Top Browsers */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block">
+                      Navegadores
+                    </span>
+                    {(analytics.topBrowsers || []).map((item: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 flex items-center justify-between text-xs"
+                      >
+                        <span className="font-semibold text-zinc-800 dark:text-zinc-200 truncate pr-1">
+                          🌐 {item.browser}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 shrink-0">
+                          {item.count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Top Pages & Traffic Sources */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Top Pages */}
@@ -854,48 +944,97 @@ export default function SuperAdminPage() {
               </div>
             </div>
 
-            {/* Real-time Recent Activity Stream */}
+            {/* Real-time Comprehensive Live Visitor Intelligence Feed */}
             <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-                <h3 className="text-base font-bold flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-600" />
-                  <span>Registro de Acessos Recentes em Tempo Real</span>
-                </h3>
-                <span className="text-xs text-zinc-400">Últimos eventos gravados</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+                <div>
+                  <h3 className="text-base font-black flex items-center gap-2 text-zinc-900 dark:text-zinc-100">
+                    <Radio className="w-5 h-5 text-emerald-600 animate-pulse" />
+                    <span>Feed de Visitantes & Dispositivos em Tempo Real</span>
+                  </h3>
+                  <p className="text-xs text-zinc-500 mt-0.5">
+                    Detalhamento completo de IP, localização geográfica, resolução de tela, navegador e tempo de navegação
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 self-start sm:self-auto flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  Monitoramento Ativo ({analytics.recentViews?.length || 0} eventos)
+                </span>
               </div>
 
               {(analytics.recentViews || []).length === 0 ? (
-                <p className="text-xs text-zinc-500 py-4 text-center">Navegue pelas páginas do site para ver o registro em tempo real.</p>
+                <p className="text-xs text-zinc-500 py-8 text-center">Navegue pelas páginas do site para ver os acessos detalhados em tempo real.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-50 dark:bg-zinc-800/60 text-zinc-500 uppercase font-semibold">
+                    <thead className="bg-zinc-50 dark:bg-zinc-800/60 text-zinc-500 uppercase font-bold text-[10px] tracking-wider border-b border-zinc-100 dark:border-zinc-800">
                       <tr>
-                        <th className="py-2.5 px-3">Data e Hora</th>
-                        <th className="py-2.5 px-3">Página Acessada</th>
-                        <th className="py-2.5 px-3">Dispositivo</th>
-                        <th className="py-2.5 px-3">Origem</th>
-                        <th className="py-2.5 px-3 text-right">Tempo</th>
+                        <th className="py-3 px-3">Data e Hora</th>
+                        <th className="py-3 px-3">IP do Dispositivo</th>
+                        <th className="py-3 px-3">Localização (Cidade/Estado)</th>
+                        <th className="py-3 px-3">Dispositivo & SO</th>
+                        <th className="py-3 px-3">Navegador & Tela</th>
+                        <th className="py-3 px-3">Página Acessada</th>
+                        <th className="py-3 px-3">Origem</th>
+                        <th className="py-3 px-3 text-right">Tempo</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                       {(analytics.recentViews || []).map((view: any) => (
-                        <tr key={view.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40">
-                          <td className="py-2.5 px-3 text-zinc-400 font-mono text-[11px]">
+                        <tr key={view.id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors">
+                          <td className="py-3 px-3 text-zinc-400 font-mono text-[11px] whitespace-nowrap">
                             {format(new Date(view.createdAt), 'dd/MM HH:mm:ss', { locale: ptBR })}
                           </td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-zinc-900 dark:text-zinc-100">
-                            {view.path}
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <span className="capitalize px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[10px] font-semibold text-zinc-600 dark:text-zinc-300">
-                              {view.deviceType}
+                          <td className="py-3 px-3">
+                            <span className="font-mono text-[11px] font-bold text-zinc-900 dark:text-zinc-100 px-2 py-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                              {view.ip || view.ipHash || 'Anônimo'}
                             </span>
                           </td>
-                          <td className="py-2.5 px-3 text-zinc-500">
-                            {view.referrer || 'Direto'}
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                              <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                                {view.city ? `${view.city}${view.region ? `, ${view.region}` : ''}` : view.country || 'Brasil'}
+                              </span>
+                            </div>
                           </td>
-                          <td className="py-2.5 px-3 text-right font-mono text-zinc-500">
+                          <td className="py-3 px-3 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              {view.deviceType === 'mobile' ? (
+                                <Smartphone className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              ) : view.deviceType === 'tablet' ? (
+                                <Tablet className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                              ) : (
+                                <Laptop className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                              )}
+                              <span className="text-zinc-700 dark:text-zinc-300 font-medium">
+                                {view.os || (view.deviceType === 'mobile' ? 'Mobile' : 'Desktop')}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 whitespace-nowrap text-zinc-600 dark:text-zinc-400">
+                            <div>
+                              <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                                {view.browser || 'Navegador'}
+                              </span>
+                              {view.screenResolution && (
+                                <span className="text-[10px] text-zinc-400 block font-mono">
+                                  {view.screenResolution}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 font-mono font-bold text-blue-600 dark:text-blue-400 max-w-[200px] truncate">
+                            <a href={view.path} target="_blank" rel="noreferrer" className="hover:underline">
+                              {view.path}
+                            </a>
+                          </td>
+                          <td className="py-3 px-3 text-zinc-500 whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-[11px] font-medium">
+                              {view.referrer || 'Direto'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-right font-mono text-zinc-700 dark:text-zinc-300 font-bold whitespace-nowrap">
                             {view.durationSeconds > 0 ? `${view.durationSeconds}s` : '< 5s'}
                           </td>
                         </tr>
