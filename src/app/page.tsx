@@ -166,66 +166,68 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Logo href="/" size="md" />
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <Logo href="/" size="md" className="shrink-0" />
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <ThemeToggle />
 
             <Link
               href="/login"
-              className="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
-              Entrar no Painel
+              <span className="hidden xs:inline sm:inline">Entrar no Painel</span>
+              <span className="xs:hidden sm:hidden">Entrar</span>
             </Link>
             <Link
               href="/register"
-              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
+              className="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5 shrink-0"
             >
-              <span>Criar Conta Grátis</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Criar Conta</span>
+              <span className="hidden sm:inline">Grátis</span>
+              <ArrowRight className="w-3.5 h-3.5 hidden xs:inline sm:inline" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-blue-500/15 blur-[130px] pointer-events-none rounded-full" />
+      <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[650px] h-[250px] sm:h-[350px] bg-blue-500/15 blur-[100px] sm:blur-[130px] pointer-events-none rounded-full" />
 
-        <div className="relative max-w-4xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span>TáMarcado - Agendamento Inteligente para Negócios & Especialistas</span>
+        <div className="relative max-w-4xl mx-auto space-y-5 sm:space-y-6">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 max-w-full">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
+            <span className="truncate sm:whitespace-normal">TáMarcado - Agendamento Inteligente para Negócios</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.15]">
             A plataforma de agendamentos que se adapta ao{' '}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 via-indigo-600 to-teal-600">
               seu modelo de negócio.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-zinc-600 dark:text-zinc-400 max-w-3xl mx-auto leading-relaxed">
             Seja você um <strong>escritório de advocacia</strong>, <strong>clínica médica</strong>, <strong>consultoria</strong>, <strong>salão de beleza</strong>, <strong>barbearia</strong> ou <strong>personal trainer</strong>: automatize sua agenda com uma página pública exclusiva, termos personalizados e cálculo de horários livres em tempo real.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 sm:pt-4">
             <Link
               href="/register"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
-              <Zap className="w-4 h-4" />
+              <Zap className="w-4 h-4 shrink-0" />
               <span>Criar Minha Página de Agendamento (7 Dias Grátis)</span>
             </Link>
 
             <Link
               href="/login"
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl text-xs sm:text-sm font-bold text-zinc-800 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2"
             >
-              <LayoutDashboard className="w-4 h-4 text-blue-600" />
-              <span>Acessar Painel de Gerenciamento do Negócio</span>
+              <LayoutDashboard className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>Acessar Painel de Gerenciamento</span>
             </Link>
           </div>
         </div>

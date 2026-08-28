@@ -37,9 +37,10 @@ interface SidebarProps {
       logoUrl?: string;
     } | null;
   };
+  isMobile?: boolean;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, isMobile = false }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [copied, setCopied] = useState(false);
@@ -133,7 +134,14 @@ export function Sidebar({ user }: SidebarProps) {
   const primaryColor = business?.primaryColor || '#2563eb';
 
   return (
-    <aside className="w-64 shrink-0 bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-screen sticky top-0">
+    <aside
+      className={cn(
+        'bg-white dark:bg-zinc-950 flex flex-col',
+        isMobile
+          ? 'w-full h-full'
+          : 'w-64 shrink-0 border-r border-zinc-200 dark:border-zinc-800 h-screen sticky top-0'
+      )}
+    >
       {/* Brand Header */}
       <div className="p-5 border-b border-zinc-100 dark:border-zinc-800">
         <div className="flex items-center gap-3">

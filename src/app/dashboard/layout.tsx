@@ -58,22 +58,23 @@ export default function DashboardLayout({
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
+        <div className="fixed inset-0 z-50 lg:hidden flex animate-in fade-in duration-200">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative z-10 w-64 bg-white dark:bg-zinc-950 h-full flex flex-col">
-            <div className="flex justify-end p-2 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="relative z-10 w-72 max-w-[85vw] bg-white dark:bg-zinc-950 h-full flex flex-col shadow-2xl border-r border-zinc-200 dark:border-zinc-800 animate-in slide-in-from-left duration-200">
+            <div className="flex items-center justify-between p-3.5 border-b border-zinc-100 dark:border-zinc-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Menu Principal</span>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 text-zinc-400 hover:text-zinc-700"
+                className="p-1.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="flex-1 overflow-y-auto" onClick={() => setMobileMenuOpen(false)}>
-              <Sidebar user={user} />
+              <Sidebar user={user} isMobile={true} />
             </div>
           </div>
         </div>
