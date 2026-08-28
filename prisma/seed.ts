@@ -48,7 +48,7 @@ async function main() {
         'Até 2 profissionais',
         'Serviços ilimitados',
         'Página pública personalizada',
-        'Lembretes via WhatsApp e E-mail',
+        'Notificações e lembretes por E-mail',
         'Relatórios básicos de faturamento',
       ]),
     },
