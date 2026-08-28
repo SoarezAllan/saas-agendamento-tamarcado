@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
 import { getClientIp } from '@/lib/rate-limit';
+import { getSession } from '@/lib/auth';
 
 function parseUserAgent(uaString: string) {
   const ua = uaString.toLowerCase();
@@ -130,9 +131,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Path obrigatório' }, { status: 400 });
     }
 
-    // Filter out internal Next.js static asset requests
+    // 1. Filter out internal SuperAdmin pages
+    if (path.startsWith('/superadmin')) {
+      return NextResponse.json({ success: true, ignored: true });
+    }
+
+    // 2. Filter out internal Next.js static asset requests
     if (path.startsWith('/_next') || path.startsWith('/api') || path.includes('.png') || path.includes('.ico')) {
       return NextResponse.json({ success: true });
+    }
+
+    // 3. Filter out requests made by logged-in SuperAdmin user
+    const session = await getSession(req);
+    if (session && session.role === 'SUPERADMIN') {
+      return NextResponse.json({ success: true, ignored: true });
     }
 
     const clientIp = getClientIp(req);

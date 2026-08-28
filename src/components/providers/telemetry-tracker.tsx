@@ -9,6 +9,11 @@ export function TelemetryTracker() {
   const startTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
+    // Never track SuperAdmin internal operations
+    if (pathname.startsWith('/superadmin')) {
+      return;
+    }
+
     // Generate a random session ID per browser tab if not already present
     if (!sessionIdRef.current) {
       sessionIdRef.current = `sess_${Math.random().toString(36).slice(2, 11)}_${Date.now()}`;
