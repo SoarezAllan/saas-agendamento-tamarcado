@@ -101,10 +101,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      id: checkoutResult.id,
+      paymentId: checkoutResult.id,
       checkoutUrl: checkoutResult.initPoint,
       preferenceId: checkoutResult.id,
       isSimulated: checkoutResult.isSimulated,
       planName: plan.name,
+      planSlug: plan.slug,
       price,
       billingCycle,
       paymentMethod,

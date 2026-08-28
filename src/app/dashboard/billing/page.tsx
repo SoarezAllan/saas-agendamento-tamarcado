@@ -57,6 +57,8 @@ function BillingContent() {
   const [isProcessingCheckout, setIsProcessingCheckout] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<any | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
+  const [isCheckingPix, setIsCheckingPix] = useState(false);
+  const [confirmedPixSuccess, setConfirmedPixSuccess] = useState<any | null>(null);
 
   // Cancellation State
   const [isCanceling, setIsCanceling] = useState(false);
@@ -113,8 +115,85 @@ function BillingContent() {
     }
   };
 
+  // Real-time polling when Pix modal is open
   useEffect(() => {
-    fetchBilling();
+    if (!checkoutResult?.pixQrCodeText || !checkoutResult?.id || confirmedPixSuccess) return;
+
+    let isMounted = true;
+    let pollCount = 0;
+
+    const checkPixStatus = async () => {
+      try {
+        pollCount++;
+        const res = await fetch('/api/billing/confirm-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentId: checkoutResult.id,
+            planSlug: checkoutResult.planSlug || selectedPlanForCheckout?.slug,
+            billingCycle: checkoutResult.billingCycle || billingCycle,
+            paymentMethod: 'PIX',
+          }),
+        });
+
+        const resData = await res.json();
+        if (resData.success && isMounted) {
+          setConfirmedPixSuccess(resData);
+          setSuccessMessage(resData.message);
+          await fetchBilling();
+        }
+      } catch (err) {
+        console.error('Pix polling check error:', err);
+      }
+    };
+
+    // Check every 3 seconds for real-time payment detection
+    const interval = setInterval(checkPixStatus, 3000);
+    const initialTimer = setTimeout(checkPixStatus, 1500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+      clearTimeout(initialTimer);
+    };
+  }, [checkoutResult, confirmedPixSuccess, billingCycle, selectedPlanForCheckout]);
+
+  const handleManualCheckPix = async () => {
+    if (!checkoutResult?.id) return;
+    setIsCheckingPix(true);
+    try {
+      const res = await fetch('/api/billing/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentId: checkoutResult.id,
+          planSlug: checkoutResult.planSlug || selectedPlanForCheckout?.slug,
+          billingCycle: checkoutResult.billingCycle || billingCycle,
+          paymentMethod: 'PIX',
+        }),
+      });
+
+      const resData = await res.json();
+      if (resData.success) {
+        setConfirmedPixSuccess(resData);
+        setSuccessMessage(resData.message);
+        await fetchBilling();
+      } else {
+        alert('O pagamento ainda não foi identificado pelo Mercado Pago. Se você já fez a transferência via Pix, aguarde alguns instantes e tente novamente.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao consultar Mercado Pago. Tente novamente em instantes.');
+    } finally {
+      setIsCheckingPix(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBilling().then(() => {
+      // Background check if there is an approved payment for this business
+      handleVerifyPayment();
+    });
   }, []);
 
   // Handle return from Mercado Pago
@@ -467,7 +546,7 @@ function BillingContent() {
         {plans.map((plan: any) => {
           const isCurrentActive = subscription?.status === 'ACTIVE' && subscription.plan?.toLowerCase() === plan.slug.toLowerCase();
           const isPopular = plan.slug === 'pro';
-          
+
           let displayPrice = plan.priceMonthly;
           let fullCyclePrice = plan.priceMonthly;
           let economyNote = null;
@@ -682,16 +761,73 @@ function BillingContent() {
                   </button>
                 </div>
               </div>
+            ) : confirmedPixSuccess ? (
+              <div className="text-center space-y-6 py-4 animate-in zoom-in-95 duration-200">
+                <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-lg ring-8 ring-emerald-50 dark:ring-emerald-950/30">
+                  <CheckCircle className="w-10 h-10" />
+                </div>
+
+                <div className="space-y-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
+                    <Sparkles className="w-3.5 h-3.5" /> Pagamento Aprovado
+                  </span>
+                  <h4 className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+                    Assinatura Ativada com Sucesso!
+                  </h4>
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
+                    Seu pagamento via Pix foi confirmado pelo Mercado Pago e todos os recursos do <strong>Plano {selectedPlanForCheckout?.name}</strong> estão 100% liberados.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 text-xs space-y-2 text-left">
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500">Plano Contratado:</span>
+                    <strong className="text-zinc-900 dark:text-zinc-100">Plano {selectedPlanForCheckout?.name}</strong>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500">Forma de Pagamento:</span>
+                    <span className="font-bold text-emerald-600">Pix Instantâneo</span>
+                  </div>
+                  {confirmedPixSuccess.currentPeriodEnd && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-500">Válido até:</span>
+                      <strong className="text-zinc-900 dark:text-zinc-100">
+                        {format(new Date(confirmedPixSuccess.currentPeriodEnd), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      </strong>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPlanForCheckout(null);
+                    setCheckoutResult(null);
+                    setConfirmedPixSuccess(null);
+                    fetchBilling();
+                  }}
+                  className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Acessar Meu Painel Completo</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             ) : checkoutResult?.paymentMethod === 'PIX' && checkoutResult?.pixQrCodeText ? (
               <div className="text-center space-y-5 py-2">
-                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-left space-y-1.5">
-                  <div className="flex items-center gap-2 font-bold text-xs text-emerald-800 dark:text-emerald-300">
-                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>7 Dias de Teste Grátis Ativados Imediatamente!</span>
+                <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-left space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-900 dark:text-blue-200">
+                      Pague com Pix para Ativar
+                    </span>
+                    <span className="text-sm font-black text-blue-700 dark:text-blue-300">
+                      {formatCurrency(checkoutResult.price)}
+                    </span>
                   </div>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
-                    Você pode pagar o Pix de <strong>{formatCurrency(checkoutResult.price)}</strong> a qualquer momento até <strong>{trialEndsDate}</strong> para manter sua assinatura ativa sem interrupções.
-                  </p>
+
+                  <div className="flex items-center gap-2 text-[11px] text-blue-800 dark:text-blue-300 font-medium">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span>Aguardando pagamento... (detectando em tempo real)</span>
+                  </div>
                 </div>
 
                 {/* QR Code Image */}
@@ -728,16 +864,36 @@ function BillingContent() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={handleManualCheckPix}
+                    disabled={isCheckingPix}
+                    className="flex-1 py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isCheckingPix ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Consultando Mercado Pago...</span>
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4" />
+                        <span>Já fiz o Pix (Verificar Agora)</span>
+                      </>
+                    )}
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => {
                       setSelectedPlanForCheckout(null);
+                      setCheckoutResult(null);
                       fetchBilling();
                     }}
-                    className="w-full py-3 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 transition-colors"
+                    className="py-3 px-4 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                   >
-                    Entendido, Voltar ao Painel
+                    Fechar
                   </button>
                 </div>
               </div>

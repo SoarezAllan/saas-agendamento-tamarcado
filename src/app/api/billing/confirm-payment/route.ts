@@ -84,28 +84,14 @@ export async function POST(req: NextRequest) {
     let paymentDate = new Date();
     let mpPaymentId = targetPaymentId ? String(targetPaymentId) : undefined;
 
-    // If subscription is already ACTIVE in DB and period is valid
-    if (existingSubscription?.status === 'ACTIVE' && existingSubscription.currentPeriodEnd) {
-      isApproved = true;
-      if (existingSubscription.currentPeriodEnd) {
-        const remaining = Math.max(0, Math.ceil((new Date(existingSubscription.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-        return NextResponse.json({
-          success: true,
-          status: 'approved',
-          message: `Assinatura confirmada e ativa! Plano ${existingSubscription.plan} válido até ${new Date(existingSubscription.currentPeriodEnd).toLocaleDateString('pt-BR')} (${remaining} dias restantes).`,
-          subscription: existingSubscription,
-          currentPeriodEnd: existingSubscription.currentPeriodEnd,
-          daysRemaining: remaining,
-        });
-      }
-    }
-
     if (paymentData) {
       isApproved = paymentData.status === 'approved' || paymentData.status === 'accredited';
       mpPaymentId = String(paymentData.id);
 
       if (paymentData.date_approved) {
         paymentDate = new Date(paymentData.date_approved);
+      } else if (paymentData.date_created) {
+        paymentDate = new Date(paymentData.date_created);
       }
 
       // Parse external_reference: "businessId:planSlug:billingCycle:paymentMethod:timestamp"
@@ -123,11 +109,19 @@ export async function POST(req: NextRequest) {
       } else if (paymentData.payment_type_id === 'credit_card') {
         paymentMethod = 'CREDIT_CARD';
       }
-    } else {
-      // If collectionStatus is approved from URL redirect
-      if (collectionStatus === 'approved') {
-        isApproved = true;
-      }
+    } else if (collectionStatus === 'approved') {
+      isApproved = true;
+    } else if (!targetPaymentId && existingSubscription?.status === 'ACTIVE' && existingSubscription.currentPeriodEnd) {
+      // If no specific payment was requested to be checked and user is already active
+      const remaining = Math.max(0, Math.ceil((new Date(existingSubscription.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+      return NextResponse.json({
+        success: true,
+        status: 'approved',
+        message: `Assinatura confirmada e ativa! Plano ${existingSubscription.plan} válido até ${new Date(existingSubscription.currentPeriodEnd).toLocaleDateString('pt-BR')} (${remaining} dias restantes).`,
+        subscription: existingSubscription,
+        currentPeriodEnd: existingSubscription.currentPeriodEnd,
+        daysRemaining: remaining,
+      });
     }
 
     if (!isApproved) {
