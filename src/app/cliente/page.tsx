@@ -194,6 +194,46 @@ export default function CustomerDashboardPage() {
           </div>
         </div>
 
+        {/* Promo Banner: Cadastre seu Negócio (7 Dias Grátis) */}
+        <div className="relative overflow-hidden rounded-3xl p-6 sm:p-7 bg-linear-to-r from-amber-500/10 via-orange-500/10 to-blue-500/10 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-blue-950/30 border border-amber-300/60 dark:border-amber-700/50 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow-xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Oferta Especial: 7 Dias Grátis</span>
+            </div>
+            <h3 className="text-lg sm:text-xl font-black text-zinc-900 dark:text-zinc-100">
+              Você também é profissional ou possui um negócio?
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
+              Crie sua própria página de agendamentos online personalizada em 1 minuto. Receba clientes 24h por dia, envie lembretes automáticos e organize sua rotina com <strong>7 dias de teste grátis sem compromisso</strong>.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Sem Cartão de Crédito
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Link Personalizado Próprio
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                Lembretes Automáticos por E-mail
+              </span>
+            </div>
+          </div>
+
+          <div className="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <Link
+              href="/register"
+              className="px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold text-white bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg shadow-amber-600/20 hover:shadow-xl transition-all flex items-center justify-center gap-2 text-center"
+            >
+              <span>Cadastrar Meu Negócio (7 Dias Grátis)</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
           <button

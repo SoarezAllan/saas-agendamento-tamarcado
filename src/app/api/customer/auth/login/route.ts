@@ -65,9 +65,19 @@ export async function POST(req: NextRequest) {
       role: 'CUSTOMER' as const,
     };
 
+    // Check if this customer is also an admin/professional of a business
+    const staffUser = customer.email
+      ? await db.user.findUnique({
+          where: { email: customer.email.toLowerCase().trim() },
+          include: { business: true },
+        })
+      : null;
+
     return createAuthResponse(
       {
         message: 'Login realizado com sucesso!',
+        hasBusinessProfile: Boolean(staffUser && staffUser.businessId),
+        businessName: staffUser?.business?.name,
         customer: {
           id: customer.id,
           name: customer.name,

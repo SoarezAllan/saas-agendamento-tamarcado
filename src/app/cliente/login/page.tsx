@@ -29,6 +29,8 @@ function CustomerLoginForm() {
     router.push(redirectUrl);
   };
 
+  const [profileChoice, setProfileChoice] = useState<any | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -46,6 +48,12 @@ function CustomerLoginForm() {
         throw new Error(data.error || 'Erro ao realizar login');
       }
 
+      if (data.hasBusinessProfile) {
+        setProfileChoice(data);
+        setIsLoading(false);
+        return;
+      }
+
       router.push(redirectUrl);
     } catch (err: any) {
       setError(err.message || 'Erro de conexão');
@@ -53,6 +61,80 @@ function CustomerLoginForm() {
       setIsLoading(false);
     }
   };
+
+  if (profileChoice) {
+    return (
+      <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6 animate-in fade-in">
+        <div className="text-center space-y-1">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-xs">
+            <User className="w-6 h-6" />
+          </div>
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            Como deseja acessar agora?
+          </h3>
+          <p className="text-xs text-zinc-500">
+            Identificamos que você possui acesso tanto como cliente quanto como gestor do negócio <strong>{profileChoice.businessName || ''}</strong>.
+          </p>
+        </div>
+
+        <div className="space-y-3 pt-2">
+          {/* Option 1: Access Customer Portal */}
+          <button
+            type="button"
+            onClick={() => {
+              router.push('/cliente');
+            }}
+            className="w-full p-4 rounded-2xl border-2 border-blue-600 bg-blue-50/40 dark:bg-blue-950/30 hover:bg-blue-100/50 transition-all text-left flex items-center justify-between group cursor-pointer shadow-xs"
+          >
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-black text-blue-700 dark:text-blue-300 uppercase tracking-wider">
+                  Área do Cliente
+                </span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-blue-200/60 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-bold">
+                  Meus Agendamentos
+                </span>
+              </div>
+              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                Acessar meus horários marcados
+              </p>
+              <p className="text-[11px] text-zinc-500">
+                Ver serviços agendados em outros estabelecimentos
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-blue-600 shrink-0 group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          {/* Option 2: Access Business Dashboard */}
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = '/dashboard';
+            }}
+            className="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all text-left flex items-center justify-between group cursor-pointer shadow-xs"
+          >
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-black text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">
+                  Painel do Negócio
+                </span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold">
+                  Gestor / Dono
+                </span>
+              </div>
+              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                {profileChoice.businessName || 'Gerenciar Meu Negócio'}
+              </p>
+              <p className="text-[11px] text-zinc-500">
+                Agenda da empresa, faturamento, equipe e configurações
+              </p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 shrink-0 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 space-y-6">

@@ -6,24 +6,38 @@ import { dispatchAppointmentNotification } from '@/lib/notifications';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session || session.role !== 'CUSTOMER') {
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const customer = await db.customer.findUnique({
-      where: { id: session.userId },
-    });
-
-    if (!customer) {
-      return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 });
+    let customer = null;
+    if (session.role === 'CUSTOMER') {
+      customer = await db.customer.findUnique({
+        where: { id: session.userId },
+      });
+    } else if (session.email) {
+      customer = await db.customer.findUnique({
+        where: { email: session.email.toLowerCase().trim() },
+      });
+      if (!customer) {
+        customer = {
+          id: session.userId,
+          name: session.name,
+          email: session.email,
+          phone: '',
+        };
+      }
     }
+
+    const searchEmail = session.email ? session.email.toLowerCase().trim() : (customer?.email || '');
+    const searchPhone = customer?.phone || '';
 
     const appointments = await db.appointment.findMany({
       where: {
         OR: [
-          { customerId: customer.id },
-          { customerPhone: customer.phone },
-          ...(customer.email ? [{ customerEmail: customer.email }] : []),
+          ...(customer?.id ? [{ customerId: customer.id }] : []),
+          ...(searchPhone ? [{ customerPhone: searchPhone }] : []),
+          ...(searchEmail ? [{ customerEmail: searchEmail }] : []),
         ],
       },
       include: {
@@ -88,7 +102,7 @@ export async function GET(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session || session.role !== 'CUSTOMER') {
+    if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -99,21 +113,14 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'ID do agendamento é obrigatório' }, { status: 400 });
     }
 
-    const customer = await db.customer.findUnique({
-      where: { id: session.userId },
-    });
-
-    if (!customer) {
-      return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 });
-    }
+    const searchEmail = session.email ? session.email.toLowerCase().trim() : '';
 
     const appointment = await db.appointment.findFirst({
       where: {
         id: appointmentId,
         OR: [
-          { customerId: customer.id },
-          { customerPhone: customer.phone },
-          ...(customer.email ? [{ customerEmail: customer.email }] : []),
+          { customerId: session.userId },
+          ...(searchEmail ? [{ customerEmail: searchEmail }] : []),
         ],
       },
     });

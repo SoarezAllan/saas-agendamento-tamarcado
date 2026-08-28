@@ -49,6 +49,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check if this user also has personal appointments as a customer in other establishments
+    const customerAppointmentsCount = await db.appointment.count({
+      where: {
+        customerEmail: user.email,
+        ...(user.businessId ? { businessId: { not: user.businessId } } : {}),
+      },
+    });
+
     const session: UserSession = {
       userId: user.id,
       email: user.email,
@@ -61,6 +69,8 @@ export async function POST(req: NextRequest) {
     return createAuthResponse(
       {
         message: 'Login realizado com sucesso',
+        hasCustomerAppointments: customerAppointmentsCount > 0,
+        customerAppointmentsCount,
         user: {
           id: user.id,
           name: user.name,

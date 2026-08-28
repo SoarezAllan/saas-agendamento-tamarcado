@@ -19,6 +19,7 @@ import {
   Sparkles,
   ShieldCheck,
   Clock,
+  CalendarCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -92,6 +93,11 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
           href: '/dashboard/billing',
           icon: CreditCard,
         },
+        {
+          label: 'Meus Agendamentos',
+          href: '/dashboard/my-appointments',
+          icon: CalendarCheck,
+        },
       ]
     : [
         {
@@ -108,6 +114,11 @@ export function Sidebar({ user, isMobile = false }: SidebarProps) {
           label: 'Clientes',
           href: '/dashboard/customers',
           icon: UserCheck,
+        },
+        {
+          label: 'Meus Agendamentos',
+          href: '/dashboard/my-appointments',
+          icon: CalendarCheck,
         },
       ];
 
