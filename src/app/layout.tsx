@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     ],
     apple: '/icon.png',
   },
+  verification: {
+    google: 'google6b3ef84142767305',
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
