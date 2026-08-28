@@ -140,6 +140,14 @@ function BillingContent() {
         if (resData.success && isMounted) {
           setConfirmedPixSuccess(resData);
           setSuccessMessage(resData.message);
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'conversion', {
+              send_to: 'AW-18409831535',
+              value: Number(resData.subscription?.price || 49.9),
+              currency: 'BRL',
+              transaction_id: checkoutResult.id,
+            });
+          }
           await fetchBilling();
         }
       } catch (err) {
@@ -177,6 +185,14 @@ function BillingContent() {
       if (resData.success) {
         setConfirmedPixSuccess(resData);
         setSuccessMessage(resData.message);
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+          (window as any).gtag('event', 'conversion', {
+            send_to: 'AW-18409831535',
+            value: Number(resData.subscription?.price || 49.9),
+            currency: 'BRL',
+            transaction_id: checkoutResult.id,
+          });
+        }
         await fetchBilling();
       } else {
         alert('O pagamento ainda não foi identificado pelo Mercado Pago. Se você já fez a transferência via Pix, aguarde alguns instantes e tente novamente.');

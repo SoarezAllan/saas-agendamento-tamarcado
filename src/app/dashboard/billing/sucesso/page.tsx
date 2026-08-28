@@ -46,6 +46,19 @@ export default function PurchaseSuccessPage() {
     confirm();
   }, [paymentId, collectionStatus, searchParams]);
 
+  useEffect(() => {
+    if (data?.success || data?.subscription) {
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'conversion', {
+          send_to: 'AW-18409831535',
+          value: Number(data.subscription?.price || 49.9),
+          currency: 'BRL',
+          transaction_id: paymentId || String(Date.now()),
+        });
+      }
+    }
+  }, [data, paymentId]);
+
   const subscription = data?.subscription;
   const periodEndDate = subscription?.currentPeriodEnd
     ? format(new Date(subscription.currentPeriodEnd), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
