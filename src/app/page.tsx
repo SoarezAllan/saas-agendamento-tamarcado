@@ -167,7 +167,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
       {/* Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-4">
           <Logo href="/" size="md" className="shrink-0" />
 
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
@@ -175,18 +175,17 @@ export default function LandingPage() {
 
             <Link
               href="/login"
-              className="px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
             >
-              <span className="hidden xs:inline sm:inline">Entrar no Painel</span>
-              <span className="xs:hidden sm:hidden">Entrar</span>
+              Entrar
             </Link>
             <Link
               href="/register"
-              className="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5 shrink-0"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1 shrink-0"
             >
               <span>Criar Conta</span>
               <span className="hidden sm:inline">Grátis</span>
-              <ArrowRight className="w-3.5 h-3.5 hidden xs:inline sm:inline" />
+              <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
             </Link>
           </div>
         </div>
