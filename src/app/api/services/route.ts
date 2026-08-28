@@ -50,6 +50,27 @@ export async function POST(req: NextRequest) {
     const isPriceOnRequest = Boolean(priceOnRequest) || price === null || price === undefined || price === '';
     const numericPrice = isPriceOnRequest ? 0.0 : (parseFloat(price) || 0.0);
 
+    // Check Plan Services Limit
+    const subscription = await db.subscription.findUnique({
+      where: { businessId: session.businessId },
+    });
+    const currentPlanSlug = subscription?.plan?.toLowerCase() || 'starter';
+    const plan = await db.plan.findUnique({
+      where: { slug: currentPlanSlug },
+    });
+
+    if (plan && plan.maxServices && plan.maxServices < 999) {
+      const currentCount = await db.service.count({
+        where: { businessId: session.businessId, active: true },
+      });
+      if (currentCount >= plan.maxServices) {
+        return NextResponse.json(
+          { error: `Seu plano (${plan.name}) permite até ${plan.maxServices} serviços ativos. Faça upgrade para cadastrar mais serviços.` },
+          { status: 400 }
+        );
+      }
+    }
+
     const service = await db.service.create({
       data: {
         businessId: session.businessId,

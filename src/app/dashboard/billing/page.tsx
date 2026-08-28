@@ -552,13 +552,19 @@ function BillingContent() {
           let economyNote = null;
 
           if (billingCycle === 'QUARTERLY') {
-            fullCyclePrice = plan.priceQuarterly > 0 ? plan.priceQuarterly : plan.priceMonthly * 3 * 0.9;
+            fullCyclePrice = plan.priceQuarterly > 0 ? plan.priceQuarterly : plan.priceMonthly * 3;
             displayPrice = fullCyclePrice / 3;
-            economyNote = 'Economia de 10%';
+            const savings = Math.round((1 - fullCyclePrice / (plan.priceMonthly * 3)) * 100);
+            if (savings > 0) {
+              economyNote = `Economia de ${savings}%`;
+            }
           } else if (billingCycle === 'ANNUAL') {
-            fullCyclePrice = plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly * 12 * 0.8;
+            fullCyclePrice = plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly * 12;
             displayPrice = fullCyclePrice / 12;
-            economyNote = 'Economia de 20%';
+            const savings = Math.round((1 - fullCyclePrice / (plan.priceMonthly * 12)) * 100);
+            if (savings > 0) {
+              economyNote = `Economia de ${savings}%`;
+            }
           }
 
           const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features || [];
@@ -621,13 +627,13 @@ function BillingContent() {
                   <div className="flex items-center justify-between">
                     <span className="text-zinc-500 font-medium">Profissionais:</span>
                     <strong className="text-zinc-800 dark:text-zinc-200">
-                      {plan.maxProfessionals === 999 ? 'Ilimitados' : plan.maxProfessionals}
+                      {plan.maxProfessionals >= 999 ? 'Ilimitados' : `Até ${plan.maxProfessionals}`}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-zinc-500 font-medium">Serviços:</span>
                     <strong className="text-emerald-600 dark:text-emerald-400">
-                      {plan.maxServices === 999 ? 'Ilimitados' : plan.maxServices}
+                      {plan.maxServices >= 999 ? 'Ilimitados' : `Até ${plan.maxServices}`}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between">
