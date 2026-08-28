@@ -19,6 +19,7 @@ import {
   Trash2,
   RefreshCw,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   Building2,
   MessageCircle,
@@ -138,7 +139,16 @@ export default function CustomerDashboardPage() {
       {/* Top Navbar */}
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1 px-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0"
+              title="Voltar para a página inicial"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">Início</span>
+            </Link>
+            <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-700" />
             <Logo href="/" size="md" />
             <div className="hidden sm:block h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
             <span className="hidden sm:inline text-xs font-bold text-zinc-500">

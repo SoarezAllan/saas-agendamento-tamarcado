@@ -9,6 +9,7 @@ import {
   Mail,
   Lock,
   ArrowRight,
+  ArrowLeft,
   Loader2,
   Calendar,
   Sparkles,
@@ -153,6 +154,17 @@ export default function CustomerRegisterPage() {
 
   return (
     <div className="relative min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
+      {/* Top Left Back to Home Button */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1.5 px-2.5 rounded-xl hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span className="hidden xs:inline sm:inline">Voltar ao início</span>
+        </Link>
+      </div>
+
       {/* Top Right Theme Toggle */}
       <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
         <ThemeToggle />

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
+import Link from 'next/link';
 import {
   Calendar,
   Clock,
@@ -13,6 +14,7 @@ import {
   Loader2,
   CheckCircle,
   RotateCcw,
+  ArrowLeft,
 } from 'lucide-react';
 import { DateTimeStep } from '@/components/booking/datetime-step';
 import { formatCurrency, formatDuration, APPOINTMENT_STATUS_MAP } from '@/lib/utils';
@@ -142,6 +144,23 @@ export default function CustomerManageAppointmentPage({
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 py-10 px-4">
       <div className="max-w-lg mx-auto space-y-6">
+        {/* Top Controls */}
+        <div className="flex items-center justify-between px-1">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white transition-colors py-1 px-2.5 rounded-lg hover:bg-zinc-200/60 dark:hover:bg-zinc-800"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Voltar ao início</span>
+          </Link>
+          <Link
+            href={`/b/${slug}`}
+            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Agendar novo horário →
+          </Link>
+        </div>
+
         {/* Top Business Card */}
         <div className="text-center">
           <div
