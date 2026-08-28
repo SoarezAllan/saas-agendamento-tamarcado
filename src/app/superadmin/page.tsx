@@ -142,6 +142,27 @@ export default function SuperAdminPage() {
     fetchSuperAdminData();
   }, []);
 
+  const [isClearingTelemetry, setIsClearingTelemetry] = useState(false);
+
+  const handleClearTelemetry = async () => {
+    if (!confirm('Deseja realmente zerar todos os indicadores e histórico de acessos? A contagem será reiniciada a partir de agora.')) {
+      return;
+    }
+    setIsClearingTelemetry(true);
+    try {
+      const res = await fetch('/api/superadmin?target=telemetry', {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        await fetchSuperAdminData();
+      }
+    } catch (e) {
+      console.error('Error clearing telemetry:', e);
+    } finally {
+      setIsClearingTelemetry(false);
+    }
+  };
+
   const handleSaveSettings = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setIsSavingSettings(true);
@@ -645,6 +666,40 @@ export default function SuperAdminPage() {
             ======================================================== */}
         {activeTab === 'analytics' && (
           <div className="space-y-6 animate-in fade-in duration-200">
+            {/* Action Bar Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
+              <div>
+                <h2 className="text-base font-black text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-blue-600" />
+                  <span>Métricas & Tráfego em Tempo Real</span>
+                </h2>
+                <p className="text-xs text-zinc-500">
+                  Acompanhe os visitantes conectados, localização geográfica e comportamento de navegação
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <button
+                  type="button"
+                  onClick={() => fetchSuperAdminData()}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Atualizar</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearTelemetry}
+                  disabled={isClearingTelemetry}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Zerar todos os contadores e histórico de acessos gravados"
+                >
+                  {isClearingTelemetry ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                  <span>Zerar Indicadores</span>
+                </button>
+              </div>
+            </div>
+
             {/* Real Web Indicators KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs space-y-2">

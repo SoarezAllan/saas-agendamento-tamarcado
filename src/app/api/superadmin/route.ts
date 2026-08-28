@@ -132,7 +132,7 @@ export async function GET(req: NextRequest) {
     const avgDurationSeconds =
       pageViewsWithDuration.length > 0
         ? Math.round(totalDurationSeconds / pageViewsWithDuration.length)
-        : 45;
+        : 0;
 
     // Top Pages
     const pageCounts: Record<string, number> = {};
@@ -185,12 +185,15 @@ export async function GET(req: NextRequest) {
       const dev = p.deviceType || 'desktop';
       deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
     });
-    const totalDevices = allPageViewsList.length || 1;
-    const devicePercentages = {
-      desktop: Math.round(((deviceCounts.desktop || 0) / totalDevices) * 100),
-      mobile: Math.round(((deviceCounts.mobile || 0) / totalDevices) * 100),
-      tablet: Math.round(((deviceCounts.tablet || 0) / totalDevices) * 100),
-    };
+    const totalDevices = allPageViewsList.length;
+    const devicePercentages =
+      totalDevices > 0
+        ? {
+            desktop: Math.round(((deviceCounts.desktop || 0) / totalDevices) * 100),
+            mobile: Math.round(((deviceCounts.mobile || 0) / totalDevices) * 100),
+            tablet: Math.round(((deviceCounts.tablet || 0) / totalDevices) * 100),
+          }
+        : { desktop: 0, mobile: 0, tablet: 0 };
 
     // Traffic Sources (Referrers)
     const trafficCounts: Record<string, number> = {};
@@ -222,11 +225,14 @@ export async function GET(req: NextRequest) {
     }));
 
     // Conversion Rate: Landing page views to businesses registered
-    const landingViews = pageCounts['/'] || (totalPageViews > 0 ? totalPageViews : 1);
-    const conversionRate = Math.min(
-      Math.round(((totalBusinesses + totalAppointments) / Math.max(landingViews, 1)) * 1000) / 10,
-      100
-    );
+    const landingViews = pageCounts['/'] || totalPageViews || 0;
+    const conversionRate =
+      landingViews > 0
+        ? Math.min(
+            Math.round(((totalBusinesses + totalAppointments) / landingViews) * 1000) / 10,
+            100
+          )
+        : 0;
 
     const parsedPlans = plans.map((p) => ({
       ...p,
@@ -250,8 +256,8 @@ export async function GET(req: NextRequest) {
         pageViewsToday,
         pageViews7d,
         pageViews30d,
-        uniqueVisitorsCount: Math.max(uniqueIpsTotal, pageViewsToday > 0 ? 1 : 0),
-        uniqueVisitorsToday: Math.max(uniqueIpsToday, pageViewsToday > 0 ? 1 : 0),
+        uniqueVisitorsCount: uniqueIpsTotal,
+        uniqueVisitorsToday: uniqueIpsToday,
         avgDurationSeconds,
         avgDurationFormatted: `${Math.floor(avgDurationSeconds / 60)}m ${avgDurationSeconds % 60}s`,
         conversionRate,
@@ -276,5 +282,27 @@ export async function GET(req: NextRequest) {
       { error: 'Erro ao carregar dados do Super Admin' },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await getSession(req);
+    if (!session || session.role !== 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Acesso restrito ao Super Admin' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const target = searchParams.get('target');
+
+    if (target === 'telemetry') {
+      await db.pageView.deleteMany({});
+      return NextResponse.json({ success: true, message: 'Indicadores de telemetria zerados com sucesso' });
+    }
+
+    return NextResponse.json({ error: 'Alvo de exclusão inválido' }, { status: 400 });
+  } catch (error) {
+    console.error('Delete error in superadmin:', error);
+    return NextResponse.json({ error: 'Erro ao zerar indicadores' }, { status: 500 });
   }
 }
