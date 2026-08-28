@@ -101,8 +101,10 @@ function BillingContent() {
         setVerificationResult(resData);
         setSuccessMessage(resData.message);
         await fetchBilling();
+      } else if (data?.subscription?.status === 'ACTIVE') {
+        await fetchBilling();
       } else if (resData.status === 'pending' || resData.status === 'in_process') {
-        setSuccessMessage('Seu pagamento está em análise pelo Mercado Pago e será confirmado automaticamente em instantes.');
+        setSuccessMessage('Aguardando confirmação do pagamento pelo Mercado Pago. Clique em "Sincronizar" para atualizar.');
       }
     } catch (err) {
       console.error('Error confirming payment:', err);
@@ -136,8 +138,6 @@ function BillingContent() {
       } else {
         handleVerifyPayment();
       }
-    } else if (paymentStatus === 'pending') {
-      setSuccessMessage('Seu pagamento está sendo processado pelo Mercado Pago e será liberado em instantes.');
     }
   }, [paymentStatus, collectionStatusParam, paymentIdParam, isSimulated, simulatedPlan, cycleParam, methodParam]);
 
@@ -415,97 +415,34 @@ function BillingContent() {
         </div>
       )}
 
-      {/* Billing Cycle Selector Toggle */}
-      <div className="flex flex-col items-center justify-center space-y-3 pt-2">
-        <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-          Selecione a Periodicidade do Pagamento
-        </span>
-
-        <div className="inline-flex items-center p-1.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700">
-          <button
-            type="button"
-            onClick={() => setBillingCycle('MONTHLY')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              billingCycle === 'MONTHLY'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-            }`}
-          >
-            Mensal
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setBillingCycle('QUARTERLY')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              billingCycle === 'QUARTERLY'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-            }`}
-          >
-            <span>Trimestral</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-              10% OFF
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setBillingCycle('ANNUAL')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              billingCycle === 'ANNUAL'
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-sm'
-                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-            }`}
-          >
-            <span>Anual</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              20% OFF
-            </span>
-          </button>
-        </div>
-      </div>
-
       {/* Plans Pricing Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {plans.map((plan: any) => {
-          const isCurrent = currentPlanSlug === plan.slug;
+          const isCurrentActive = subscription?.status === 'ACTIVE' && subscription.plan?.toLowerCase() === plan.slug.toLowerCase();
           const isPopular = plan.slug === 'pro';
-
-          // Price calculation based on cycle
-          let displayPrice = plan.priceMonthly;
-          let periodText = '/mês';
-          let fullCyclePrice = plan.priceMonthly;
-          let economyNote = null;
-
-          if (billingCycle === 'QUARTERLY') {
-            fullCyclePrice = plan.priceQuarterly > 0 ? plan.priceQuarterly : plan.priceMonthly * 3 * 0.9;
-            displayPrice = fullCyclePrice / 3;
-            periodText = '/mês (cobrado R$ ' + fullCyclePrice.toFixed(2) + ' a cada 3 meses)';
-            economyNote = 'Economia de 10%';
-          } else if (billingCycle === 'ANNUAL') {
-            fullCyclePrice = plan.priceAnnual > 0 ? plan.priceAnnual : plan.priceMonthly * 12 * 0.8;
-            displayPrice = fullCyclePrice / 12;
-            periodText = '/mês (cobrado R$ ' + fullCyclePrice.toFixed(2) + '/ano)';
-            economyNote = 'Economia de 20%';
-          }
-
+          const displayPrice = plan.priceMonthly;
           const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features || [];
 
           return (
             <div
               key={plan.id}
               className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all bg-white dark:bg-zinc-900 border ${
-                isPopular
+                isCurrentActive
+                  ? 'border-emerald-500 ring-2 ring-emerald-500/20 shadow-xl'
+                  : isPopular
                   ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-xl'
                   : 'border-zinc-200/80 dark:border-zinc-800 shadow-sm'
               }`}
             >
-              {isPopular && (
+              {isCurrentActive ? (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-emerald-600 text-white shadow-md flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" /> Seu Plano Atual
+                </span>
+              ) : isPopular ? (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-md">
                   Mais Escolhido
                 </span>
-              )}
+              ) : null}
 
               <div className="space-y-6">
                 <div>
@@ -526,18 +463,6 @@ function BillingContent() {
                     </span>
                     <span className="text-xs font-semibold text-zinc-400">/mês</span>
                   </div>
-
-                  {billingCycle !== 'MONTHLY' && (
-                    <div className="text-[11px] text-zinc-500 font-medium">
-                      Cobrado {formatCurrency(fullCyclePrice)} {billingCycle === 'QUARTERLY' ? 'trimestralmente' : 'anualmente'}
-                    </div>
-                  )}
-
-                  {economyNote && (
-                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                      {economyNote}
-                    </span>
-                  )}
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 text-xs space-y-1.5 border border-zinc-100 dark:border-zinc-800">
@@ -549,21 +474,22 @@ function BillingContent() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-zinc-500 font-medium">Serviços:</span>
-                    <strong className="text-zinc-800 dark:text-zinc-200">
+                    <strong className="text-emerald-600 dark:text-emerald-400">
                       {plan.maxServices === 999 ? 'Ilimitados' : plan.maxServices}
                     </strong>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-zinc-500 font-medium">Agendamentos:</span>
                     <strong className="text-zinc-800 dark:text-zinc-200">
-                      {plan.maxAppointmentsPerMonth === 9999 ? 'Ilimitados' : `${plan.maxAppointmentsPerMonth}/mês`}
+                      {plan.maxAppointmentsPerMonth >= 9999 ? 'Ilimitados' : `${plan.maxAppointmentsPerMonth}/mês`}
                     </strong>
                   </div>
                 </div>
 
-                <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-300">
-                  {features.map((feat: string, fIdx: number) => (
-                    <li key={fIdx} className="flex items-start gap-2.5">
+                {/* Features List */}
+                <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400">
+                  {features.map((feat: string, idx: number) => (
+                    <li key={idx} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
@@ -572,21 +498,37 @@ function BillingContent() {
               </div>
 
               <div className="pt-8 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenCheckoutModal(plan)}
-                  className={`w-full py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
-                    isPopular
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
-                      : 'bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900'
-                  }`}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>Testar 7 Dias Grátis • {plan.name}</span>
-                </button>
+                {isCurrentActive ? (
+                  <div className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <span>Plano Atual (Ativo)</span>
+                  </div>
+                ) : subscription?.status === 'ACTIVE' ? (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCheckoutModal(plan)}
+                    className="w-full py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                    <span>Trocar para o Plano {plan.name}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleOpenCheckoutModal(plan)}
+                    className={`w-full py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
+                      isPopular
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
+                        : 'bg-zinc-900 hover:bg-black dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900'
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Assinar Plano {plan.name} (7 Dias Grátis)</span>
+                  </button>
+                )}
 
                 <p className="text-[10px] text-center text-zinc-400">
-                  Sem cobrança imediata no cartão • Cancele quando quiser
+                  {isCurrentActive ? 'Assinatura ativa e em dia' : 'Garantia de 7 dias grátis • Cancele quando quiser'}
                 </p>
               </div>
             </div>
@@ -607,7 +549,7 @@ function BillingContent() {
                   Checkout • TáMarcado
                 </span>
                 <h3 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
-                  Plano {selectedPlanForCheckout.name} ({billingCycle === 'MONTHLY' ? 'Mensal' : billingCycle === 'QUARTERLY' ? 'Trimestral' : 'Anual'})
+                  Plano {selectedPlanForCheckout.name}
                 </h3>
               </div>
               <button

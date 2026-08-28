@@ -29,10 +29,15 @@ export async function POST(req: NextRequest) {
       paymentMethod: bodyPaymentMethod,
     } = body;
 
-    const targetPaymentId = paymentId || collectionId;
+    // Fetch current subscription from DB
+    const existingSubscription = await db.subscription.findUnique({
+      where: { businessId: session.businessId },
+    });
+
+    const targetPaymentId = paymentId || collectionId || existingSubscription?.mercadoPagoPaymentId;
     let paymentData: any = null;
 
-    // 1. Try to fetch directly by payment ID if provided
+    // 1. Try to fetch directly by payment ID if provided or from existing subscription
     if (targetPaymentId) {
       const cleanId = String(targetPaymentId).replace(/\D/g, '');
       if (cleanId) {
@@ -55,26 +60,45 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 3. If still not found, search payments for this business
+    // 3. If still not found, search recent payments matching this business or user email
     if (!paymentData) {
-      const searchRef = externalReference || `${session.businessId}:`;
-      const searchResults = await searchMercadoPagoPayments({
-        external_reference: searchRef,
-        limit: 5,
-      });
+      const recentPayments = await searchMercadoPagoPayments({ limit: 15 });
+      if (recentPayments.length > 0) {
+        // Look for approved payment matching businessId prefix or payer email
+        const matchedPayment = recentPayments.find(
+          (p: any) =>
+            (p.external_reference && String(p.external_reference).startsWith(`${session.businessId}:`)) ||
+            (p.payer?.email && String(p.payer.email).toLowerCase() === session.email.toLowerCase())
+        );
 
-      if (searchResults.length > 0) {
-        // Look for approved payment
-        paymentData = searchResults.find((p: any) => p.status === 'approved') || searchResults[0];
+        if (matchedPayment) {
+          paymentData = matchedPayment;
+        }
       }
     }
 
-    let planSlug = bodyPlanSlug || 'STARTER';
-    let billingCycle: BillingCycle = (bodyBillingCycle as BillingCycle) || 'MONTHLY';
-    let paymentMethod: PaymentMethodType = (bodyPaymentMethod as PaymentMethodType) || 'CREDIT_CARD';
+    let planSlug = bodyPlanSlug || existingSubscription?.plan || 'STARTER';
+    let billingCycle: BillingCycle = (bodyBillingCycle as BillingCycle) || (existingSubscription?.billingCycle as BillingCycle) || 'MONTHLY';
+    let paymentMethod: PaymentMethodType = (bodyPaymentMethod as PaymentMethodType) || (existingSubscription?.paymentMethod as PaymentMethodType) || 'CREDIT_CARD';
     let isApproved = false;
     let paymentDate = new Date();
     let mpPaymentId = targetPaymentId ? String(targetPaymentId) : undefined;
+
+    // If subscription is already ACTIVE in DB and period is valid
+    if (existingSubscription?.status === 'ACTIVE' && existingSubscription.currentPeriodEnd) {
+      isApproved = true;
+      if (existingSubscription.currentPeriodEnd) {
+        const remaining = Math.max(0, Math.ceil((new Date(existingSubscription.currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+        return NextResponse.json({
+          success: true,
+          status: 'approved',
+          message: `Assinatura confirmada e ativa! Plano ${existingSubscription.plan} válido até ${new Date(existingSubscription.currentPeriodEnd).toLocaleDateString('pt-BR')} (${remaining} dias restantes).`,
+          subscription: existingSubscription,
+          currentPeriodEnd: existingSubscription.currentPeriodEnd,
+          daysRemaining: remaining,
+        });
+      }
+    }
 
     if (paymentData) {
       isApproved = paymentData.status === 'approved' || paymentData.status === 'accredited';
@@ -198,3 +222,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
