@@ -5,11 +5,18 @@ import { hashPassword, createAuthResponse } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, email, password } = body;
+    const { name, phone, email, password, code } = body;
 
     if (!name || !phone || !email || !password) {
       return NextResponse.json(
         { error: 'Preencha todos os campos obrigatórios (Nome, Telefone, E-mail e Senha).' },
+        { status: 400 }
+      );
+    }
+
+    if (!code || code.trim().length < 6) {
+      return NextResponse.json(
+        { error: 'Informe o código de verificação de 6 dígitos enviado para seu e-mail.' },
         { status: 400 }
       );
     }
@@ -31,12 +38,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate verification code
+    const verification = await db.emailVerificationCode.findFirst({
+      where: {
+        email: cleanEmail,
+        code: code.trim(),
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!verification) {
+      return NextResponse.json(
+        { error: 'Código de verificação inválido ou expirado. Verifique os números ou solicite um novo código.' },
+        { status: 400 }
+      );
+    }
+
+    // Delete used code
+    await db.emailVerificationCode.deleteMany({
+      where: { email: cleanEmail },
+    });
+
     // Check if email already exists
     const existing = await db.customer.findUnique({
       where: { email: cleanEmail },
     });
 
-    if (existing && existing.passwordHash) {
+    if (existing && existing.passwordHash && existing.emailVerified) {
       return NextResponse.json(
         { error: 'Já existe uma conta cadastrada com este e-mail. Faça login para acessar seus agendamentos.' },
         { status: 409 }
@@ -47,13 +75,13 @@ export async function POST(req: NextRequest) {
 
     let customer;
     if (existing) {
-      // Update existing customer record (e.g. from previous unauthenticated bookings)
       customer = await db.customer.update({
         where: { id: existing.id },
         data: {
           name: name.trim(),
           phone: cleanPhone,
           passwordHash,
+          emailVerified: true,
         },
       });
     } else {
@@ -63,6 +91,7 @@ export async function POST(req: NextRequest) {
           phone: cleanPhone,
           email: cleanEmail,
           passwordHash,
+          emailVerified: true,
         },
       });
     }
