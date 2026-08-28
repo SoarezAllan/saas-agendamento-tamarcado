@@ -38,6 +38,8 @@ import {
   Crown,
   User,
   Check,
+  Menu,
+  X,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
@@ -47,6 +49,7 @@ import { SupportModal } from '@/components/landing/support-modal';
 export default function LandingPage() {
   const [loggingInEmail, setLoggingInEmail] = useState<string | null>(null);
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleDemoLogin = async (demoEmail: string, demoPass: string, redirectUrl = '/dashboard') => {
     setLoggingInEmail(demoEmail);
@@ -166,16 +169,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between selection:bg-blue-600 selection:text-white">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-4">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
           <Logo href="/" size="md" className="shrink-0" />
 
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
             <ThemeToggle />
 
             <Link
               href="/cliente/login"
-              className="inline-flex px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shrink-0 items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
+              className="inline-flex px-3.5 py-2 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shrink-0 items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>Área do Cliente</span>
@@ -183,30 +187,100 @@ export default function LandingPage() {
 
             <Link
               href="/login"
-              className="px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shrink-0"
             >
               Entrar
             </Link>
             <Link
               href="/register"
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1 shrink-0"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5 shrink-0"
             >
               <span>Criar Conta</span>
-              <span className="hidden sm:inline">Grátis</span>
-              <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
+              <span>Grátis</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+
+          {/* Mobile Navigation */}
+          <div className="flex md:hidden items-center gap-1.5 shrink-0">
+            <ThemeToggle />
+
+            <Link
+              href="/login"
+              className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              Entrar
+            </Link>
+
+            <Link
+              href="/register"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs transition-all"
+            >
+              Cadastrar
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+              aria-label="Abrir menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-zinc-100 dark:border-zinc-800 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md px-4 py-3.5 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-lg">
+            <Link
+              href="/cliente/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200/70 dark:border-blue-800/70"
+            >
+              <Calendar className="w-4 h-4 text-blue-600 shrink-0" />
+              <div className="text-left">
+                <span className="block font-bold">Área do Cliente</span>
+                <span className="text-[10px] text-blue-600/80 font-normal">Acessar e consultar meus horários</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4 text-zinc-500 shrink-0" />
+              <div className="text-left">
+                <span className="block font-bold">Painel do Estabelecimento</span>
+                <span className="text-[10px] text-zinc-400 font-normal">Acesso para donos e profissionais</span>
+              </div>
+            </Link>
+
+            <Link
+              href="/register"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-xs"
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                <span>Criar Conta Grátis (7 Dias)</span>
+              </div>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+      <section className="relative pt-10 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[650px] h-[250px] sm:h-[350px] bg-blue-500/15 blur-[100px] sm:blur-[130px] pointer-events-none rounded-full" />
 
         <div className="relative max-w-4xl mx-auto space-y-5 sm:space-y-6">
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 max-w-full">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 max-w-full">
             <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
-            <span className="truncate sm:whitespace-normal">TáMarcado - Agendamento Inteligente para Negócios</span>
+            <span className="sm:hidden">Agendamento Inteligente para Negócios</span>
+            <span className="hidden sm:inline">TáMarcado - Agendamento Inteligente para Negócios</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.15]">
