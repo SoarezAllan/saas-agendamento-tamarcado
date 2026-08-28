@@ -217,7 +217,7 @@ export default function PublicBookingPage({
             </span>
           ) : (
             <Link
-              href="/cliente"
+              href="/cliente/login"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-3 py-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 shadow-xs"
             >
               <Calendar className="w-3.5 h-3.5 text-blue-600" />
@@ -227,7 +227,7 @@ export default function PublicBookingPage({
           <div className="flex items-center gap-2">
             {isDemoSlug && (
               <Link
-                href="/cliente"
+                href="/cliente/login"
                 className="inline-flex items-center gap-1 text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:text-blue-600 transition-colors px-2.5 py-1 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800"
               >
                 <User className="w-3 h-3 text-blue-600" />
@@ -237,8 +237,6 @@ export default function PublicBookingPage({
             <ThemeToggle />
           </div>
         </div>
-
-        {/* Business Header Card */}
         <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-xl shadow-zinc-200/50 dark:shadow-none border border-zinc-200/80 dark:border-zinc-800 mb-6">
           <div className="flex items-center gap-4">
             <div

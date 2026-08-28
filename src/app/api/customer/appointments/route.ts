@@ -6,27 +6,16 @@ import { dispatchAppointmentNotification } from '@/lib/notifications';
 export async function GET(req: NextRequest) {
   try {
     const session = await getSession(req);
-    if (!session) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session || session.role !== 'CUSTOMER') {
+      return NextResponse.json({ error: 'Não autorizado. Faça login como cliente.' }, { status: 401 });
     }
 
-    let customer = null;
-    if (session.role === 'CUSTOMER') {
-      customer = await db.customer.findUnique({
-        where: { id: session.userId },
-      });
-    } else if (session.email) {
-      customer = await db.customer.findUnique({
-        where: { email: session.email.toLowerCase().trim() },
-      });
-      if (!customer) {
-        customer = {
-          id: session.userId,
-          name: session.name,
-          email: session.email,
-          phone: '',
-        };
-      }
+    const customer = await db.customer.findUnique({
+      where: { id: session.userId },
+    });
+
+    if (!customer) {
+      return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 401 });
     }
 
     const searchEmail = session.email ? session.email.toLowerCase().trim() : (customer?.email || '');

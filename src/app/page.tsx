@@ -174,7 +174,7 @@ export default function LandingPage() {
             <ThemeToggle />
 
             <Link
-              href="/cliente"
+              href="/cliente/login"
               className="inline-flex px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors shrink-0 items-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60"
             >
               <Calendar className="w-3.5 h-3.5" />
