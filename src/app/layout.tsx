@@ -80,7 +80,11 @@ export const metadata: Metadata = {
     apple: '/icon.png',
   },
   verification: {
-    google: ['9DMDT4wpxflQDnwZoLPCJbwUqSwr8CfIUXiY3YBFh64', 'google6b3ef84142767305'],
+    google: [
+      'qtN5FuI_0ryTpnB0Zkqbl3jfpyxKxL7iQm6dCfvrC8U',
+      '9DMDT4wpxflQDnwZoLPCJbwUqSwr8CfIUXiY3YBFh64',
+      'google6b3ef84142767305',
+    ],
   },
   other: {
     'geo.region': 'BR',
