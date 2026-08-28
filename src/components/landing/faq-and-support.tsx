@@ -14,12 +14,12 @@ const FAQ_ITEMS = [
   {
     question: 'Como funciona o teste grátis de 7 dias?',
     answer:
-      'Você cria sua conta em menos de 2 minutos e ganha acesso imediato a todas as funcionalidades do sistema para testar com seus clientes e colaboradores. Não cobramos nada e não pedimos cartão no cadastro.',
+      'Você cria sua conta em menos de 2 minutos e ganha acesso imediato a todas as funcionalidades do sistema para testar com seus clientes e colaboradores durante todo o período de avaliação.',
   },
   {
-    question: 'Preciso cadastrar cartão de crédito para começar?',
+    question: 'Como funciona a assinatura após os 7 dias?',
     answer:
-      'Não! O teste é 100% gratuito. Você só escolhe um plano de assinatura se aprovar os resultados e quiser continuar recebendo agendamentos após os 7 dias.',
+      'Durante os 7 dias de teste você tem acesso total a todos os recursos da plataforma para automatizar seus agendamentos. Você tem total liberdade e controle sobre sua conta para gerenciar seu plano diretamente pelo painel a qualquer momento.',
   },
   {
     question: 'Como meus clientes fazem para agendar?',
