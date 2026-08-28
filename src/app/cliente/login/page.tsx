@@ -257,6 +257,42 @@ export default function CustomerLoginPage() {
           </p>
         </div>
 
+        {/* Profile Selector - Slim Version */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+              Tipo de Acesso
+            </span>
+            <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Modo Cliente Ativo
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80">
+            {/* Inactive Card: Dono / Gestor */}
+            <Link
+              href="/login"
+              className="py-2 px-2.5 rounded-xl bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border border-zinc-200/80 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-600 shadow-xs flex items-center justify-center gap-2 transition-all group"
+            >
+              <Shield className="w-4 h-4 text-zinc-400 group-hover:text-blue-600 shrink-0 transition-colors" />
+              <div className="text-left leading-none space-y-0.5 min-w-0">
+                <span className="text-xs font-bold block group-hover:text-blue-600 truncate">Dono / Gestor</span>
+                <span className="text-[9px] text-zinc-400 group-hover:text-blue-500 font-medium block truncate">Painel do Negócio</span>
+              </div>
+            </Link>
+
+            {/* Active Card: Área do Cliente */}
+            <div className="py-2 px-2.5 rounded-xl bg-blue-600 text-white shadow-xs flex items-center justify-center gap-2 cursor-default ring-1.5 ring-blue-600">
+              <User className="w-4 h-4 text-white shrink-0" />
+              <div className="text-left leading-none space-y-0.5 min-w-0">
+                <span className="text-xs font-black block truncate">Área do Cliente</span>
+                <span className="text-[9px] text-blue-100 font-medium block truncate">Meus Agendamentos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <Suspense
           fallback={
             <div className="bg-white dark:bg-zinc-900 py-12 px-6 rounded-3xl text-center">
