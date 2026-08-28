@@ -73,7 +73,12 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ business });
+    const response = NextResponse.json({ business });
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=15, stale-while-revalidate=60'
+    );
+    return response;
   } catch (error) {
     console.error('Public business info error:', error);
     return NextResponse.json(

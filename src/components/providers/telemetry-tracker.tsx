@@ -22,29 +22,37 @@ export function TelemetryTracker() {
     startTimeRef.current = Date.now();
     const currentSessionId = sessionIdRef.current;
 
-    // Send initial page view with rich client diagnostics
-    try {
-      const screenResolution = typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : undefined;
-      const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
+    // Send initial page view deferred to idle time (prevents blocking LCP/FCP)
+    const sendInitial = () => {
+      try {
+        const screenResolution =
+          typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : undefined;
+        const language = typeof navigator !== 'undefined' ? navigator.language : undefined;
 
-      fetch('/api/telemetry', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          path: pathname,
-          referrer: document.referrer || '',
-          sessionId: currentSessionId,
-          screenResolution,
-          language,
-          durationSeconds: 0,
-          isHeartbeat: false,
-        }),
-      }).catch(() => {});
-    } catch {
-      // Ignore
+        fetch('/api/telemetry', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: pathname,
+            referrer: document.referrer || '',
+            sessionId: currentSessionId,
+            screenResolution,
+            language,
+            durationSeconds: 0,
+            isHeartbeat: false,
+          }),
+        }).catch(() => {});
+      } catch {}
+    };
+
+    let idleId: any;
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleId = (window as any).requestIdleCallback(sendInitial, { timeout: 2000 });
+    } else {
+      idleId = setTimeout(sendInitial, 1000);
     }
 
-    // Heartbeat every 15 seconds to update duration
+    // Heartbeat every 30 seconds to update duration (reduced frequency for performance)
     const interval = setInterval(() => {
       const durationSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
       try {
@@ -58,30 +66,38 @@ export function TelemetryTracker() {
             isHeartbeat: true,
           }),
         }).catch(() => {});
-      } catch {
-        // Ignore
-      }
-    }, 15000);
+      } catch {}
+    }, 30000);
 
     return () => {
+      if (typeof window !== 'undefined' && 'cancelIdleCallback' in window && typeof idleId === 'number') {
+        (window as any).cancelIdleCallback(idleId);
+      } else {
+        clearTimeout(idleId);
+      }
       clearInterval(interval);
-      // Send final duration on unmount / route change
+
+      // Send final duration on unmount / route change using sendBeacon if available
       const finalDuration = Math.floor((Date.now() - startTimeRef.current) / 1000);
       if (finalDuration > 1) {
-        try {
-          fetch('/api/telemetry', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              path: pathname,
-              sessionId: currentSessionId,
-              durationSeconds: finalDuration,
-              isHeartbeat: true,
-            }),
-            keepalive: true,
-          }).catch(() => {});
-        } catch {
-          // Ignore
+        const payload = JSON.stringify({
+          path: pathname,
+          sessionId: currentSessionId,
+          durationSeconds: finalDuration,
+          isHeartbeat: true,
+        });
+
+        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+          navigator.sendBeacon('/api/telemetry', new Blob([payload], { type: 'application/json' }));
+        } else {
+          try {
+            fetch('/api/telemetry', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: payload,
+              keepalive: true,
+            }).catch(() => {});
+          } catch {}
         }
       }
     };
@@ -89,4 +105,3 @@ export function TelemetryTracker() {
 
   return null;
 }
-

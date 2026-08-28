@@ -316,6 +316,10 @@ export default function LandingPage() {
                       <img
                         src={biz.image}
                         alt={biz.name}
+                        loading="lazy"
+                        decoding="async"
+                        width={400}
+                        height={180}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                       />
                       <div className="absolute bottom-3 left-3">
