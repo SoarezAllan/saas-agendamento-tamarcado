@@ -153,11 +153,15 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
-      {/* Top Header Bar with Logo and ThemeToggle cleanly separated */}
-      <div className="w-full max-w-md mx-auto px-4 flex items-center justify-between">
-        <Logo href="/" size="md" />
+    <div className="relative min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-between py-6 sm:py-12 sm:px-6 lg:px-8">
+      {/* Top Right Theme Toggle */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
         <ThemeToggle />
+      </div>
+
+      {/* Centered Logo */}
+      <div className="w-full flex justify-center py-2">
+        <Logo href="/" size="md" />
       </div>
 
       <div className="my-auto sm:mx-auto sm:w-full sm:max-w-md px-4 py-4 space-y-6">
