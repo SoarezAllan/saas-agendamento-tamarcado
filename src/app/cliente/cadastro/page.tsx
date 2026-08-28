@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
-import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
 
 export default function CustomerRegisterPage() {
   const router = useRouter();
@@ -188,25 +187,7 @@ export default function CustomerRegisterPage() {
           )}
 
           {step === 'FORM' ? (
-            <>
-              {/* Google Fast Sign-In */}
-              <div className="space-y-2">
-                <GoogleSignInButton
-                  onSuccess={handleGoogleSuccess}
-                  text="Cadastrar com o Google"
-                  phone={phone}
-                />
-
-                <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-                  <span className="shrink mx-3 text-[11px] text-zinc-400 uppercase font-semibold">
-                    ou crie com e-mail
-                  </span>
-                  <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-                </div>
-              </div>
-
-              <form onSubmit={handleRequestCode} className="space-y-4">
+            <form onSubmit={handleRequestCode} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
                     Nome Completo <span className="text-rose-500">*</span>
@@ -310,7 +291,6 @@ export default function CustomerRegisterPage() {
                   )}
                 </button>
               </form>
-            </>
           ) : (
             <form onSubmit={handleVerifyAndRegister} className="space-y-4">
               <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 text-center space-y-1">

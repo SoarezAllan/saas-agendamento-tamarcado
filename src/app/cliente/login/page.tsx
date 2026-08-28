@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
-import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
 
 function CustomerLoginForm() {
   const router = useRouter();
@@ -62,22 +61,6 @@ function CustomerLoginForm() {
           {error}
         </div>
       )}
-
-      {/* Google Fast Login */}
-      <div className="space-y-2">
-        <GoogleSignInButton
-          onSuccess={handleGoogleSuccess}
-          text="Entrar com o Google"
-        />
-
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-          <span className="shrink mx-3 text-[11px] text-zinc-400 uppercase font-semibold">
-            ou com sua senha
-          </span>
-          <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

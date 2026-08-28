@@ -22,7 +22,6 @@ import {
 import { formatCurrency, formatDuration } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { GoogleSignInButton } from '@/components/auth/google-sign-in-button';
 
 interface CustomerStepProps {
   service: {
@@ -551,22 +550,6 @@ export function CustomerStep({
         /* SCENARIO 3: CLIENT LOGIN TAB (ALREADY HAS AN ACCOUNT)                     */
         /* ========================================================================= */
         <form onSubmit={handleLoginSubmit} className="space-y-4 animate-in fade-in">
-          <div className="space-y-2">
-            <GoogleSignInButton
-              onSuccess={handleGoogleSuccess}
-              text="Entrar com o Google"
-              phone={phone}
-            />
-
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-              <span className="shrink mx-3 text-[11px] text-zinc-400 uppercase font-semibold">
-                ou entre com sua senha
-              </span>
-              <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-            </div>
-          </div>
-
           <div>
             <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
               E-mail ou WhatsApp cadastrado
@@ -621,25 +604,9 @@ export function CustomerStep({
         </form>
       ) : (
         /* ========================================================================= */
-        /* SCENARIO 4: NEW CLIENT REGISTRATION (EMAIL PIN OR 1-CLICK GOOGLE)         */
+        /* SCENARIO 4: NEW CLIENT REGISTRATION (WITH 6-DIGIT EMAIL PIN)              */
         /* ========================================================================= */
         <form onSubmit={handleSendCode} className="space-y-4">
-          {/* Google 1-Click Fast Auth Button */}
-          <div className="space-y-2">
-            <GoogleSignInButton
-              onSuccess={handleGoogleSuccess}
-              text="Conectar com o Google (Sem Verificação)"
-              phone={phone}
-            />
-
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-              <span className="shrink mx-3 text-[11px] text-zinc-400 uppercase font-semibold">
-                ou cadastre-se com e-mail
-              </span>
-              <div className="flex-grow border-t border-zinc-200 dark:border-zinc-800"></div>
-            </div>
-          </div>
 
           <div>
             <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">
