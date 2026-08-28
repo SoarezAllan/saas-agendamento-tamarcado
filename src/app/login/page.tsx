@@ -223,6 +223,21 @@ function LoginForm() {
         </button>
       </form>
 
+      {/* Customer Area Callout */}
+      <div className="p-3.5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 flex items-center justify-between text-xs">
+        <div className="space-y-0.5">
+          <span className="font-bold text-blue-900 dark:text-blue-200 block">É cliente de um serviço?</span>
+          <span className="text-[11px] text-blue-700 dark:text-blue-400 block">Consulte seus horários marcados</span>
+        </div>
+        <Link
+          href="/cliente/login"
+          className="px-3 py-1.5 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition-colors shrink-0 flex items-center gap-1 text-[11px]"
+        >
+          <span>Área do Cliente</span>
+          <ArrowRight className="w-3 h-3" />
+        </Link>
+      </div>
+
       <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
         Ainda não tem conta para o seu negócio?{' '}
         <Link href="/register" className="text-blue-600 font-bold hover:underline">
@@ -254,6 +269,24 @@ export default function LoginPage() {
           <p className="mt-1 text-xs text-zinc-500">
             Entre com sua conta de administrador ou profissional
           </p>
+        </div>
+
+        {/* Profile Mode Switcher Tabs */}
+        <div className="flex p-1 bg-zinc-200/80 dark:bg-zinc-800 rounded-2xl">
+          <button
+            type="button"
+            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-xs flex items-center justify-center gap-1.5 cursor-default"
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>Dono / Gestor</span>
+          </button>
+          <Link
+            href="/cliente/login"
+            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Área do Cliente</span>
+          </Link>
         </div>
 
         <Suspense

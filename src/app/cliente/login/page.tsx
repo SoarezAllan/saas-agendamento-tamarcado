@@ -11,6 +11,7 @@ import {
   Calendar,
   Sparkles,
   ShieldCheck,
+  Shield,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Logo } from '@/components/ui/logo';
@@ -254,6 +255,24 @@ export default function CustomerLoginPage() {
           <p className="text-xs text-zinc-500 max-w-xs mx-auto">
             Consulte seus horários marcados, remarque ou cancele serviços em um só lugar
           </p>
+        </div>
+
+        {/* Profile Mode Switcher Tabs */}
+        <div className="flex p-1 bg-zinc-200/80 dark:bg-zinc-800 rounded-2xl">
+          <button
+            type="button"
+            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-xs flex items-center justify-center gap-1.5 cursor-default"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Área do Cliente</span>
+          </button>
+          <Link
+            href="/login"
+            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <Shield className="w-3.5 h-3.5" />
+            <span>Dono / Gestor</span>
+          </Link>
         </div>
 
         <Suspense
