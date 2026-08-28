@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     apple: '/icon.png',
   },
   verification: {
-    google: 'google6b3ef84142767305',
+    google: ['9DMDT4wpxflQDnwZoLPCJbwUqSwr8CfIUXiY3YBFh64', 'google6b3ef84142767305'],
   },
   other: {
     'geo.region': 'BR',
