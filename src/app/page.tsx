@@ -202,9 +202,7 @@ export default function LandingPage() {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="flex md:hidden items-center gap-1.5 shrink-0">
-            <ThemeToggle />
-
+          <div className="flex md:hidden items-center gap-1 sm:gap-2 shrink-0">
             <Link
               href="/login"
               className="px-2.5 py-1.5 rounded-lg text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
@@ -222,7 +220,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer ml-0.5"
               aria-label="Abrir menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -232,7 +230,7 @@ export default function LandingPage() {
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-zinc-100 dark:border-zinc-800 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md px-4 py-3.5 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-lg">
+          <div className="md:hidden border-t border-zinc-100 dark:border-zinc-800 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md px-4 py-3.5 space-y-2.5 animate-in slide-in-from-top-2 duration-200 shadow-lg">
             <Link
               href="/cliente/login"
               onClick={() => setMobileMenuOpen(false)}
@@ -268,6 +266,14 @@ export default function LandingPage() {
               </div>
               <ArrowRight className="w-4 h-4" />
             </Link>
+
+            {/* Mobile Theme Toggle */}
+            <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between px-1">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Aparência (Claro / Escuro)
+              </span>
+              <ThemeToggle showLabel />
+            </div>
           </div>
         )}
       </header>
