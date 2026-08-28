@@ -272,19 +272,19 @@ export default function LoginPage() {
         </div>
 
         {/* Profile Mode Switcher Tabs */}
-        <div className="flex p-1 bg-zinc-200/80 dark:bg-zinc-800 rounded-2xl">
+        <div className="flex p-1.5 bg-zinc-200/90 dark:bg-zinc-800/90 rounded-2xl border border-zinc-300/80 dark:border-zinc-700/80 shadow-xs">
           <button
             type="button"
-            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-xs flex items-center justify-center gap-1.5 cursor-default"
+            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-black bg-blue-600 text-white shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 cursor-default transition-all"
           >
-            <Shield className="w-3.5 h-3.5" />
+            <Shield className="w-4 h-4 text-white" />
             <span>Dono / Gestor</span>
           </button>
           <Link
             href="/cliente/login"
-            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 flex items-center justify-center gap-1.5 transition-colors"
+            className="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 flex items-center justify-center gap-2 transition-all"
           >
-            <User className="w-3.5 h-3.5" />
+            <User className="w-4 h-4 text-zinc-500 dark:text-zinc-400" />
             <span>Área do Cliente</span>
           </Link>
         </div>

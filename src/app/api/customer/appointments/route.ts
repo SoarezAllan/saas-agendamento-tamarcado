@@ -18,13 +18,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 401 });
     }
 
-    const searchEmail = session.email ? session.email.toLowerCase().trim() : (customer?.email || '');
-    const searchPhone = customer?.phone || '';
+    const searchEmail = customer.email ? customer.email.toLowerCase().trim() : '';
+    const searchPhone = customer.phone || '';
 
     const appointments = await db.appointment.findMany({
       where: {
         OR: [
-          ...(customer?.id ? [{ customerId: customer.id }] : []),
+          { customerId: customer.id },
           ...(searchPhone ? [{ customerPhone: searchPhone }] : []),
           ...(searchEmail ? [{ customerEmail: searchEmail }] : []),
         ],
